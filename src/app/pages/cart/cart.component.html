@@ -43,15 +43,15 @@
           <div *ngIf="cartItems.length > 0" class="cart-items-list">
             <div *ngFor="let item of cartItems; let i = index" class="cart-item">
               <div class="item-image">
-                <img [src]="item.image" [alt]="item.name">
-                <div *ngIf="!item.inStock" class="out-of-stock-badge">
+                <img [src]="item.image_url || 'assets/placeholder-image.jpg'" [alt]="item.name">
+                <div *ngIf="item.stock === 0" class="out-of-stock-badge">
                   Нет в наличии
                 </div>
               </div>
               
               <div class="item-details">
                 <h3 class="item-name">{{ item.name }}</h3>
-                <p class="item-category">{{ item.category }}</p>
+                <p class="item-category">{{ item.category_slug }}</p>
                 <div class="item-price">{{ formatPrice(item.price) }}</div>
               </div>
               
@@ -187,7 +187,7 @@
       <div class="recommended-grid">
         <div *ngFor="let product of recommendedProducts" class="recommended-card">
           <div class="product-image">
-            <img [src]="product.image" [alt]="product.name">
+            <img [src]="product.image_url || 'assets/placeholder-image.jpg'" [alt]="product.name">
           </div>
           <div class="product-info">
             <h4>{{ product.name }}</h4>

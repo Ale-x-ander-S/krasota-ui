@@ -18,22 +18,19 @@ import { ProductService, Product, ProductFilters, ProductResponse } from '../../
   styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit, OnDestroy {
-  products: Product[] = [];
-  filteredProducts: Product[] = [];
-  categories: string[] = [];
-  selectedCategory: string = '';
-  searchTerm: string = '';
-  sortBy: string = 'name';
   viewMode: 'grid' | 'list' = 'grid';
-  
-  // Состояние загрузки
+  searchTerm: string = '';
+  selectedCategory: string = '';
+  currentSort: string = 'name-asc';
+  products: Product[] = [];
+  categories: string[] = [];
   loading: boolean = false;
   error: string | null = null;
-  
-  // Пагинация
   currentPage: number = 1;
   totalProducts: number = 0;
   productsPerPage: number = 10;
+  
+  filters: ProductFilters = {};
   
   @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
 
@@ -79,18 +76,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    const filters: ProductFilters = {
-      search: this.searchTerm,
-      category: this.selectedCategory,
-      sortBy: this.sortBy as any
-    };
-
-    this.productService.getProducts(filters, this.currentPage, this.productsPerPage)
+    this.productService.getProducts(this.filters, this.currentPage, this.productsPerPage)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: ProductResponse) => {
           this.products = response.products;
-          this.filteredProducts = response.products;
           this.totalProducts = response.total;
           this.loading = false;
         },
@@ -116,20 +106,68 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   filterProducts() {
-    this.currentPage = 1; // Сбрасываем на первую страницу
+    this.currentPage = 1;
+    this.filters = {
+      search: this.searchTerm || undefined,
+      category_id: this.selectedCategory || undefined,
+      sort: this.filters.sort,
+      order: this.filters.order
+    };
     this.loadProducts();
+  }
+
+  onSearchChange() {
+    this.filterProducts();
   }
 
   onCategoryChange() {
     this.filterProducts();
   }
 
-  onSearchChange() {
-    // Поиск уже настроен через debounce
+  onSortChange(sortBy: string) {
+    this.currentSort = sortBy;
+    
+    // Парсим параметры сортировки
+    let sort: 'name' | 'price' | 'created_at' = 'name';
+    let order: 'asc' | 'desc' = 'asc';
+    
+    switch (sortBy) {
+      case 'price-asc':
+        sort = 'price';
+        order = 'asc';
+        break;
+      case 'price-desc':
+        sort = 'price';
+        order = 'desc';
+        break;
+      case 'name-asc':
+        sort = 'name';
+        order = 'asc';
+        break;
+      case 'name-desc':
+        sort = 'name';
+        order = 'desc';
+        break;
+      case 'newest':
+        sort = 'created_at';
+        order = 'desc';
+        break;
+      case 'oldest':
+        sort = 'created_at';
+        order = 'asc';
+        break;
+      default:
+        sort = 'name';
+        order = 'asc';
+    }
+    
+    this.filters = { ...this.filters, sort, order };
+    this.filterProducts();
   }
 
-  onSortChange() {
-    this.filterProducts();
+  onSortChangeEvent(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.onSortChange(target.value);
   }
 
   toggleViewMode(mode: 'grid' | 'list') {
@@ -143,7 +181,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   addToCart(event: Event, product: Product) {
     event.stopPropagation();
     
-    if (!product.inStock) return;
+    if (product.stock === 0) return;
     
     this.store.dispatch(new AddToCart(product));
   }
@@ -200,5 +238,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const start = (this.currentPage - 1) * this.productsPerPage + 1;
     const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
     return `Показано ${start}-${end} из ${this.totalProducts} товаров`;
+  }
+
+  onPriceFilterChange() {
+    // Получаем значения из полей ввода
+    const minPriceInput = document.getElementById('min-price') as HTMLInputElement;
+    const maxPriceInput = document.getElementById('max-price') as HTMLInputElement;
+    
+    const minPrice = minPriceInput?.value ? Number(minPriceInput.value) : undefined;
+    const maxPrice = maxPriceInput?.value ? Number(maxPriceInput.value) : undefined;
+    
+    this.filters = { 
+      ...this.filters, 
+      min_price: minPrice,
+      max_price: maxPrice
+    };
+    
+    this.filterProducts();
   }
 }
