@@ -21,7 +21,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   viewMode: 'grid' | 'list' = 'grid';
   searchTerm: string = '';
   selectedCategory: string = '';
-  currentSort: string = 'name-asc';
+
   products: Product[] = [];
   categories: string[] = [];
   loading: boolean = false;
@@ -110,8 +110,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.filters = {
       search: this.searchTerm || undefined,
       category_id: this.selectedCategory || undefined,
-      sort: this.filters.sort,
-      order: this.filters.order
+
     };
     this.loadProducts();
   }
@@ -124,51 +123,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.filterProducts();
   }
 
-  onSortChange(sortBy: string) {
-    this.currentSort = sortBy;
-    
-    // Парсим параметры сортировки
-    let sort: 'name' | 'price' | 'created_at' = 'name';
-    let order: 'asc' | 'desc' = 'asc';
-    
-    switch (sortBy) {
-      case 'price-asc':
-        sort = 'price';
-        order = 'asc';
-        break;
-      case 'price-desc':
-        sort = 'price';
-        order = 'desc';
-        break;
-      case 'name-asc':
-        sort = 'name';
-        order = 'asc';
-        break;
-      case 'name-desc':
-        sort = 'name';
-        order = 'desc';
-        break;
-      case 'newest':
-        sort = 'created_at';
-        order = 'desc';
-        break;
-      case 'oldest':
-        sort = 'created_at';
-        order = 'asc';
-        break;
-      default:
-        sort = 'name';
-        order = 'asc';
-    }
-    
-    this.filters = { ...this.filters, sort, order };
-    this.filterProducts();
-  }
 
-  onSortChangeEvent(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.onSortChange(target.value);
-  }
 
   toggleViewMode(mode: 'grid' | 'list') {
     this.viewMode = mode;

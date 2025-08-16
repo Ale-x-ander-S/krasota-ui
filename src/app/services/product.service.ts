@@ -17,7 +17,6 @@ export interface Product {
   size: string;
   is_active: boolean;
   is_featured: boolean;
-  sort_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -27,8 +26,6 @@ export interface ProductFilters {
   search?: string;
   min_price?: number;
   max_price?: number;
-  sort?: 'name' | 'price' | 'created_at';
-  order?: 'asc' | 'desc';
 }
 
 export interface ProductResponse {
@@ -61,7 +58,6 @@ export class ProductService {
       size: '6.1"',
       is_active: true,
       is_featured: true,
-      sort_order: 1,
       created_at: '2023-01-01T10:00:00Z',
       updated_at: '2023-01-01T10:00:00Z'
     },
@@ -79,7 +75,6 @@ export class ProductService {
       size: '13.3"',
       is_active: true,
       is_featured: false,
-      sort_order: 2,
       created_at: '2023-01-02T10:00:00Z',
       updated_at: '2023-01-02T10:00:00Z'
     },
@@ -97,7 +92,6 @@ export class ProductService {
       size: 'S',
       is_active: true,
       is_featured: true,
-      sort_order: 3,
       created_at: '2023-01-03T10:00:00Z',
       updated_at: '2023-01-03T10:00:00Z'
     },
@@ -115,7 +109,6 @@ export class ProductService {
       size: '42',
       is_active: true,
       is_featured: false,
-      sort_order: 4,
       created_at: '2023-01-04T10:00:00Z',
       updated_at: '2023-01-04T10:00:00Z'
     },
@@ -133,7 +126,6 @@ export class ProductService {
       size: '32',
       is_active: true,
       is_featured: true,
-      sort_order: 5,
       created_at: '2023-01-05T10:00:00Z',
       updated_at: '2023-01-05T10:00:00Z'
     },
@@ -151,7 +143,6 @@ export class ProductService {
       size: 'Medium',
       is_active: true,
       is_featured: false,
-      sort_order: 6,
       created_at: '2023-01-06T10:00:00Z',
       updated_at: '2023-01-06T10:00:00Z'
     },
@@ -169,7 +160,6 @@ export class ProductService {
       size: '41mm',
       is_active: true,
       is_featured: true,
-      sort_order: 7,
       created_at: '2023-01-07T10:00:00Z',
       updated_at: '2023-01-07T10:00:00Z'
     },
@@ -187,7 +177,6 @@ export class ProductService {
       size: 'L',
       is_active: true,
       is_featured: false,
-      sort_order: 8,
       created_at: '2023-01-08T10:00:00Z',
       updated_at: '2023-01-08T10:00:00Z'
     },
@@ -206,7 +195,6 @@ export class ProductService {
       size: '280.6 x 214.9 x 6.4 mm',
       is_active: true,
       is_featured: true,
-      sort_order: 9,
       created_at: '2023-01-09T10:00:00Z',
       updated_at: '2023-01-09T10:00:00Z'
     },
@@ -224,7 +212,6 @@ export class ProductService {
       size: '390 x 260 x 104 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 10,
       created_at: '2023-01-10T10:00:00Z',
       updated_at: '2023-01-10T10:00:00Z'
     },
@@ -242,7 +229,6 @@ export class ProductService {
       size: '167 x 185 x 71 mm',
       is_active: true,
       is_featured: true,
-      sort_order: 11,
       created_at: '2023-01-11T10:00:00Z',
       updated_at: '2023-01-11T10:00:00Z'
     },
@@ -260,7 +246,6 @@ export class ProductService {
       size: 'EU 42',
       is_active: true,
       is_featured: false,
-      sort_order: 12,
       created_at: '2023-01-12T10:00:00Z',
       updated_at: '2023-01-12T10:00:00Z'
     },
@@ -278,7 +263,6 @@ export class ProductService {
       size: 'L',
       is_active: true,
       is_featured: false,
-      sort_order: 13,
       created_at: '2023-01-13T10:00:00Z',
       updated_at: '2023-01-13T10:00:00Z'
     },
@@ -296,7 +280,6 @@ export class ProductService {
       size: '58mm',
       is_active: true,
       is_featured: false,
-      sort_order: 14,
       created_at: '2023-01-14T10:00:00Z',
       updated_at: '2023-01-14T10:00:00Z'
     },
@@ -314,7 +297,6 @@ export class ProductService {
       size: '43 x 30 x 16 cm',
       is_active: true,
       is_featured: false,
-      sort_order: 15,
       created_at: '2023-01-15T10:00:00Z',
       updated_at: '2023-01-15T10:00:00Z'
     },
@@ -332,7 +314,6 @@ export class ProductService {
       size: '430 x 20 x 15 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 16,
       created_at: '2023-01-16T10:00:00Z',
       updated_at: '2023-01-16T10:00:00Z'
     },
@@ -350,7 +331,6 @@ export class ProductService {
       size: '124.9 x 84.3 x 51 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 17,
       created_at: '2023-01-17T10:00:00Z',
       updated_at: '2023-01-17T10:00:00Z'
     },
@@ -368,7 +348,6 @@ export class ProductService {
       size: '612 x 363 x 65 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 18,
       created_at: '2023-01-18T10:00:00Z',
       updated_at: '2023-01-18T10:00:00Z'
     },
@@ -386,7 +365,6 @@ export class ProductService {
       size: '450 x 400 x 2 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 19,
       created_at: '2023-01-19T10:00:00Z',
       updated_at: '2023-01-19T10:00:00Z'
     },
@@ -404,7 +382,6 @@ export class ProductService {
       size: '85 x 57 x 8 mm',
       is_active: true,
       is_featured: false,
-      sort_order: 20,
       created_at: '2023-01-20T10:00:00Z',
       updated_at: '2023-01-20T10:00:00Z'
     }
@@ -502,27 +479,7 @@ export class ProductService {
       filtered = filtered.filter(p => p.price <= filters.max_price!);
     }
 
-    // Сортировка
-    if (filters.sort) {
-      filtered = this.sortProducts(filtered, filters.sort, filters.order);
-    }
-
     return filtered;
-  }
-
-  private sortProducts(products: Product[], sortBy: string, order: string = 'asc'): Product[] {
-    const sorted = [...products];
-    
-    switch (sortBy) {
-      case 'price':
-        return sorted.sort((a, b) => a.price - b.price);
-      case 'name':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'created_at':
-        return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      default:
-        return sorted;
-    }
   }
 
   private paginateProducts(products: Product[], page: number, limit: number): ProductResponse {
@@ -547,8 +504,6 @@ export class ProductService {
     if (filters.category_id) params = params.set('category_id', filters.category_id);
     if (filters.min_price) params = params.set('min_price', filters.min_price.toString());
     if (filters.max_price) params = params.set('max_price', filters.max_price.toString());
-    if (filters.sort) params = params.set('sort', filters.sort);
-    if (filters.order) params = params.set('order', filters.order);
 
     return params;
   }

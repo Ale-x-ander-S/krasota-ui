@@ -51,22 +51,7 @@
           </select>
         </div>
 
-        <!-- Sort -->
-        <div class="filter-group">
-          <label for="sort">Сортировка:</label>
-          <select 
-            class="sort-select" 
-            [value]="currentSort"
-            (change)="onSortChangeEvent($event)"
-          >
-            <option value="name-asc">По названию (А-Я)</option>
-            <option value="name-desc">По названию (Я-А)</option>
-            <option value="price-asc">По цене (по возрастанию)</option>
-            <option value="price-desc">По цене (по убыванию)</option>
-            <option value="newest">Сначала новые</option>
-            <option value="oldest">Сначала старые</option>
-          </select>
-        </div>
+
       </div>
     </section>
 
