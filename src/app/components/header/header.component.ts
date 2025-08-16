@@ -53,4 +53,9 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/cart']);
     this.closeMobileMenu();
   }
+
+  reloadPage() {
+    // Перезагружаем текущую страницу
+    window.location.reload();
+  }
 }

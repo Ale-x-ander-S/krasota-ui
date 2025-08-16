@@ -41,13 +41,22 @@ $border-radius: 8px;
       display: flex;
       align-items: center;
       gap: 12px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: $border-radius;
 
       &:hover {
         transform: scale(1.05);
+        background: rgba($primary-color, 0.05);
         
         .logo-icon svg {
           transform: rotate(15deg) scale(1.1);
         }
+      }
+
+      &:active {
+        transform: scale(0.98);
+        background: rgba($primary-color, 0.1);
       }
     }
 

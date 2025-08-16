@@ -34,7 +34,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   totalProducts: number = 0;
   productsPerPage: number = 10;
-
+  
   @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
 
   private destroy$ = new Subject<void>();
@@ -164,20 +164,41 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   get pageNumbers(): number[] {
     const pages: number[] = [];
-    const maxPages = Math.min(5, this.totalPages); // Показываем максимум 5 страниц
+    const maxVisiblePages = 7; // Показываем максимум 7 страниц
     
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
-    let endPage = Math.min(this.totalPages, startPage + maxPages - 1);
-    
-    // Корректируем если выходим за границы
-    if (endPage - startPage + 1 < maxPages) {
-      startPage = Math.max(1, endPage - maxPages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+    if (this.totalPages <= maxVisiblePages) {
+      // Если страниц мало, показываем все
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Если страниц много, показываем умно
+      const leftSide = Math.floor(maxVisiblePages / 2);
+      const rightSide = maxVisiblePages - leftSide - 1;
+      
+      let startPage = Math.max(1, this.currentPage - leftSide);
+      let endPage = Math.min(this.totalPages, this.currentPage + rightSide);
+      
+      // Корректируем границы
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        if (startPage === 1) {
+          endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+        } else {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
     }
     
     return pages;
+  }
+
+  get pageInfo(): string {
+    const start = (this.currentPage - 1) * this.productsPerPage + 1;
+    const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
+    return `Показано ${start}-${end} из ${this.totalProducts} товаров`;
   }
 }

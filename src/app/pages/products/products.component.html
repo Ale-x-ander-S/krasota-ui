@@ -151,30 +151,58 @@
 
       <!-- Pagination -->
       <div *ngIf="totalPages > 1" class="pagination">
-        <button 
-          class="page-btn" 
-          [disabled]="currentPage === 1"
-          (click)="onPageChange(currentPage - 1)"
-        >
-          ←
-        </button>
-        
-        <button 
-          *ngFor="let page of pageNumbers"
-          class="page-btn"
-          [class.active]="page === currentPage"
-          (click)="onPageChange(page)"
-        >
-          {{ page }}
-        </button>
-        
-        <button 
-          class="page-btn" 
-          [disabled]="currentPage === totalPages"
-          (click)="onPageChange(currentPage + 1)"
-        >
-          →
-        </button>
+        <!-- Page Info -->
+        <div class="page-info">
+          {{ pageInfo }}
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1"
+            (click)="onPageChange(1)"
+            title="Первая страница"
+          >
+            ««
+          </button>
+          
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1"
+            (click)="onPageChange(currentPage - 1)"
+            title="Предыдущая страница"
+          >
+            «
+          </button>
+          
+          <button 
+            *ngFor="let page of pageNumbers"
+            class="page-btn"
+            [class.active]="page === currentPage"
+            (click)="onPageChange(page)"
+          >
+            {{ page }}
+          </button>
+          
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages"
+            (click)="onPageChange(currentPage + 1)"
+            title="Следующая страница"
+          >
+            »
+          </button>
+          
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages"
+            (click)="onPageChange(totalPages)"
+            title="Последняя страница"
+          >
+            »»
+          </button>
+        </div>
       </div>
     </section>
   </div>
