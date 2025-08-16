@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
+import { Store, Select } from '@ngxs/store';
+import { AddToCart, CartStateClass } from '../../store/cart';
+import { Observable } from 'rxjs';
 
 interface Product {
   id: number;
@@ -30,8 +33,12 @@ export class ProductsComponent implements OnInit {
   sortBy: string = 'name';
   viewMode: 'grid' | 'list' = 'grid'; // Добавляем режим отображения
 
+  @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private store: Store
+  ) {}
 
   ngOnInit() {
     this.loadProducts();
@@ -167,14 +174,7 @@ export class ProductsComponent implements OnInit {
     
     if (!product.inStock) return;
     
-    // Здесь будет логика добавления в корзину
-    // Пока что просто показываем уведомление
-    alert(`${product.name} добавлен в корзину!`);
-    
-    // В будущем здесь можно добавить:
-    // - Сохранение в localStorage
-    // - Отправку в сервис корзины
-    // - Обновление счетчика в хедере
+    this.store.dispatch(new AddToCart(product));
   }
 
   getCartItemCount(): number {
