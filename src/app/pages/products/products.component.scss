@@ -605,6 +605,19 @@ body {
         font-size: 0.8rem;
         font-weight: 600;
       }
+
+      .rating-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+      }
     }
 
     .product-info {
@@ -659,6 +672,23 @@ body {
           gap: 5px;
           color: $accent-color;
           font-size: 0.9rem;
+        }
+      }
+
+      .product-details {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-size: 0.85rem;
+        color: $text-secondary;
+
+        .product-brand {
+          font-weight: 600;
+          color: $primary-color;
+        }
+
+        .product-weight {
+          opacity: 0.8;
         }
       }
 
@@ -827,4 +857,55 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+// Error State
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+
+  @include mobile {
+    padding: 40px 20px;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    margin: 0 0 10px 0;
+    color: $danger-color;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 20px 0;
+    color: $text-secondary;
+    font-size: 1rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: $primary-color;
+    color: white;
+    text-decoration: none;
+    border-radius: $border-radius;
+    font-weight: 500;
+    transition: $transition;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: darken($primary-color, 10%);
+      transform: translateY(-2px);
+    }
+  }
 }
