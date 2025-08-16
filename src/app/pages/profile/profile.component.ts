@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer';
 
 interface UserProfile {
   firstName: string;
@@ -55,7 +56,7 @@ interface UserSettings {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })

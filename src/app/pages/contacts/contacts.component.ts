@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer';
 
 interface FaqItem {
   question: string;
@@ -22,7 +23,7 @@ interface ContactForm {
 @Component({
   selector: 'app-contacts',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss']
 })

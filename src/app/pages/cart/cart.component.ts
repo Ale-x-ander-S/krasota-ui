@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer';
 
 interface CartItem {
   id: number;
@@ -26,7 +27,7 @@ interface Product {
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })

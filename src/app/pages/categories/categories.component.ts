@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer';
 
 interface Product {
   id: number;
@@ -25,7 +26,7 @@ interface Category {
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, FooterComponent],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss']
 })

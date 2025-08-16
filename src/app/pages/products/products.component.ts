@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer';
 import { Store, Select } from '@ngxs/store';
 import { AddToCart } from '../../store/cart/cart.actions';
 import { CartStateClass } from '../../store/cart';
@@ -12,7 +13,7 @@ import { ProductService, Product, ProductFilters, ProductResponse } from '../../
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
