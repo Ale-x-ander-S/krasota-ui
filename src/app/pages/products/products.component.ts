@@ -239,21 +239,4 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
     return `Показано ${start}-${end} из ${this.totalProducts} товаров`;
   }
-
-  onPriceFilterChange() {
-    // Получаем значения из полей ввода
-    const minPriceInput = document.getElementById('min-price') as HTMLInputElement;
-    const maxPriceInput = document.getElementById('max-price') as HTMLInputElement;
-    
-    const minPrice = minPriceInput?.value ? Number(minPriceInput.value) : undefined;
-    const maxPrice = maxPriceInput?.value ? Number(maxPriceInput.value) : undefined;
-    
-    this.filters = { 
-      ...this.filters, 
-      min_price: minPrice,
-      max_price: maxPrice
-    };
-    
-    this.filterProducts();
-  }
 }
