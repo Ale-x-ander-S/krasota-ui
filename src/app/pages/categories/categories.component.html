@@ -1,0 +1,175 @@
+<!-- Header с навигацией -->
+<app-header></app-header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Категории товаров</h1>
+        <p class="hero-subtitle">
+          Исследуйте наш широкий ассортимент товаров, организованный по категориям 
+          для удобного поиска и выбора
+        </p>
+      </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+      <div class="filters-container">
+        <!-- Search -->
+        <div class="filter-group">
+          <label for="search">Поиск по категориям:</label>
+          <input 
+            type="text" 
+            id="search" 
+            placeholder="Найти категорию или товар..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          >
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <label for="category">Фильтр категорий:</label>
+          <select 
+            id="category" 
+            [(ngModel)]="selectedCategory"
+            (change)="onCategoryChange()"
+            class="category-select"
+          >
+            <option value="">Все категории</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="filter-group">
+          <button class="clear-filters-btn" (click)="clearFilters()">
+            Очистить фильтры
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Overview -->
+    <section class="categories-overview">
+      <div class="section-header">
+        <h2>Обзор категорий</h2>
+        <p>Найдено категорий: {{ getFilteredCategories().length }}</p>
+      </div>
+      
+      <div class="categories-grid">
+        <div *ngFor="let category of getFilteredCategories()" class="category-card">
+          <div class="category-header">
+            <div class="category-icon">{{ category.icon }}</div>
+            <div class="category-info">
+              <h3 class="category-name">{{ category.name }}</h3>
+              <div class="category-count">{{ category.productCount }} товаров</div>
+            </div>
+          </div>
+          
+          <div class="category-description">
+            <p>{{ category.description }}</p>
+          </div>
+
+          <!-- Category Products Preview -->
+          <div class="products-preview" *ngIf="getFilteredProducts(category).length > 0">
+            <h4>Популярные товары в категории:</h4>
+            <div class="products-grid">
+              <div 
+                *ngFor="let product of getFilteredProducts(category).slice(0, 3)" 
+                class="product-preview-card"
+                [class.out-of-stock]="!product.inStock"
+                (click)="goToProduct(product.id)"
+                style="cursor: pointer;"
+              >
+                <div class="product-image">
+                  <img [src]="product.image" [alt]="product.name">
+                  <div *ngIf="!product.inStock" class="out-of-stock-badge">
+                    Нет в наличии
+                  </div>
+                </div>
+                
+                <div class="product-info">
+                  <h5 class="product-name">{{ product.name }}</h5>
+                  <div class="product-price">{{ formatPrice(product.price) }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="view-all-products" *ngIf="getFilteredProducts(category).length > 3">
+              <a routerLink="/products" [queryParams]="{category: category.name}" class="view-all-btn">
+                Посмотреть все товары в категории "{{ category.name }}"
+              </a>
+            </div>
+          </div>
+
+          <!-- Empty State for Category -->
+          <div class="empty-category" *ngIf="getFilteredProducts(category).length === 0">
+            <p>В данной категории товары не найдены</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State for All Categories -->
+      <div *ngIf="getFilteredCategories().length === 0" class="empty-state">
+        <h3>Категории не найдены</h3>
+        <p>Попробуйте изменить параметры поиска</p>
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Очистить фильтры
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="quick-stats">
+      <div class="stats-container">
+        <div class="stat-item">
+          <div class="stat-number">{{ categories.length }}</div>
+          <div class="stat-label">Категорий</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ getTotalProducts() }}</div>
+          <div class="stat-label">Всего товаров</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ getTotalInStock() }}</div>
+          <div class="stat-label">В наличии</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Krasota72</h4>
+        <p>Ваш надежный интернет-магазин</p>
+      </div>
+      <div class="footer-section">
+        <h4>Контакты</h4>
+        <p>Email: info&#64;krasota72.ru</p>
+        <p>Телефон: +7 (999) 123-45-67</p>
+      </div>
+      <div class="footer-section">
+        <h4>Мы в соцсетях</h4>
+        <div class="social-links">
+          <a href="#" class="social-link">VK</a>
+          <a href="#" class="social-link">Telegram</a>
+          <a href="#" class="social-link">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Krasota72. Все права защищены.</p>
+    </div>
+  </div>
+</footer>

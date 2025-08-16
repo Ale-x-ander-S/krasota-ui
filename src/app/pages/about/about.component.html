@@ -1,0 +1,134 @@
+<!-- Header с навигацией -->
+<app-header></app-header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">О компании Krasota72</h1>
+        <p class="hero-subtitle">
+          Мы создаем будущее онлайн-торговли, предлагая инновационные решения 
+          и исключительный сервис для наших клиентов
+        </p>
+      </div>
+    </section>
+
+    <!-- Company Mission -->
+    <section class="mission-section">
+      <div class="section-content">
+        <h2>Наша миссия</h2>
+        <p class="mission-text">
+          Сделать качественные товары доступными каждому, создавая удобную и безопасную 
+          платформу для онлайн-покупок. Мы стремимся к тому, чтобы каждый клиент 
+          получал не только нужный товар, но и отличный опыт покупки.
+        </p>
+      </div>
+    </section>
+
+    <!-- Company Stats -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div *ngFor="let stat of companyStats" class="stat-card">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-number">{{ stat.number }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Company Values -->
+    <section class="values-section">
+      <div class="section-content">
+        <h2>Наши ценности</h2>
+        <div class="values-grid">
+          <div *ngFor="let value of companyValues" class="value-card">
+            <div class="value-icon">{{ value.icon }}</div>
+            <h3 class="value-title">{{ value.title }}</h3>
+            <p class="value-description">{{ value.description }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Company History -->
+    <section class="history-section">
+      <div class="section-content">
+        <h2>История компании</h2>
+        <div class="timeline">
+          <div *ngFor="let milestone of companyHistory" class="timeline-item">
+            <div class="timeline-year">{{ milestone.year }}</div>
+            <div class="timeline-content">
+              <h3 class="timeline-title">{{ milestone.title }}</h3>
+              <p class="timeline-description">{{ milestone.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+      <div class="section-content">
+        <h2>Наша команда</h2>
+        <p class="team-intro">
+          За каждым успешным проектом стоит команда профессионалов, 
+          преданных своему делу и стремящихся к совершенству
+        </p>
+        <div class="team-grid">
+          <div *ngFor="let member of teamMembers" class="team-member">
+            <div class="member-image">
+              <img [src]="member.image" [alt]="member.name">
+            </div>
+            <div class="member-info">
+              <h3 class="member-name">{{ member.name }}</h3>
+              <div class="member-position">{{ member.position }}</div>
+              <p class="member-description">{{ member.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>Готовы начать сотрудничество?</h2>
+        <p>Свяжитесь с нами для обсуждения возможностей партнерства</p>
+        <div class="cta-buttons">
+          <a routerLink="/products" class="btn btn-primary">Перейти к товарам</a>
+          <a href="#" class="btn btn-secondary">Связаться с нами</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Krasota72</h4>
+        <p>Ваш надежный интернет-магазин</p>
+      </div>
+      <div class="footer-section">
+        <h4>Контакты</h4>
+        <p>Email: info&#64;krasota72.ru</p>
+        <p>Телефон: +7 (999) 123-45-67</p>
+      </div>
+      <div class="footer-section">
+        <h4>Мы в соцсетях</h4>
+        <div class="social-links">
+          <a href="#" class="social-link">VK</a>
+          <a href="#" class="social-link">Telegram</a>
+          <a href="#" class="social-link">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Krasota72. Все права защищены.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,225 @@
+<!-- Header с навигацией -->
+<app-header></app-header>
+
+<main class="checkout-page">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Оформление заказа</h1>
+        <p>Заполните данные для доставки и выберите способ оплаты</p>
+      </div>
+    </section>
+
+    <!-- Checkout Content -->
+    <section class="checkout-content">
+      <div class="checkout-layout">
+        <!-- Checkout Form -->
+        <div class="checkout-form-section">
+          <form (ngSubmit)="onSubmit()" #checkoutFormElement="ngForm">
+            <!-- Personal Information -->
+            <div class="form-section">
+              <h2>Личные данные</h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">Имя *</label>
+                  <input 
+                    type="text" 
+                    id="firstName" 
+                    name="firstName"
+                    [(ngModel)]="checkoutForm.firstName"
+                    required
+                    class="form-input"
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Фамилия *</label>
+                  <input 
+                    type="text" 
+                    id="lastName" 
+                    name="lastName"
+                    [(ngModel)]="checkoutForm.lastName"
+                    required
+                    class="form-input"
+                  >
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">Email *</label>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email"
+                    [(ngModel)]="checkoutForm.email"
+                    required
+                    class="form-input"
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="phone">Телефон *</label>
+                  <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone"
+                    [(ngModel)]="checkoutForm.phone"
+                    required
+                    class="form-input"
+                    placeholder="+7 (999) 123-45-67"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="form-section">
+              <h2>Адрес доставки</h2>
+              <div class="form-group">
+                <label for="address">Адрес *</label>
+                <input 
+                  type="text" 
+                  id="address" 
+                  name="address"
+                  [(ngModel)]="checkoutForm.address"
+                  required
+                  class="form-input"
+                  placeholder="Улица, дом, квартира"
+                >
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">Город *</label>
+                  <input 
+                    type="text" 
+                    id="city" 
+                    name="city"
+                    [(ngModel)]="checkoutForm.city"
+                    required
+                    class="form-input"
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="postalCode">Индекс *</label>
+                  <input 
+                    type="text" 
+                    id="postalCode" 
+                    name="postalCode"
+                    [(ngModel)]="checkoutForm.postalCode"
+                    required
+                    class="form-input"
+                    placeholder="123456"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Method -->
+            <div class="form-section">
+              <h2>Способ доставки</h2>
+              <div class="delivery-methods">
+                <div 
+                  *ngFor="let method of deliveryMethods" 
+                  class="delivery-method"
+                  [class.selected]="selectedDelivery.value === method.value"
+                  (click)="onDeliveryChange(method)"
+                >
+                  <div class="method-info">
+                    <div class="method-label">{{ method.label }}</div>
+                    <div class="method-time">{{ method.time }}</div>
+                  </div>
+                  <div class="method-price">{{ formatPrice(method.price) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="form-section">
+              <h2>Способ оплаты</h2>
+              <div class="payment-methods">
+                <div 
+                  *ngFor="let method of paymentMethods" 
+                  class="payment-method"
+                  [class.selected]="selectedPayment.value === method.value"
+                  (click)="onPaymentChange(method)"
+                >
+                  <div class="method-icon">{{ method.icon }}</div>
+                  <div class="method-label">{{ method.label }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Notes -->
+            <div class="form-section">
+              <h2>Дополнительно</h2>
+              <div class="form-group">
+                <label for="notes">Комментарий к заказу</label>
+                <textarea 
+                  id="notes" 
+                  name="notes"
+                  [(ngModel)]="checkoutForm.notes"
+                  class="form-textarea"
+                  placeholder="Укажите особые пожелания по доставке или другие детали"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" [disabled]="!validateForm()">
+                Оформить заказ
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary-section">
+          <div class="order-summary">
+            <h2>Ваш заказ</h2>
+            
+            <!-- Cart Items -->
+            <div class="cart-items">
+              <div *ngFor="let item of cartItems" class="cart-item">
+                <div class="item-image">
+                  <img [src]="item.image" [alt]="item.name">
+                </div>
+                <div class="item-details">
+                  <h3 class="item-name">{{ item.name }}</h3>
+                  <p class="item-category">{{ item.category }}</p>
+                  <div class="item-quantity">Количество: {{ item.quantity }}</div>
+                </div>
+                <div class="item-price">{{ formatPrice(item.price * item.quantity) }}</div>
+              </div>
+            </div>
+
+            <!-- Order Totals -->
+            <div class="order-totals">
+              <div class="total-row">
+                <span>Товары ({{ cartItems.length }})</span>
+                <span>{{ formatPrice(getSubtotal()) }}</span>
+              </div>
+              <div class="total-row">
+                <span>Доставка</span>
+                <span>{{ formatPrice(getDeliveryCost()) }}</span>
+              </div>
+              <div class="total-row total-final">
+                <span>Итого</span>
+                <span>{{ formatPrice(getTotal()) }}</span>
+              </div>
+            </div>
+
+            <!-- Back to Cart -->
+            <div class="back-to-cart">
+              <a routerLink="/cart" class="back-link">
+                ← Вернуться в корзину
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

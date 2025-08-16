@@ -1,0 +1,142 @@
+<!-- Header с навигацией -->
+<app-header></app-header>
+
+<!-- Main Content -->
+<main class="main-content" *ngIf="product">
+  <div class="container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs">
+      <a routerLink="/products" class="breadcrumb-link">Товары</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ product.name }}</span>
+    </nav>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail">
+      <div class="product-gallery">
+        <div class="main-image">
+          <img [src]="selectedImage" [alt]="product.name">
+        </div>
+      </div>
+
+      <div class="product-info">
+        <div class="product-header">
+          <h1 class="product-title">{{ product.name }}</h1>
+          <div class="product-category">{{ product.category }}</div>
+        </div>
+
+        <div class="product-price">
+          <span class="price-amount">{{ formatPrice(product.price) }}</span>
+          <span class="price-availability" [class.in-stock]="product.inStock" [class.out-of-stock]="!product.inStock">
+            {{ product.inStock ? 'В наличии' : 'Нет в наличии' }}
+          </span>
+        </div>
+
+        <div class="product-description">
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Quantity Selector -->
+        <div class="quantity-selector" *ngIf="product.inStock">
+          <label for="quantity">Количество:</label>
+          <div class="quantity-controls">
+            <button class="quantity-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">-</button>
+            <input type="number" id="quantity" [(ngModel)]="quantity" min="1" class="quantity-input">
+            <button class="quantity-btn" (click)="increaseQuantity()">+</button>
+          </div>
+        </div>
+
+        <!-- Add to Cart Button -->
+        <div class="add-to-cart-section" *ngIf="product.inStock">
+          <button class="add-to-cart-btn" (click)="addToCart()">
+            Добавить в корзину
+          </button>
+        </div>
+
+        <!-- Back Button -->
+        <button class="back-btn" (click)="goBack()">
+          ← Назад к товарам
+        </button>
+      </div>
+    </section>
+
+    <!-- Product Details Tabs -->
+    <section class="product-tabs">
+      <div class="tabs-container">
+        <!-- Specifications Tab -->
+        <div class="tab-content" *ngIf="product.specifications">
+          <h3>Характеристики</h3>
+          <ul class="specifications-list">
+            <li *ngFor="let spec of product.specifications" class="spec-item">
+              {{ spec }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Features Tab -->
+        <div class="tab-content" *ngIf="product.features">
+          <h3>Особенности</h3>
+          <ul class="features-list">
+            <li *ngFor="let feature of product.features" class="feature-item">
+              <span class="feature-icon">✓</span>
+              {{ feature }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div class="tab-content" *ngIf="product.reviews && product.reviews.length > 0">
+          <h3>Отзывы ({{ product.reviews.length }})</h3>
+          <div class="reviews-container">
+            <div *ngFor="let review of product.reviews" class="review-item">
+              <div class="review-header">
+                <div class="review-author">{{ review.author }}</div>
+                <div class="review-rating">
+                  <span *ngFor="let star of getRatingStars(review.rating)" class="star filled">★</span>
+                  <span *ngFor="let star of getRatingStars(5 - review.rating)" class="star">☆</span>
+                </div>
+                <div class="review-date">{{ formatDate(review.date) }}</div>
+              </div>
+              <div class="review-comment">{{ review.comment }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Loading State -->
+<div *ngIf="!product" class="loading-state">
+  <div class="container">
+    <div class="loading-spinner">Загрузка...</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Krasota72</h4>
+        <p>Ваш надежный интернет-магазин</p>
+      </div>
+      <div class="footer-section">
+        <h4>Контакты</h4>
+        <p>Email: info&#64;krasota72.ru</p>
+        <p>Телефон: +7 (999) 123-45-67</p>
+      </div>
+      <div class="footer-section">
+        <h4>Мы в соцсетях</h4>
+        <div class="social-links">
+          <a href="#" class="social-link">VK</a>
+          <a href="#" class="social-link">Telegram</a>
+          <a href="#" class="social-link">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Krasota72. Все права защищены.</p>
+    </div>
+  </div>
+</footer>

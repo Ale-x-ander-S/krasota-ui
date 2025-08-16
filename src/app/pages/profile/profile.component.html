@@ -1,0 +1,376 @@
+<!-- Header с навигацией -->
+<app-header></app-header>
+
+<main class="profile-page">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Личный кабинет</h1>
+        <p>Управляйте своим профилем и отслеживайте заказы</p>
+      </div>
+    </section>
+
+    <!-- Profile Content -->
+    <section class="profile-content">
+      <div class="profile-layout">
+        <!-- Profile Sidebar -->
+        <div class="profile-sidebar">
+          <div class="user-info">
+            <div class="user-avatar">
+              <span>{{ getUserInitials() }}</span>
+            </div>
+            <h3>{{ userProfile.firstName }} {{ userProfile.lastName }}</h3>
+            <p>{{ userProfile.email }}</p>
+            <p class="user-phone">{{ userProfile.phone || 'Телефон не указан' }}</p>
+          </div>
+
+          <nav class="profile-nav">
+            <button 
+              class="nav-item" 
+              [class.active]="activeTab === 'profile'"
+              (click)="setActiveTab('profile')"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Профиль
+            </button>
+            <button 
+              class="nav-item" 
+              [class.active]="activeTab === 'orders'"
+              (click)="setActiveTab('orders')"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              Мои заказы
+            </button>
+            <button 
+              class="nav-item" 
+              [class.active]="activeTab === 'favorites'"
+              (click)="setActiveTab('favorites')"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              Избранное
+            </button>
+            <button 
+              class="nav-item" 
+              [class.active]="activeTab === 'addresses'"
+              (click)="setActiveTab('addresses')"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Адреса доставки
+            </button>
+            <button 
+              class="nav-item" 
+              [class.active]="activeTab === 'settings'"
+              (click)="setActiveTab('settings')"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              Настройки
+            </button>
+          </nav>
+
+          <button class="logout-btn" (click)="logout()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16,17 21,12 16,7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Выйти
+          </button>
+        </div>
+
+        <!-- Profile Content Area -->
+        <div class="profile-main">
+          <!-- Profile Tab -->
+          <div *ngIf="activeTab === 'profile'" class="tab-content profile-tab">
+            <h2>Редактировать профиль</h2>
+            <form class="profile-form" (ngSubmit)="updateProfile()">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="editFirstName">Имя *</label>
+                  <input 
+                    type="text" 
+                    id="editFirstName" 
+                    name="editFirstName"
+                    [(ngModel)]="editProfile.firstName" 
+                    required
+                  >
+                </div>
+                
+                <div class="form-group">
+                  <label for="editLastName">Фамилия *</label>
+                  <input 
+                    type="text" 
+                    id="editLastName" 
+                    name="editLastName"
+                    [(ngModel)]="editProfile.lastName" 
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="editEmail">Email *</label>
+                <input 
+                  type="email" 
+                  id="editEmail" 
+                  name="editEmail"
+                  [(ngModel)]="editProfile.email" 
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="editPhone">Телефон</label>
+                <input 
+                  type="tel" 
+                  id="editPhone" 
+                  name="editPhone"
+                  [(ngModel)]="editProfile.phone" 
+                  placeholder="+7 (999) 123-45-67"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="editBirthDate">Дата рождения</label>
+                <input 
+                  type="date" 
+                  id="editBirthDate" 
+                  name="editBirthDate"
+                  [(ngModel)]="editProfile.birthDate"
+                >
+              </div>
+
+              <button type="submit" class="save-btn" [disabled]="isUpdating">
+                <span *ngIf="!isUpdating">Сохранить изменения</span>
+                <span *ngIf="isUpdating">Сохранение...</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Orders Tab -->
+          <div *ngIf="activeTab === 'orders'" class="tab-content orders-tab">
+            <h2>История заказов</h2>
+            
+            <div *ngIf="orders.length === 0" class="empty-orders">
+              <div class="empty-icon">📦</div>
+              <h3>У вас пока нет заказов</h3>
+              <p>Сделайте первый заказ и он появится здесь</p>
+              <a routerLink="/products" class="start-shopping-btn">
+                Начать покупки
+              </a>
+            </div>
+
+            <div *ngIf="orders.length > 0" class="orders-list">
+              <div *ngFor="let order of orders" class="order-card">
+                <div class="order-header">
+                  <div class="order-info">
+                    <h4>Заказ #{{ order.id }}</h4>
+                    <p class="order-date">{{ formatDate(order.date) }}</p>
+                    <span class="order-status" [class]="order.status">
+                      {{ getStatusText(order.status) }}
+                    </span>
+                  </div>
+                  <div class="order-total">
+                    <span class="total-amount">{{ formatPrice(order.total) }}</span>
+                    <span class="total-items">{{ order.items.length }} товар(ов)</span>
+                  </div>
+                </div>
+
+                <div class="order-items">
+                  <div *ngFor="let item of order.items" class="order-item">
+                    <img [src]="item.image" [alt]="item.name" class="item-image">
+                    <div class="item-details">
+                      <h5>{{ item.name }}</h5>
+                      <p class="item-category">{{ item.category }}</p>
+                      <div class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="order-actions">
+                  <button class="action-btn" (click)="repeatOrder(order)">
+                    Повторить заказ
+                  </button>
+                  <button class="action-btn secondary" (click)="viewOrderDetails(order)">
+                    Подробности
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Favorites Tab -->
+          <div *ngIf="activeTab === 'favorites'" class="tab-content favorites-tab">
+            <h2>Избранные товары</h2>
+            
+            <div *ngIf="favorites.length === 0" class="empty-favorites">
+              <div class="empty-icon">❤️</div>
+              <h3>У вас пока нет избранных товаров</h3>
+              <p>Добавляйте товары в избранное для быстрого доступа</p>
+              <a routerLink="/products" class="start-shopping-btn">
+                Перейти к товарам
+              </a>
+            </div>
+
+            <div *ngIf="favorites.length > 0" class="favorites-grid">
+              <div *ngFor="let product of favorites" class="favorite-card">
+                <img [src]="product.image" [alt]="product.name" class="product-image">
+                <div class="product-info">
+                  <h4>{{ product.name }}</h4>
+                  <p class="product-category">{{ product.category }}</p>
+                  <div class="product-price">{{ formatPrice(product.price) }}</div>
+                  <div class="product-actions">
+                    <button class="add-to-cart-btn" (click)="addToCart(product)">
+                      В корзину
+                    </button>
+                    <button class="remove-favorite-btn" (click)="removeFromFavorites(product)">
+                      Убрать
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Addresses Tab -->
+          <div *ngIf="activeTab === 'addresses'" class="tab-content addresses-tab">
+            <h2>Адреса доставки</h2>
+            
+            <div *ngIf="addresses.length === 0" class="empty-addresses">
+              <div class="empty-icon">📍</div>
+              <h3>У вас пока нет адресов доставки</h3>
+              <p>Добавьте адрес для быстрого оформления заказов</p>
+            </div>
+
+            <div *ngIf="addresses.length > 0" class="addresses-list">
+              <div *ngFor="let address of addresses; let i = index" class="address-card">
+                <div class="address-info">
+                  <h4>{{ address.name }}</h4>
+                  <p>{{ address.street }}, {{ address.house }}</p>
+                  <p>{{ address.city }}, {{ address.postalCode }}</p>
+                  <p *ngIf="address.apartment">Квартира: {{ address.apartment }}</p>
+                </div>
+                <div class="address-actions">
+                  <button class="action-btn" (click)="editAddress(i)">
+                    Редактировать
+                  </button>
+                  <button class="action-btn secondary" (click)="deleteAddress(i)">
+                    Удалить
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button class="add-address-btn" (click)="addNewAddress()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Добавить адрес
+            </button>
+          </div>
+
+          <!-- Settings Tab -->
+          <div *ngIf="activeTab === 'settings'" class="tab-content settings-tab">
+            <h2>Настройки аккаунта</h2>
+            
+            <div class="settings-section">
+              <h3>Безопасность</h3>
+              <button class="change-password-btn" (click)="changePassword()">
+                Изменить пароль
+              </button>
+            </div>
+
+            <div class="settings-section">
+              <h3>Уведомления</h3>
+              <div class="setting-item">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="settings.emailNotifications"
+                    name="emailNotifications"
+                  >
+                  <span class="checkmark"></span>
+                  Email уведомления
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="settings.smsNotifications"
+                    name="smsNotifications"
+                  >
+                  <span class="checkmark"></span>
+                  SMS уведомления
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Приватность</h3>
+              <div class="setting-item">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="settings.publicProfile"
+                    name="publicProfile"
+                  >
+                  <span class="checkmark"></span>
+                  Публичный профиль
+                </label>
+              </div>
+            </div>
+
+            <button class="save-settings-btn" (click)="saveSettings()">
+              Сохранить настройки
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Krasota72</h4>
+        <p>Ваш надежный интернет-магазин</p>
+      </div>
+      <div class="footer-section">
+        <h4>Контакты</h4>
+        <p>Email: info&#64;krasota72.ru</p>
+        <p>Телефон: +7 (999) 123-45-67</p>
+      </div>
+      <div class="footer-section">
+        <h4>Мы в соцсетях</h4>
+        <div class="social-links">
+          <a href="#" class="social-link">VK</a>
+          <a href="#" class="social-link">Telegram</a>
+          <a href="#" class="social-link">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Krasota72. Все права защищены.</p>
+    </div>
+  </div>
+</footer>
