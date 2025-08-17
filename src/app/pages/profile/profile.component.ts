@@ -14,7 +14,7 @@ interface UserProfile {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  birthDate?: string;
+  address?: string;
   created_at: string;
   updated_at: string;
 }
@@ -44,19 +44,8 @@ interface Product {
   category: string;
 }
 
-interface Address {
-  name: string;
-  street: string;
-  house: string;
-  apartment?: string;
-  city: string;
-  postalCode: string;
-}
-
 interface UserSettings {
   emailNotifications: boolean;
-  smsNotifications: boolean;
-  publicProfile: boolean;
 }
 
 @Component({
@@ -80,7 +69,7 @@ export class ProfileComponent implements OnInit {
     firstName: '',
     lastName: '',
     phone: '',
-    birthDate: '',
+    address: '',
     created_at: '',
     updated_at: ''
   };
@@ -147,21 +136,8 @@ export class ProfileComponent implements OnInit {
     }
   ];
 
-  addresses: Address[] = [
-    {
-      name: 'Дом',
-      street: 'ул. Примерная',
-      house: 'д. 123',
-      apartment: 'кв. 456',
-      city: 'Москва',
-      postalCode: '123456'
-    }
-  ];
-
   settings: UserSettings = {
     emailNotifications: true,
-    smsNotifications: false,
-    publicProfile: false
   };
 
   constructor(
@@ -186,7 +162,7 @@ export class ProfileComponent implements OnInit {
         firstName: currentUser.username.split(' ')[0] || currentUser.username,
         lastName: currentUser.username.split(' ')[1] || '',
         phone: '+7 (999) 123-45-67', // По умолчанию, можно добавить в API
-        birthDate: '1990-01-01', // По умолчанию, можно добавить в API
+        address: 'ул. Примерная, д. 123, кв. 456, Москва, 123456', // По умолчанию, можно добавить в API
         created_at: currentUser.created_at,
         updated_at: currentUser.updated_at
       };
@@ -286,25 +262,6 @@ export class ProfileComponent implements OnInit {
   removeFromFavorites(product: Product) {
     this.favorites = this.favorites.filter(fav => fav.id !== product.id);
     alert(`${product.name} удален из избранного`);
-  }
-
-  editAddress(index: number) {
-    alert(`Редактирование адреса: ${this.addresses[index].name}`);
-  }
-
-  deleteAddress(index: number) {
-    if (confirm('Вы уверены, что хотите удалить этот адрес?')) {
-      this.addresses.splice(index, 1);
-      alert('Адрес удален');
-    }
-  }
-
-  addNewAddress() {
-    alert('Добавление нового адреса');
-  }
-
-  changePassword() {
-    alert('Функция изменения пароля');
   }
 
   saveSettings() {

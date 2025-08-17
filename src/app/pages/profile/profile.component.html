@@ -24,6 +24,7 @@
             <p>{{ userProfile.email }}</p>
             <p class="user-role">Роль: {{ getRoleText(userProfile.role) }}</p>
             <p class="user-phone">{{ userProfile.phone || 'Телефон не указан' }}</p>
+            <p class="user-address" *ngIf="userProfile.address">{{ userProfile.address }}</p>
             <p class="user-date">Дата регистрации: {{ formatDate(parseDate(userProfile.created_at)) }}</p>
           </div>
 
@@ -60,17 +61,6 @@
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
               Избранное
-            </button>
-            <button 
-              class="nav-item" 
-              [class.active]="activeTab === 'addresses'"
-              (click)="setActiveTab('addresses')"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              Адреса доставки
             </button>
             <button 
               class="nav-item" 
@@ -157,13 +147,15 @@
               </div>
 
               <div class="form-group">
-                <label for="editBirthDate">Дата рождения</label>
-                <input 
-                  type="date" 
-                  id="editBirthDate" 
-                  name="editBirthDate"
-                  [(ngModel)]="editProfile.birthDate"
-                >
+                <label for="editAddress">Адрес доставки</label>
+                <textarea 
+                  id="editAddress" 
+                  name="editAddress"
+                  [(ngModel)]="editProfile.address" 
+                  placeholder="Введите полный адрес доставки"
+                  rows="3"
+                ></textarea>
+                <small class="form-help">Укажите полный адрес для доставки заказов</small>
               </div>
 
               <button type="submit" class="save-btn" [disabled]="isUpdating">
@@ -258,55 +250,10 @@
             </div>
           </div>
 
-          <!-- Addresses Tab -->
-          <div *ngIf="activeTab === 'addresses'" class="tab-content addresses-tab">
-            <h2>Адреса доставки</h2>
-            
-            <div *ngIf="addresses.length === 0" class="empty-addresses">
-              <div class="empty-icon">📍</div>
-              <h3>У вас пока нет адресов доставки</h3>
-              <p>Добавьте адрес для быстрого оформления заказов</p>
-            </div>
-
-            <div *ngIf="addresses.length > 0" class="addresses-list">
-              <div *ngFor="let address of addresses; let i = index" class="address-card">
-                <div class="address-info">
-                  <h4>{{ address.name }}</h4>
-                  <p>{{ address.street }}, {{ address.house }}</p>
-                  <p>{{ address.city }}, {{ address.postalCode }}</p>
-                  <p *ngIf="address.apartment">Квартира: {{ address.apartment }}</p>
-                </div>
-                <div class="address-actions">
-                  <button class="action-btn" (click)="editAddress(i)">
-                    Редактировать
-                  </button>
-                  <button class="action-btn secondary" (click)="deleteAddress(i)">
-                    Удалить
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <button class="add-address-btn" (click)="addNewAddress()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Добавить адрес
-            </button>
-          </div>
-
           <!-- Settings Tab -->
           <div *ngIf="activeTab === 'settings'" class="tab-content settings-tab">
             <h2>Настройки аккаунта</h2>
             
-            <div class="settings-section">
-              <h3>Безопасность</h3>
-              <button class="change-password-btn" (click)="changePassword()">
-                Изменить пароль
-              </button>
-            </div>
-
             <div class="settings-section">
               <h3>Уведомления</h3>
               <div class="setting-item">
@@ -318,32 +265,6 @@
                   >
                   <span class="checkmark"></span>
                   Email уведомления
-                </label>
-              </div>
-              <div class="setting-item">
-                <label class="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="settings.smsNotifications"
-                    name="smsNotifications"
-                  >
-                  <span class="checkmark"></span>
-                  SMS уведомления
-                </label>
-              </div>
-            </div>
-
-            <div class="settings-section">
-              <h3>Приватность</h3>
-              <div class="setting-item">
-                <label class="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="settings.publicProfile"
-                    name="publicProfile"
-                  >
-                  <span class="checkmark"></span>
-                  Публичный профиль
                 </label>
               </div>
             </div>

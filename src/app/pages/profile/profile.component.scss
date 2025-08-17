@@ -105,8 +105,18 @@
   }
 
   .user-phone {
-    color: #475569;
-    font-weight: 500;
+    color: #64748b;
+    margin: 8px 0;
+    font-size: 0.9rem;
+  }
+
+  .user-address {
+    color: #64748b;
+    margin: 8px 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   .user-role {
@@ -261,6 +271,25 @@
           color: #64748b;
           cursor: not-allowed;
           border-color: #cbd5e1;
+        }
+      }
+
+      textarea {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+
+        &:focus {
+          outline: none;
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
       }
 
