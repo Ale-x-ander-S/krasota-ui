@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { Store, Select } from '@ngxs/store';
 import { CartStateClass } from '../../store/cart';
 import { Observable } from 'rxjs';
+import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -18,10 +19,15 @@ export class HeaderComponent implements OnInit {
   currentRoute: string = '';
   
   @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
+  
+  // Аутентификация
+  currentUser$ = this.authService.currentUser$;
+  isAuthenticated$ = this.authService.isAuthenticated$;
 
   constructor(
     private router: Router,
-    private store: Store
+    private store: Store,
+    private authService: AuthService
   ) {}
 
   get itemCount(): number {
@@ -57,5 +63,21 @@ export class HeaderComponent implements OnInit {
   reloadPage() {
     // Перезагружаем текущую страницу
     window.location.reload();
+  }
+
+  // Аутентификация
+  login() {
+    this.router.navigate(['/auth']);
+    this.closeMobileMenu();
+  }
+
+  logout() {
+    this.authService.logout();
+    this.closeMobileMenu();
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
+    this.closeMobileMenu();
   }
 }

@@ -1,153 +1,149 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header.component';
-import { FooterComponent } from '../../components/footer';
-
-interface LoginData {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
-
-interface RegisterData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-  agreement: boolean;
-}
+import { Router } from '@angular/router';
+import { AuthService, LoginCredentials, RegisterData } from '../../services/auth.service';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent {
-  showMobileMenu: boolean = false;
-  isLoginMode: boolean = true;
-  isSubmitting: boolean = false;
-  showSuccessMessage: boolean = false;
-  
-  showLoginPassword: boolean = false;
-  showRegisterPassword: boolean = false;
-  showConfirmPassword: boolean = false;
+  isLoginMode = true;
+  loading = false;
+  error = '';
 
-  loginData: LoginData = {
+  // Форма входа
+  loginForm = {
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   };
 
-  registerData: RegisterData = {
-    firstName: '',
-    lastName: '',
+  // Форма регистрации
+  registerForm = {
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
-    agreement: false
+    username: ''
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  setLoginMode() {
-    this.isLoginMode = true;
-    this.showSuccessMessage = false;
+  // Переключение между режимами входа и регистрации
+  toggleMode(): void {
+    this.isLoginMode = !this.isLoginMode;
+    this.error = '';
+    this.resetForms();
   }
 
-  setRegisterMode() {
-    this.isLoginMode = false;
-    this.showSuccessMessage = false;
+  // Вход пользователя
+  onLogin(): void {
+    if (!this.validateLoginForm()) return;
+
+    this.loading = true;
+    this.error = '';
+
+    const credentials: LoginCredentials = {
+      email: this.loginForm.email,
+      password: this.loginForm.password
+    };
+
+    this.authService.login(credentials).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        this.error = this.getErrorMessage(error);
+        this.loading = false;
+      }
+    });
   }
 
-  toggleLoginPassword() {
-    this.showLoginPassword = !this.showLoginPassword;
+  // Регистрация пользователя
+  onRegister(): void {
+    if (!this.validateRegisterForm()) return;
+
+    this.loading = true;
+    this.error = '';
+
+    const userData: RegisterData = {
+      email: this.registerForm.email,
+      password: this.registerForm.password,
+      username: this.registerForm.username
+    };
+
+    this.authService.register(userData).subscribe({
+      next: () => {
+        this.error = '';
+        // Переключаемся на режим входа после успешной регистрации
+        this.isLoginMode = true;
+        this.resetForms();
+        this.loading = false;
+      },
+      error: (error) => {
+        this.error = this.getErrorMessage(error);
+        this.loading = false;
+      }
+    });
   }
 
-  toggleRegisterPassword() {
-    this.showRegisterPassword = !this.showRegisterPassword;
-  }
-
-  toggleConfirmPassword() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-
-  isFormValid(): boolean {
-    if (this.isLoginMode) {
-      return !!this.loginData.email && !!this.loginData.password;
-    } else {
-      return !!this.registerData.firstName && 
-             !!this.registerData.lastName && 
-             !!this.registerData.email && 
-             !!this.registerData.password && 
-             !!this.registerData.confirmPassword && 
-             this.registerData.agreement &&
-             this.registerData.password === this.registerData.confirmPassword;
+  // Валидация формы входа
+  private validateLoginForm(): boolean {
+    if (!this.loginForm.email || !this.loginForm.password) {
+      this.error = 'Заполните все поля';
+      return false;
     }
+    return true;
   }
 
-  onLogin() {
-    if (!this.isFormValid()) return;
+  // Валидация формы регистрации
+  private validateRegisterForm(): boolean {
+    if (!this.registerForm.email || !this.registerForm.password || !this.registerForm.username) {
+      this.error = 'Заполните все поля';
+      return false;
+    }
 
-    this.isSubmitting = true;
+    if (this.registerForm.password !== this.registerForm.confirmPassword) {
+      this.error = 'Пароли не совпадают';
+      return false;
+    }
+
+    if (this.registerForm.password.length < 6) {
+      this.error = 'Пароль должен содержать минимум 6 символов';
+      return false;
+    }
+
+    return true;
+  }
+
+  // Получение сообщения об ошибке
+  private getErrorMessage(error: any): string {
+    if (error.error && typeof error.error === 'object') {
+      const errorObj = error.error;
+      const messages = Object.values(errorObj).filter(msg => typeof msg === 'string');
+      return messages.length > 0 ? messages[0] as string : 'Произошла ошибка';
+    }
     
-    // Имитация входа
-    setTimeout(() => {
-      console.log('Вход:', this.loginData);
-      this.isSubmitting = false;
-      this.showSuccessMessage = true;
-      
-      // Перенаправление в личный кабинет через 2 секунды
-      setTimeout(() => {
-        this.router.navigate(['/profile']);
-      }, 2000);
-    }, 1500);
-  }
-
-  onRegister() {
-    if (!this.isFormValid()) return;
-
-    this.isSubmitting = true;
+    if (error.status === 401) {
+      return 'Неверный email или пароль';
+    }
     
-    // Имитация регистрации
-    setTimeout(() => {
-      console.log('Регистрация:', this.registerData);
-      this.isSubmitting = false;
-      this.showSuccessMessage = true;
-      
-      // Сброс формы
-      this.registerData = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        agreement: false
-      };
-    }, 1500);
+    if (error.status === 409) {
+      return 'Пользователь с таким email или именем уже существует';
+    }
+    
+    return 'Произошла ошибка. Попробуйте еще раз.';
   }
 
-  toggleMobileMenu(): void {
-    this.showMobileMenu = !this.showMobileMenu;
-  }
-
-  closeMobileMenu(): void {
-    this.showMobileMenu = false;
-  }
-
-  getCartItemCount(): number {
-    // Имитация получения количества товаров в корзине
-    return Math.floor(Math.random() * 5) + 1;
-  }
-
-  goToCart(): void {
-    this.router.navigate(['/cart']);
+  // Сброс форм
+  private resetForms(): void {
+    this.loginForm = { email: '', password: '' };
+    this.registerForm = { email: '', password: '', confirmPassword: '', username: '' };
   }
 }

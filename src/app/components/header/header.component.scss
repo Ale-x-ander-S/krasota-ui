@@ -306,6 +306,105 @@ $border-radius: 8px;
   }
 }
 
+// Аутентификация
+.auth-link {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: $primary-color !important;
+    transform: translateY(-2px);
+  }
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  
+  .user-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: $border-radius;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba($primary-color, 0.1);
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .username {
+      color: $text-primary;
+      font-weight: 500;
+      font-size: 14px;
+    }
+  }
+  
+  .logout-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: $border-radius;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.user-menu-mobile {
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid $light-bg;
+    margin-bottom: 16px;
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .username {
+      color: $text-primary;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+}
+
 // Responsive Design
 @media (max-width: 768px) {
   .header {

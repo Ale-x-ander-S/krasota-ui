@@ -47,7 +47,21 @@
       <a routerLink="/cart" class="nav-link cart-icon" [class.active]="isActiveRoute('/cart')">
         <span class="cart-text">Корзина</span>
       </a>
-      <a routerLink="/auth" class="nav-link" [class.active]="isActiveRoute('/auth')">Войти</a>
+      
+      <!-- Аутентификация -->
+      <ng-container *ngIf="!(isAuthenticated$ | async); else userMenu">
+        <a (click)="login()" class="nav-link auth-link" style="cursor: pointer;">Войти</a>
+      </ng-container>
+      
+      <ng-template #userMenu>
+        <div class="user-menu">
+          <button class="user-menu-btn" (click)="goToProfile()">
+            <span class="user-avatar">{{ (currentUser$ | async)?.username?.charAt(0)?.toUpperCase() }}</span>
+            <span class="username">{{ (currentUser$ | async)?.username }}</span>
+          </button>
+          <button class="logout-btn" (click)="logout()">Выйти</button>
+        </div>
+      </ng-template>
     </nav>
 
     <!-- Mobile Controls -->
@@ -76,7 +90,22 @@
       <a routerLink="/cart" class="nav-link cart-icon" [class.active]="isActiveRoute('/cart')" (click)="closeMobileMenu()">
         <span class="cart-text">Корзина</span>
       </a>
-      <a routerLink="/auth" class="nav-link" [class.active]="isActiveRoute('/auth')" (click)="closeMobileMenu()">Войти</a>
+      
+      <!-- Аутентификация для мобильных -->
+      <ng-container *ngIf="!(isAuthenticated$ | async); else userMenuMobile">
+        <a (click)="login()" class="nav-link auth-link" (click)="closeMobileMenu()" style="cursor: pointer;">Войти</a>
+      </ng-container>
+      
+      <ng-template #userMenuMobile>
+        <div class="user-menu-mobile">
+          <div class="user-info">
+            <span class="user-avatar">{{ (currentUser$ | async)?.username?.charAt(0)?.toUpperCase() }}</span>
+            <span class="username">{{ (currentUser$ | async)?.username }}</span>
+          </div>
+          <a (click)="goToProfile()" class="nav-link" (click)="closeMobileMenu()" style="cursor: pointer;">Профиль</a>
+          <a (click)="logout()" class="nav-link" (click)="closeMobileMenu()" style="cursor: pointer;">Выйти</a>
+        </div>
+      </ng-template>
     </nav>
   </div>
 </header>
