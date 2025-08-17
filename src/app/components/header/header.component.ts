@@ -60,10 +60,7 @@ export class HeaderComponent implements OnInit {
     this.closeMobileMenu();
   }
 
-  reloadPage() {
-    // Перезагружаем текущую страницу
-    window.location.reload();
-  }
+
 
   // Аутентификация
   login() {
@@ -78,6 +75,11 @@ export class HeaderComponent implements OnInit {
 
   goToProfile() {
     this.router.navigate(['/profile']);
+    this.closeMobileMenu();
+  }
+
+  goToAdmin() {
+    this.router.navigate(['/admin']);
     this.closeMobileMenu();
   }
 }

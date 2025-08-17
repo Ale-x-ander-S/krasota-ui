@@ -1,7 +1,7 @@
 <header class="header">
   <div class="header-container">
     <div class="logo">
-      <a (click)="reloadPage()" style="cursor: pointer;">
+      <a routerLink="/products" style="cursor: pointer;">
         <div class="logo-icon">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Роза как символ красоты -->
@@ -59,6 +59,11 @@
             <span class="user-avatar">{{ (currentUser$ | async)?.username?.charAt(0)?.toUpperCase() }}</span>
             <span class="username">{{ (currentUser$ | async)?.username }}</span>
           </button>
+          <button *ngIf="(currentUser$ | async)?.role === 'admin'" class="admin-btn" (click)="goToAdmin()" title="Админ панель">
+            <svg class="admin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </button>
           <button class="logout-btn" (click)="logout()">Выйти</button>
         </div>
       </ng-template>
@@ -103,6 +108,12 @@
             <span class="username">{{ (currentUser$ | async)?.username }}</span>
           </div>
           <a (click)="goToProfile()" class="nav-link" (click)="closeMobileMenu()" style="cursor: pointer;">Профиль</a>
+          <a *ngIf="(currentUser$ | async)?.role === 'admin'" (click)="goToAdmin()" class="nav-link" (click)="closeMobileMenu()" style="cursor: pointer;">
+            <svg class="admin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            Админ панель
+          </a>
           <a (click)="logout()" class="nav-link" (click)="closeMobileMenu()" style="cursor: pointer;">Выйти</a>
         </div>
       </ng-template>

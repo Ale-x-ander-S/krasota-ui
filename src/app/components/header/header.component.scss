@@ -25,6 +25,7 @@ $border-radius: 8px;
     align-items: center;
     justify-content: space-between;
     height: 70px;
+    gap: 20px;
 
     @media (max-width: 768px) {
       padding: 0 15px;
@@ -34,6 +35,8 @@ $border-radius: 8px;
 
   // Logo
   .logo {
+    flex-shrink: 0;
+    
     a {
       text-decoration: none;
       color: inherit;
@@ -98,6 +101,7 @@ $border-radius: 8px;
   .nav-desktop {
     display: flex;
     gap: 30px;
+    flex-shrink: 0;
 
     @media (max-width: 768px) {
       display: none;
@@ -113,6 +117,8 @@ $border-radius: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
 
       &:hover, &.active {
         color: $primary-color;
@@ -260,21 +266,27 @@ $border-radius: 8px;
       transform: translateY(0);
     }
 
-    .nav-link {
-      text-decoration: none;
-      color: $text-secondary;
-      font-weight: 500;
-      padding: 12px 0;
-      border-bottom: 1px solid $light-bg;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+          .nav-link {
+        text-decoration: none;
+        color: $text-secondary;
+        font-weight: 500;
+        padding: 12px 0;
+        border-bottom: 1px solid $light-bg;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
 
-      &:hover, &.active {
-        color: $primary-color;
-        padding-left: 10px;
-      }
+        &:hover, &.active {
+          color: $primary-color;
+          padding-left: 10px;
+        }
+
+        .admin-icon {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+        }
 
       &.cart-icon {
         svg {
@@ -357,6 +369,32 @@ $border-radius: 8px;
     }
   }
   
+  .admin-btn {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+    }
+
+    .admin-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
   .logout-btn {
     background: #ef4444;
     color: white;
