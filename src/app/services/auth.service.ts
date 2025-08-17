@@ -19,6 +19,10 @@ export interface User {
   username: string;
   email: string;
   role: string;
+  address?: string;
+  phone?: string;
+  is_email_active: boolean;
+  favorites?: any;
   created_at: string;
   updated_at: string;
 }
@@ -102,6 +106,44 @@ export class AuthService {
     } catch {
       return true;
     }
+  }
+
+  // Получить профиль текущего пользователя
+  getProfile(): Observable<User> {
+    const token = this.getToken();
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.get<User>('http://45.12.229.112:8080/api/v1/users/me', { headers });
+  }
+
+  // Обновить профиль текущего пользователя
+  updateProfile(profileData: Partial<User>): Observable<User> {
+    const token = this.getToken();
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.put<User>('http://45.12.229.112:8080/api/v1/users/me', profileData, { headers }).pipe(
+      tap(updatedUser => {
+        // Обновляем локальные данные пользователя
+        this.currentUserSubject.next(updatedUser);
+        localStorage.setItem(this.userKey, JSON.stringify(updatedUser));
+      })
+    );
+  }
+
+  // Обновить статус email пользователя
+  updateEmailStatus(isEmailActive: boolean): Observable<any> {
+    const token = this.getToken();
+    const headers = { 'Authorization': `Bearer ${token}` };
+    const body = { is_email_active: isEmailActive };
+    return this.http.put<any>('http://45.12.229.112:8080/api/v1/users/me/email-status', body, { headers }).pipe(
+      tap(() => {
+        // Обновляем локальные данные пользователя
+        const currentUser = this.currentUserSubject.value;
+        if (currentUser) {
+          currentUser.is_email_active = isEmailActive;
+          this.currentUserSubject.next(currentUser);
+          localStorage.setItem(this.userKey, JSON.stringify(currentUser));
+        }
+      })
+    );
   }
 
   // Получить информацию из токена

@@ -25,7 +25,7 @@
             <p class="user-role">Роль: {{ getRoleText(userProfile.role) }}</p>
             <p class="user-phone">{{ userProfile.phone || 'Телефон не указан' }}</p>
             <p class="user-address" *ngIf="userProfile.address">{{ userProfile.address }}</p>
-            <p class="user-date">Дата регистрации: {{ formatDate(parseDate(userProfile.created_at)) }}</p>
+            <p class="user-date">Дата регистрации: {{ formatDateString(userProfile.created_at) }}</p>
           </div>
 
           <nav class="profile-nav">
@@ -232,7 +232,7 @@
 
             <div *ngIf="favorites.length > 0" class="favorites-grid">
               <div *ngFor="let product of favorites" class="favorite-card">
-                <img [src]="product.image" [alt]="product.name" class="product-image">
+                <img [src]="product.image" [alt]="product.name" class="product-image" (error)="onImageError($event)">
                 <div class="product-info">
                   <h4>{{ product.name }}</h4>
                   <p class="product-category">{{ product.category }}</p>
@@ -254,14 +254,32 @@
           <div *ngIf="activeTab === 'settings'" class="tab-content settings-tab">
             <h2>Настройки аккаунта</h2>
             
+            <!-- Сообщение об успешном сохранении -->
+            <div *ngIf="notification.show && notification.type === 'success'" class="success-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+              {{ notification.message }}
+            </div>
+
+            <!-- Сообщение об ошибке -->
+            <div *ngIf="notification.show && notification.type === 'error'" class="error-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+              {{ notification.message }}
+            </div>
+            
             <div class="settings-section">
               <h3>Уведомления</h3>
               <div class="setting-item">
                 <label class="checkbox-label">
                   <input 
                     type="checkbox" 
-                    [(ngModel)]="settings.emailNotifications"
-                    name="emailNotifications"
+                    [(ngModel)]="settings.is_email_active"
+                    name="is_email_active"
                   >
                   <span class="checkmark"></span>
                   Email уведомления

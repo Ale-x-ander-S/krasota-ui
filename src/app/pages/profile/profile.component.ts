@@ -17,6 +17,7 @@ interface UserProfile {
   address?: string;
   created_at: string;
   updated_at: string;
+  favorites?: number[]; // Добавляем поле favorites
 }
 
 interface OrderItem {
@@ -45,7 +46,7 @@ interface Product {
 }
 
 interface UserSettings {
-  emailNotifications: boolean;
+  is_email_active: boolean;
 }
 
 @Component({
@@ -61,6 +62,13 @@ export class ProfileComponent implements OnInit {
   isUpdating: boolean = false;
   showSuccessMessage: boolean = false;
 
+  // Уведомления
+  notification = {
+    show: false,
+    message: '',
+    type: 'success' as 'success' | 'error'
+  };
+
   userProfile: UserProfile = {
     id: 0,
     username: '',
@@ -71,7 +79,8 @@ export class ProfileComponent implements OnInit {
     phone: '',
     address: '',
     created_at: '',
-    updated_at: ''
+    updated_at: '',
+    favorites: [] // Инициализируем favorites
   };
 
   editProfile: UserProfile = { ...this.userProfile };
@@ -137,7 +146,7 @@ export class ProfileComponent implements OnInit {
   ];
 
   settings: UserSettings = {
-    emailNotifications: true,
+    is_email_active: true,
   };
 
   constructor(
@@ -150,29 +159,81 @@ export class ProfileComponent implements OnInit {
     this.loadUserProfile();
   }
 
+  // Показать уведомление
+  showNotification(message: string, type: 'success' | 'error' = 'success') {
+    this.notification.message = message;
+    this.notification.type = type;
+    this.notification.show = true;
+    
+    // Автоматически скрываем через 3 секунды
+    setTimeout(() => {
+      this.hideNotification();
+    }, 3000);
+  }
+
+  // Скрыть уведомление
+  hideNotification() {
+    this.notification.show = false;
+  }
+
   private loadUserProfile() {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      // Преобразуем данные из AuthService в UserProfile
-      this.userProfile = {
-        id: currentUser.id,
-        username: currentUser.username,
-        email: currentUser.email,
-        role: currentUser.role,
-        firstName: currentUser.username.split(' ')[0] || currentUser.username,
-        lastName: currentUser.username.split(' ')[1] || '',
-        phone: '+7 (999) 123-45-67', // По умолчанию, можно добавить в API
-        address: 'ул. Примерная, д. 123, кв. 456, Москва, 123456', // По умолчанию, можно добавить в API
-        created_at: currentUser.created_at,
-        updated_at: currentUser.updated_at
-      };
-      
-      // Копируем для редактирования
-      this.editProfile = { ...this.userProfile };
-    } else {
-      // Если пользователь не авторизован, перенаправляем на страницу входа
-      this.router.navigate(['/auth']);
-    }
+    // Получаем профиль через API
+    this.authService.getProfile().subscribe({
+      next: (user) => {
+        this.userProfile = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          firstName: user.username.split(' ')[0] || user.username,
+          lastName: user.username.split(' ')[1] || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+          favorites: user.favorites || [] // Загружаем избранные товары
+        };
+        
+        // Копируем для редактирования
+        this.editProfile = { ...this.userProfile };
+        
+        // Загружаем настройки из профиля
+        this.settings.is_email_active = user.is_email_active;
+
+        // Загружаем избранные товары
+        this.loadFavorites();
+      },
+      error: (error) => {
+        console.error('Ошибка загрузки профиля:', error);
+        // Если API недоступен, используем данные из AuthService
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser) {
+          this.userProfile = {
+            id: currentUser.id,
+            username: currentUser.username,
+            email: currentUser.email,
+            role: currentUser.role,
+            firstName: currentUser.username.split(' ')[0] || currentUser.username,
+            lastName: currentUser.username.split(' ')[1] || '',
+            phone: currentUser.phone || '',
+            address: currentUser.address || '',
+            created_at: currentUser.created_at,
+            updated_at: currentUser.updated_at,
+            favorites: currentUser.favorites || [] // Загружаем избранные товары
+          };
+          
+          this.editProfile = { ...this.userProfile };
+          
+          // Загружаем настройки из профиля
+          this.settings.is_email_active = currentUser.is_email_active;
+
+          // Загружаем избранные товары
+          this.loadFavorites();
+        } else {
+          this.router.navigate(['/auth']);
+        }
+      }
+    });
   }
 
   getUserInitials(): string {
@@ -197,6 +258,11 @@ export class ProfileComponent implements OnInit {
   }
 
   formatDate(date: Date): string {
+    // Проверяем, что дата валидна
+    if (!date || isNaN(date.getTime())) {
+      return 'Дата не указана';
+    }
+    
     return new Intl.DateTimeFormat('ru-RU', {
       day: '2-digit',
       month: '2-digit',
@@ -204,8 +270,28 @@ export class ProfileComponent implements OnInit {
     }).format(date);
   }
 
-  parseDate(dateString: string): Date {
-    return new Date(dateString);
+  parseDate(dateString: string): Date | null {
+    if (!dateString) {
+      return null;
+    }
+    
+    const date = new Date(dateString);
+    
+    // Проверяем, что дата валидна
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+    
+    return date;
+  }
+
+  // Безопасное форматирование строки даты
+  formatDateString(dateString: string): string {
+    const date = this.parseDate(dateString);
+    if (!date) {
+      return 'Дата не указана';
+    }
+    return this.formatDate(date);
   }
 
   getStatusText(status: string): string {
@@ -231,18 +317,34 @@ export class ProfileComponent implements OnInit {
   updateProfile() {
     this.isUpdating = true;
     
-    // Здесь можно добавить вызов API для обновления профиля
-    // Пока что обновляем локально
-    setTimeout(() => {
-      this.userProfile = { ...this.editProfile };
-      this.isUpdating = false;
-      
-      // Показываем уведомление об успешном обновлении
-      this.showSuccessMessage = true;
-      setTimeout(() => {
-        this.showSuccessMessage = false;
-      }, 3000);
-    }, 1500);
+    // Подготавливаем данные для API
+    const profileData = {
+      email: this.editProfile.email,
+      phone: this.editProfile.phone,
+      address: this.editProfile.address
+    };
+    
+    // Отправляем запрос на обновление профиля
+    this.authService.updateProfile(profileData).subscribe({
+      next: (updatedUser) => {
+        // Обновляем локальные данные
+        this.userProfile = { ...this.editProfile };
+        this.isUpdating = false;
+        
+        // Показываем уведомление об успешном обновлении
+        this.showSuccessMessage = true;
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Ошибка обновления профиля:', error);
+        this.isUpdating = false;
+        
+        // Показываем ошибку
+        alert('Ошибка обновления профиля. Попробуйте еще раз.');
+      }
+    });
   }
 
   repeatOrder(order: Order) {
@@ -252,7 +354,9 @@ export class ProfileComponent implements OnInit {
   }
 
   viewOrderDetails(order: Order) {
-    alert(`Детали заказа #${order.id}\nСтатус: ${this.getStatusText(order.status)}\nДата: ${this.formatDate(order.date)}`);
+    const orderDate = order.date instanceof Date ? order.date : new Date(order.date);
+    const formattedDate = this.formatDate(orderDate);
+    alert(`Детали заказа #${order.id}\nСтатус: ${this.getStatusText(order.status)}\nДата: ${formattedDate}`);
   }
 
   addToCart(product: Product) {
@@ -260,12 +364,46 @@ export class ProfileComponent implements OnInit {
   }
 
   removeFromFavorites(product: Product) {
+    // Убираем товар из локального массива
     this.favorites = this.favorites.filter(fav => fav.id !== product.id);
-    alert(`${product.name} удален из избранного`);
+    
+    // Обновляем массив favorites в профиле пользователя
+    if (this.userProfile.favorites) {
+      this.userProfile.favorites = this.userProfile.favorites.filter(id => id !== product.id);
+    }
+    
+    // Отправляем обновление на сервер
+    const profileData = {
+      favorites: this.userProfile.favorites
+    };
+    
+    this.authService.updateProfile(profileData).subscribe({
+      next: (updatedUser) => {
+        console.log('Товар удален из избранного');
+      },
+      error: (error) => {
+        console.error('Ошибка обновления избранного:', error);
+        // Возвращаем товар обратно при ошибке
+        this.favorites.push(product);
+        if (this.userProfile.favorites) {
+          this.userProfile.favorites.push(product.id);
+        }
+      }
+    });
   }
 
   saveSettings() {
-    alert('Настройки сохранены');
+    // Отправляем настройку через API
+    this.authService.updateEmailStatus(this.settings.is_email_active).subscribe({
+      next: (response) => {
+        // Показываем уведомление об успешном сохранении
+        this.showNotification('Настройки успешно сохранены!', 'success');
+      },
+      error: (error) => {
+        console.error('Ошибка сохранения настроек:', error);
+        this.showNotification('Ошибка сохранения настроек. Попробуйте еще раз.', 'error');
+      }
+    });
   }
 
   logout() {
@@ -290,5 +428,31 @@ export class ProfileComponent implements OnInit {
 
   goToCart(): void {
     this.router.navigate(['/cart']);
+  }
+
+  // Обработка ошибки загрузки изображения
+  onImageError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkltYWdlPC90ZXh0Pjwvc3ZnPg==';
+  }
+
+  // Загрузка избранных товаров
+  loadFavorites() {
+    if (this.userProfile.favorites && this.userProfile.favorites.length > 0) {
+      // Получаем товары по ID из favorites
+      this.favorites = [];
+      this.userProfile.favorites.forEach((productId: number) => {
+        // Здесь можно добавить вызов API для получения товара по ID
+        // Пока используем моковые данные для демонстрации
+        const mockProduct = {
+          id: productId,
+          name: `Товар #${productId}`,
+          price: Math.floor(Math.random() * 10000) + 1000,
+          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzAwMDAwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9kdWN0ICM8L3RleHQ+PC9zdmc+',
+          category: 'Категория'
+        };
+        this.favorites.push(mockProduct);
+      });
+    }
   }
 }
