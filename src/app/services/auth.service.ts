@@ -104,6 +104,31 @@ export class AuthService {
     }
   }
 
+  // Получить информацию из токена
+  getTokenInfo(): any {
+    const token = this.getToken();
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload;
+    } catch {
+      return null;
+    }
+  }
+
+  // Получить роль пользователя из токена
+  getRoleFromToken(): string | null {
+    const tokenInfo = this.getTokenInfo();
+    return tokenInfo?.role || tokenInfo?.user_role || null;
+  }
+
+  // Получить ID пользователя из токена
+  getUserIdFromToken(): number | null {
+    const tokenInfo = this.getTokenInfo();
+    return tokenInfo?.sub || tokenInfo?.user_id || tokenInfo?.id || null;
+  }
+
   // Обновить токен (если есть эндпоинт для обновления)
   refreshToken(): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}).pipe(

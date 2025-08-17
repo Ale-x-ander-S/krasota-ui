@@ -51,6 +51,7 @@ export class AdminComponent implements OnInit {
   activeTab: string = 'dashboard';
   currentUser: User | null = null;
   loading = false;
+  showDebugInfo = false;
 
   // Статистика
   stats: AdminStats = {
@@ -139,12 +140,21 @@ export class AdminComponent implements OnInit {
   ];
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
+    
+    // Отладочная информация о токене
+    console.log('=== Отладочная информация о токене ===');
+    console.log('Токен:', this.authService.getToken());
+    console.log('Информация из токена:', this.authService.getTokenInfo());
+    console.log('Роль из токена:', this.authService.getRoleFromToken());
+    console.log('ID пользователя из токена:', this.authService.getUserIdFromToken());
+    console.log('Текущий пользователь:', this.currentUser);
+    console.log('=====================================');
     
     // Проверяем, является ли пользователь админом
     if (!this.currentUser || this.currentUser.role !== 'admin') {
@@ -272,5 +282,9 @@ export class AdminComponent implements OnInit {
 
   exitAdmin() {
     this.router.navigate(['/']);
+  }
+
+  toggleDebugInfo() {
+    this.showDebugInfo = !this.showDebugInfo;
   }
 }

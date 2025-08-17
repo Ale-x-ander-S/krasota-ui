@@ -12,6 +12,32 @@
     </div>
   </div>
 
+  <!-- Отладочная информация о токене (только для разработки) -->
+  <div class="debug-info" *ngIf="showDebugInfo">
+    <h3>🔍 Отладочная информация о токене</h3>
+    <div class="debug-grid">
+      <div class="debug-item">
+        <strong>Токен:</strong>
+        <code>{{ authService.getToken() | slice:0:50 }}...</code>
+      </div>
+      <div class="debug-item">
+        <strong>Роль из токена:</strong>
+        <span class="debug-value">{{ authService.getRoleFromToken() || 'Не найдено' }}</span>
+      </div>
+      <div class="debug-item">
+        <strong>ID из токена:</strong>
+        <span class="debug-value">{{ authService.getUserIdFromToken() || 'Не найдено' }}</span>
+      </div>
+      <div class="debug-item">
+        <strong>Полная информация:</strong>
+        <pre class="debug-json">{{ authService.getTokenInfo() | json }}</pre>
+      </div>
+    </div>
+    <button class="debug-toggle" (click)="toggleDebugInfo()">
+      {{ showDebugInfo ? 'Скрыть' : 'Показать' }} отладочную информацию
+    </button>
+  </div>
+
   <!-- Навигация по табам -->
   <div class="admin-tabs">
     <button 

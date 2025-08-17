@@ -4,13 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
+import { AuthService, User } from '../../services/auth.service';
 
 interface UserProfile {
-  firstName: string;
-  lastName: string;
+  id: number;
+  username: string;
   email: string;
-  phone: string;
-  birthDate: string;
+  role: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  birthDate?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface OrderItem {
@@ -64,13 +70,19 @@ export class ProfileComponent implements OnInit {
   showMobileMenu: boolean = false;
   activeTab: string = 'profile';
   isUpdating: boolean = false;
+  showSuccessMessage: boolean = false;
 
   userProfile: UserProfile = {
-    firstName: 'Иван',
-    lastName: 'Иванов',
-    email: 'ivan.ivanov@example.com',
-    phone: '+7 (999) 123-45-67',
-    birthDate: '1990-01-01'
+    id: 0,
+    username: '',
+    email: '',
+    role: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    birthDate: '',
+    created_at: '',
+    updated_at: ''
   };
 
   editProfile: UserProfile = { ...this.userProfile };
@@ -152,14 +164,48 @@ export class ProfileComponent implements OnInit {
     publicProfile: false
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    // Загрузка данных пользователя
+    // Загружаем реальные данные пользователя
+    this.loadUserProfile();
+  }
+
+  private loadUserProfile() {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      // Преобразуем данные из AuthService в UserProfile
+      this.userProfile = {
+        id: currentUser.id,
+        username: currentUser.username,
+        email: currentUser.email,
+        role: currentUser.role,
+        firstName: currentUser.username.split(' ')[0] || currentUser.username,
+        lastName: currentUser.username.split(' ')[1] || '',
+        phone: '+7 (999) 123-45-67', // По умолчанию, можно добавить в API
+        birthDate: '1990-01-01', // По умолчанию, можно добавить в API
+        created_at: currentUser.created_at,
+        updated_at: currentUser.updated_at
+      };
+      
+      // Копируем для редактирования
+      this.editProfile = { ...this.userProfile };
+    } else {
+      // Если пользователь не авторизован, перенаправляем на страницу входа
+      this.router.navigate(['/auth']);
+    }
   }
 
   getUserInitials(): string {
-    return `${this.userProfile.firstName.charAt(0)}${this.userProfile.lastName.charAt(0)}`;
+    if (this.userProfile.firstName && this.userProfile.lastName) {
+      return `${this.userProfile.firstName.charAt(0)}${this.userProfile.lastName.charAt(0)}`;
+    } else if (this.userProfile.username) {
+      return this.userProfile.username.charAt(0).toUpperCase();
+    }
+    return 'U';
   }
 
   setActiveTab(tab: string) {
@@ -182,6 +228,10 @@ export class ProfileComponent implements OnInit {
     }).format(date);
   }
 
+  parseDate(dateString: string): Date {
+    return new Date(dateString);
+  }
+
   getStatusText(status: string): string {
     const statusMap: { [key: string]: string } = {
       'pending': 'Ожидает подтверждения',
@@ -193,14 +243,29 @@ export class ProfileComponent implements OnInit {
     return statusMap[status] || status;
   }
 
+  getRoleText(role: string): string {
+    const roleMap: { [key: string]: string } = {
+      'admin': 'Администратор',
+      'user': 'Пользователь',
+      'moderator': 'Модератор'
+    };
+    return roleMap[role] || role;
+  }
+
   updateProfile() {
     this.isUpdating = true;
     
-    // Имитация обновления профиля
+    // Здесь можно добавить вызов API для обновления профиля
+    // Пока что обновляем локально
     setTimeout(() => {
       this.userProfile = { ...this.editProfile };
       this.isUpdating = false;
-      alert('Профиль обновлен успешно!');
+      
+      // Показываем уведомление об успешном обновлении
+      this.showSuccessMessage = true;
+      setTimeout(() => {
+        this.showSuccessMessage = false;
+      }, 3000);
     }, 1500);
   }
 
@@ -248,6 +313,7 @@ export class ProfileComponent implements OnInit {
 
   logout() {
     if (confirm('Вы уверены, что хотите выйти?')) {
+      this.authService.logout();
       this.router.navigate(['/auth']);
     }
   }

@@ -20,9 +20,11 @@
             <div class="user-avatar">
               <span>{{ getUserInitials() }}</span>
             </div>
-            <h3>{{ userProfile.firstName }} {{ userProfile.lastName }}</h3>
+            <h3>{{ userProfile.username }}</h3>
             <p>{{ userProfile.email }}</p>
+            <p class="user-role">Роль: {{ getRoleText(userProfile.role) }}</p>
             <p class="user-phone">{{ userProfile.phone || 'Телефон не указан' }}</p>
+            <p class="user-date">Дата регистрации: {{ formatDate(parseDate(userProfile.created_at)) }}</p>
           </div>
 
           <nav class="profile-nav">
@@ -98,29 +100,26 @@
           <!-- Profile Tab -->
           <div *ngIf="activeTab === 'profile'" class="tab-content profile-tab">
             <h2>Редактировать профиль</h2>
+            
+            <!-- Сообщение об успешном обновлении -->
+            <div *ngIf="showSuccessMessage" class="success-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+              Профиль успешно обновлен!
+            </div>
             <form class="profile-form" (ngSubmit)="updateProfile()">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="editFirstName">Имя *</label>
-                  <input 
-                    type="text" 
-                    id="editFirstName" 
-                    name="editFirstName"
-                    [(ngModel)]="editProfile.firstName" 
-                    required
-                  >
-                </div>
-                
-                <div class="form-group">
-                  <label for="editLastName">Фамилия *</label>
-                  <input 
-                    type="text" 
-                    id="editLastName" 
-                    name="editLastName"
-                    [(ngModel)]="editProfile.lastName" 
-                    required
-                  >
-                </div>
+              <div class="form-group">
+                <label for="editUsername">Имя пользователя *</label>
+                <input 
+                  type="text" 
+                  id="editUsername" 
+                  name="editUsername"
+                  [(ngModel)]="editProfile.username" 
+                  required
+                  readonly
+                >
+                <small class="form-help">Имя пользователя нельзя изменить</small>
               </div>
 
               <div class="form-group">
@@ -132,6 +131,18 @@
                   [(ngModel)]="editProfile.email" 
                   required
                 >
+              </div>
+
+              <div class="form-group">
+                <label for="editRole">Роль</label>
+                <input 
+                  type="text" 
+                  id="editRole" 
+                  name="editRole"
+                  [value]="getRoleText(userProfile.role)" 
+                  readonly
+                >
+                <small class="form-help">Роль определяется системой</small>
               </div>
 
               <div class="form-group">
