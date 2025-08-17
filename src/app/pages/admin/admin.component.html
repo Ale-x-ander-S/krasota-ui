@@ -1,4 +1,15 @@
 <div class="admin-container">
+  <!-- Уведомления -->
+  <div *ngIf="notification.show" class="notification" [class]="'notification-' + notification.type">
+    <div class="notification-content">
+      <span class="notification-icon">
+        {{ notification.type === 'success' ? '✅' : '❌' }}
+      </span>
+      <span class="notification-message">{{ notification.message }}</span>
+      <button class="notification-close" (click)="hideNotification()">×</button>
+    </div>
+  </div>
+
   <div class="admin-header">
     <div class="header-content">
       <div class="header-text">
@@ -125,26 +136,45 @@
       </div>
     </div>
 
-    <!-- Быстрые действия -->
-    <div class="quick-actions">
-      <h3>Быстрые действия</h3>
-      <div class="actions-grid">
-        <button class="action-btn" (click)="goToProducts()">
-          <span class="action-icon">🛍️</span>
-          Управление товарами
-        </button>
-        <button class="action-btn" (click)="goToOrders()">
-          <span class="action-icon">📦</span>
-          Управление заказами
-        </button>
-        <button class="action-btn" (click)="goToUsers()">
-          <span class="action-icon">👥</span>
-          Управление пользователями
-        </button>
-        <button class="action-btn" (click)="goToAnalytics()">
-          <span class="action-icon">📊</span>
-          Аналитика
-        </button>
+    <!-- Аналитика -->
+    <div class="analytics-section">
+      <h3>📊 Аналитика</h3>
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <div class="analytics-icon">📈</div>
+          <div class="analytics-content">
+            <h4>Продажи за месяц</h4>
+            <p class="analytics-value">{{ formatPrice(1245000) }}</p>
+            <span class="analytics-change positive">+12.5%</span>
+          </div>
+        </div>
+        
+        <div class="analytics-card">
+          <div class="analytics-icon">🆕</div>
+          <div class="analytics-content">
+            <h4>Новых пользователей</h4>
+            <p class="analytics-value">+{{ newUsersCount }}</p>
+            <span class="analytics-change positive">+15.2%</span>
+          </div>
+        </div>
+        
+        <div class="analytics-card">
+          <div class="analytics-icon">🔥</div>
+          <div class="analytics-content">
+            <h4>Популярные товары</h4>
+            <p class="analytics-value">{{ popularProductsCount }}</p>
+            <span class="analytics-change neutral">Стабильно</span>
+          </div>
+        </div>
+        
+        <div class="analytics-card">
+          <div class="analytics-icon">📊</div>
+          <div class="analytics-content">
+            <h4>Конверсия</h4>
+            <p class="analytics-value">3.2%</p>
+            <span class="analytics-change positive">+0.8%</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -203,7 +233,27 @@
   <div *ngIf="activeTab === 'users'" class="tab-content users-tab">
     <h2>Управление пользователями</h2>
     
-    <div class="table-container">
+    <!-- Индикатор загрузки -->
+    <div *ngIf="usersLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Загрузка пользователей...</p>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div *ngIf="usersError && !usersLoading" class="error-message">
+      {{ usersError }}
+      <button class="btn btn-small" (click)="loadUsers()">Повторить</button>
+    </div>
+
+    <!-- Таблица пользователей -->
+    <div *ngIf="!usersLoading && !usersError" class="table-container">
+      <div class="table-header">
+        <h3>Всего пользователей: {{ users.length }}</h3>
+        <button class="btn btn-primary" (click)="loadUsers()">
+          🔄 Обновить
+        </button>
+      </div>
+      
       <table class="admin-table">
         <thead>
           <tr>
@@ -211,13 +261,14 @@
             <th>Имя пользователя</th>
             <th>Email</th>
             <th>Роль</th>
+            <th>Email активирован</th>
             <th>Дата регистрации</th>
-            <th>Последний вход</th>
+            <th>Дата обновления</th>
             <th>Действия</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of recentUsers">
+          <tr *ngFor="let user of users">
             <td>#{{ user.id }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
@@ -226,15 +277,24 @@
                 {{ getRoleText(user.role) }}
               </span>
             </td>
-            <td>{{ formatDate(user.registrationDate) }}</td>
-            <td>{{ formatDate(user.lastLogin) }}</td>
             <td>
-              <button class="btn btn-small" (click)="viewUserDetails(user)">👁️</button>
-                              <select class="role-select" (change)="changeUserRole(user, $event)">
-                <option value="user" [selected]="user.role === 'user'">Пользователь</option>
-                <option value="moderator" [selected]="user.role === 'moderator'">Модератор</option>
-                <option value="admin" [selected]="user.role === 'admin'">Администратор</option>
-              </select>
+              <span class="status-badge" [class]="user.is_email_active ? 'status-active' : 'status-inactive'">
+                {{ user.is_email_active ? 'Да' : 'Нет' }}
+              </span>
+            </td>
+            <td>{{ formatDateString(user.created_at) }}</td>
+            <td>{{ formatDateString(user.updated_at) }}</td>
+            <td>
+              <button class="btn btn-small" (click)="viewUserDetails(user)" title="Просмотр деталей">👁️</button>
+              <button class="btn btn-small btn-primary" (click)="editUser(user)" title="Редактировать">✏️</button>
+              <button 
+                class="btn btn-small btn-danger" 
+                (click)="deleteUser(user)" 
+                [disabled]="user.id === currentUser?.id"
+                title="Удалить пользователя"
+              >
+                🗑️
+              </button>
             </td>
           </tr>
         </tbody>
@@ -242,42 +302,855 @@
     </div>
   </div>
 
+  <!-- Модальное окно редактирования пользователя -->
+  <div *ngIf="editingUser" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Редактирование пользователя</h3>
+        <button class="modal-close" (click)="cancelEdit()">×</button>
+      </div>
+      
+      <form (ngSubmit)="saveUserChanges()" class="edit-form">
+        <div class="form-group" [class.has-error]="hasFieldError('username')">
+          <label for="edit-username">Имя пользователя *</label>
+          <input
+            type="text"
+            id="edit-username"
+            [(ngModel)]="editForm.username"
+            name="username"
+            required
+            class="form-control"
+            (input)="clearFieldError('username')"
+            [class.error]="hasFieldError('username')"
+          >
+          <div *ngIf="hasFieldError('username')" class="error-message">
+            {{ getFieldError('username') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasFieldError('email')">
+          <label for="edit-email">Email *</label>
+          <input
+            type="email"
+            id="edit-email"
+            [(ngModel)]="editForm.email"
+            name="email"
+            required
+            class="form-control"
+            (input)="clearFieldError('email')"
+            [class.error]="hasFieldError('email')"
+          >
+          <div *ngIf="hasFieldError('email')" class="error-message">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasFieldError('role')">
+          <label for="edit-role">Роль *</label>
+          <select
+            id="edit-role"
+            [(ngModel)]="editForm.role"
+            name="role"
+            required
+            class="form-control"
+            (change)="clearFieldError('role')"
+            [class.error]="hasFieldError('role')"
+          >
+            <option value="">Выберите роль</option>
+            <option value="user">Пользователь</option>
+            <option value="moderator">Модератор</option>
+            <option value="admin">Администратор</option>
+          </select>
+          <div *ngIf="hasFieldError('role')" class="error-message">
+            {{ getFieldError('role') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasFieldError('address')">
+          <label for="edit-address">Адрес</label>
+          <input
+            type="text"
+            id="edit-address"
+            [(ngModel)]="editForm.address"
+            name="address"
+            class="form-control"
+            placeholder="Не указан"
+            (input)="clearFieldError('address')"
+            [class.error]="hasFieldError('address')"
+          >
+          <div *ngIf="hasFieldError('address')" class="error-message">
+            {{ getFieldError('address') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasFieldError('phone')">
+          <label for="edit-phone">Телефон</label>
+          <input
+            type="tel"
+            id="edit-phone"
+            [(ngModel)]="editForm.phone"
+            name="phone"
+            class="form-control"
+            placeholder="Не указан"
+            (input)="clearFieldError('phone')"
+            [class.error]="hasFieldError('phone')"
+          >
+          <div *ngIf="hasFieldError('phone')" class="error-message">
+            {{ getFieldError('phone') }}
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="editForm.is_email_active"
+              name="is_email_active"
+            >
+            Email активирован
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Сохранить изменения
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования товара -->
+  <div *ngIf="editingProduct" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Редактирование товара</h3>
+        <button class="modal-close" (click)="cancelProductEdit()">×</button>
+      </div>
+      
+      <form (ngSubmit)="saveProductChanges()" class="edit-form">
+        <div class="form-group" [class.has-error]="hasProductFieldError('name')">
+          <label for="edit-product-name">Название товара *</label>
+          <input
+            type="text"
+            id="edit-product-name"
+            [(ngModel)]="productEditForm.name"
+            name="name"
+            required
+            class="form-control"
+            (input)="clearProductFieldError('name')"
+            [class.error]="hasProductFieldError('name')"
+          >
+          <div *ngIf="hasProductFieldError('name')" class="error-message">
+            {{ getProductFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasProductFieldError('description')">
+          <label for="edit-product-description">Описание *</label>
+          <textarea
+            id="edit-product-description"
+            [(ngModel)]="productEditForm.description"
+            name="description"
+            required
+            class="form-control"
+            rows="3"
+            (input)="clearProductFieldError('description')"
+            [class.error]="hasProductFieldError('description')"
+          ></textarea>
+          <div *ngIf="hasProductFieldError('description')" class="error-message">
+            {{ getProductFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" [class.has-error]="hasProductFieldError('price')">
+            <label for="edit-product-price">Цена *</label>
+            <input
+              type="number"
+              id="edit-product-price"
+              [(ngModel)]="productEditForm.price"
+              name="price"
+              required
+              min="0"
+              step="0.01"
+              class="form-control"
+              (input)="clearProductFieldError('price')"
+              [class.error]="hasProductFieldError('price')"
+            >
+            <div *ngIf="hasProductFieldError('price')" class="error-message">
+              {{ getProductFieldError('price') }}
+            </div>
+          </div>
+
+          <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
+            <label for="edit-product-category">ID категории *</label>
+            <input
+              type="number"
+              id="edit-product-category"
+              [(ngModel)]="productEditForm.category_id"
+              name="category_id"
+              required
+              min="1"
+              class="form-control"
+              (input)="clearProductFieldError('category_id')"
+              [class.error]="hasProductFieldError('category_id')"
+            >
+            <div *ngIf="hasProductFieldError('category_id')" class="error-message">
+              {{ getProductFieldError('category_id') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-product-image">URL изображения</label>
+          <input
+            type="url"
+            id="edit-product-image"
+            [(ngModel)]="productEditForm.image_url"
+            name="image_url"
+            class="form-control"
+            placeholder="Введите URL изображения"
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" [class.has-error]="hasProductFieldError('stock')">
+            <label for="edit-product-stock">Запас *</label>
+            <input
+              type="number"
+              id="edit-product-stock"
+              [(ngModel)]="productEditForm.stock"
+              name="stock"
+              required
+              min="0"
+              class="form-control"
+              (input)="clearProductFieldError('stock')"
+              [class.error]="hasProductFieldError('stock')"
+            >
+            <div *ngIf="hasProductFieldError('stock')" class="error-message">
+              {{ getProductFieldError('stock') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-product-stock-type">Тип запаса</label>
+            <select
+              id="edit-product-stock-type"
+              [(ngModel)]="productEditForm.stock_type"
+              name="stock_type"
+              class="form-control"
+            >
+              <option value="piece">Штуки</option>
+              <option value="kg">Килограммы</option>
+              <option value="m">Метры</option>
+              <option value="l">Литры</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-product-color">Цвет</label>
+            <input
+              type="text"
+              id="edit-product-color"
+              [(ngModel)]="productEditForm.color"
+              name="color"
+              class="form-control"
+              placeholder="Не указан"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="edit-product-size">Размер</label>
+            <input
+              type="text"
+              id="edit-product-size"
+              [(ngModel)]="productEditForm.size"
+              name="size"
+              class="form-control"
+              placeholder="Не указан"
+            >
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasProductFieldError('sku')">
+          <label for="edit-product-sku">SKU *</label>
+          <input
+            type="text"
+            id="edit-product-sku"
+            [(ngModel)]="productEditForm.sku"
+            name="sku"
+            required
+            class="form-control"
+            (input)="clearProductFieldError('sku')"
+            [class.error]="hasProductFieldError('sku')"
+          >
+          <div *ngIf="hasProductFieldError('sku')" class="error-message">
+            {{ getProductFieldError('sku') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-product-sort-order">Порядок сортировки</label>
+          <input
+            type="number"
+            id="edit-product-sort-order"
+            [(ngModel)]="productEditForm.sort_order"
+            name="sort_order"
+            min="0"
+            class="form-control"
+          >
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="productEditForm.is_active"
+              name="is_active"
+            >
+            Товар активен
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="productEditForm.is_featured"
+              name="is_featured"
+            >
+            Избранный товар
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelProductEdit()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Сохранить изменения
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно создания товара -->
+  <div *ngIf="creatingProduct" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Создание нового товара</h3>
+        <button class="modal-close" (click)="cancelProductCreate()">×</button>
+      </div>
+      
+      <form (ngSubmit)="createNewProduct()" class="edit-form">
+        <div class="form-group" [class.has-error]="hasProductFieldError('name')">
+          <label for="create-product-name">Название товара *</label>
+          <input
+            type="text"
+            id="create-product-name"
+            [(ngModel)]="productCreateForm.name"
+            name="name"
+            required
+            class="form-control"
+            (input)="clearProductFieldError('name')"
+            [class.error]="hasProductFieldError('name')"
+          >
+          <div *ngIf="hasProductFieldError('name')" class="error-message">
+            {{ getProductFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasProductFieldError('description')">
+          <label for="create-product-description">Описание *</label>
+          <textarea
+            id="create-product-description"
+            [(ngModel)]="productCreateForm.description"
+            name="description"
+            required
+            class="form-control"
+            rows="3"
+            (input)="clearProductFieldError('description')"
+            [class.error]="hasProductFieldError('description')"
+          ></textarea>
+          <div *ngIf="hasProductFieldError('description')" class="error-message">
+            {{ getProductFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" [class.has-error]="hasProductFieldError('price')">
+            <label for="create-product-price">Цена *</label>
+            <input
+              type="number"
+              id="create-product-price"
+              [(ngModel)]="productCreateForm.price"
+              name="price"
+              required
+              min="0"
+              step="0.01"
+              class="form-control"
+              (input)="clearProductFieldError('price')"
+              [class.error]="hasProductFieldError('price')"
+            >
+            <div *ngIf="hasProductFieldError('price')" class="error-message">
+              {{ getProductFieldError('price') }}
+            </div>
+          </div>
+
+          <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
+            <label for="create-product-category">ID категории *</label>
+            <input
+              type="number"
+              id="create-product-category"
+              [(ngModel)]="productCreateForm.category_id"
+              name="category_id"
+              required
+              min="1"
+              class="form-control"
+              (input)="clearProductFieldError('category_id')"
+              [class.error]="hasProductFieldError('category_id')"
+            >
+            <div *ngIf="hasProductFieldError('category_id')" class="error-message">
+              {{ getProductFieldError('category_id') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="create-product-image">URL изображения</label>
+          <input
+            type="url"
+            id="create-product-image"
+            [(ngModel)]="productCreateForm.image_url"
+            name="image_url"
+            class="form-control"
+            placeholder="Введите URL изображения"
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" [class.has-error]="hasProductFieldError('stock')">
+            <label for="create-product-stock">Запас *</label>
+            <input
+              type="number"
+              id="create-product-stock"
+              [(ngModel)]="productCreateForm.stock"
+              name="stock"
+              required
+              min="0"
+              class="form-control"
+              (input)="clearProductFieldError('stock')"
+              [class.error]="hasProductFieldError('stock')"
+            >
+            <div *ngIf="hasProductFieldError('stock')" class="error-message">
+              {{ getProductFieldError('stock') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="create-product-stock-type">Тип запаса</label>
+            <select
+              id="create-product-stock-type"
+              [(ngModel)]="productCreateForm.stock_type"
+              name="stock_type"
+              class="form-control"
+            >
+              <option value="piece">Штуки</option>
+              <option value="kg">Килограммы</option>
+              <option value="m">Метры</option>
+              <option value="l">Литры</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-product-color">Цвет</label>
+            <input
+              type="text"
+              id="create-product-color"
+              [(ngModel)]="productCreateForm.color"
+              name="color"
+              class="form-control"
+              placeholder="Не указан"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="create-product-size">Размер</label>
+            <input
+              type="text"
+              id="create-product-size"
+              [(ngModel)]="productCreateForm.size"
+              name="size"
+              class="form-control"
+              placeholder="Не указан"
+            >
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasProductFieldError('sku')">
+          <label for="create-product-sku">SKU *</label>
+          <input
+            type="text"
+            id="create-product-sku"
+            [(ngModel)]="productCreateForm.sku"
+            name="sku"
+            required
+            class="form-control"
+            (input)="clearProductFieldError('sku')"
+            [class.error]="hasProductFieldError('sku')"
+          >
+          <div *ngIf="hasProductFieldError('sku')" class="error-message">
+            {{ getProductFieldError('sku') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="create-product-sort-order">Порядок сортировки</label>
+          <input
+            type="number"
+            id="create-product-sort-order"
+            [(ngModel)]="productCreateForm.sort_order"
+            name="sort_order"
+            min="0"
+            class="form-control"
+          >
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="productCreateForm.is_active"
+              name="is_active"
+            >
+            Товар активен
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="productCreateForm.is_featured"
+              name="is_featured"
+            >
+            Избранный товар
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelProductCreate()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-success">
+            Создать товар
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра товара -->
+  <div *ngIf="viewingProduct" class="modal-overlay">
+    <div class="modal-content product-view-modal">
+      <div class="modal-header">
+        <h3>Просмотр товара</h3>
+        <button class="modal-close" (click)="closeProductView()">×</button>
+      </div>
+      
+      <div class="product-view-content">
+        <!-- Изображение товара -->
+        <div class="product-image-section">
+          <img 
+            [src]="viewingProduct.image_url" 
+            [alt]="viewingProduct.name"
+            class="product-view-image"
+            (error)="onImageError($event)"
+          >
+        </div>
+
+        <!-- Основная информация -->
+        <div class="product-info-section">
+          <div class="info-group">
+            <label>ID товара</label>
+            <span class="info-value">#{{ viewingProduct.id }}</span>
+          </div>
+
+          <div class="info-group">
+            <label>Название</label>
+            <span class="info-value product-name">{{ viewingProduct.name }}</span>
+          </div>
+
+          <div class="info-group">
+            <label>SKU</label>
+            <span class="info-value">{{ viewingProduct.sku }}</span>
+          </div>
+
+          <div class="info-group">
+            <label>Описание</label>
+            <span class="info-value product-description">{{ viewingProduct.description }}</span>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Цена</label>
+              <span class="info-value price-value">{{ formatPrice(viewingProduct.price) }}</span>
+            </div>
+
+            <div class="info-group">
+              <label>Категория ID</label>
+              <span class="info-value">{{ viewingProduct.category_id }}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Запас</label>
+              <span class="info-value stock-value" [class]="viewingProduct.stock === 0 ? 'stock-empty' : viewingProduct.stock < 10 ? 'stock-low' : 'stock-ok'">
+                {{ viewingProduct.stock }} {{ viewingProduct.stock_type }}
+              </span>
+            </div>
+
+            <div class="info-group">
+              <label>Порядок сортировки</label>
+              <span class="info-value">{{ viewingProduct.sort_order }}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group" *ngIf="viewingProduct.color">
+              <label>Цвет</label>
+              <span class="info-value">{{ viewingProduct.color }}</span>
+            </div>
+
+            <div class="info-group" *ngIf="viewingProduct.size">
+              <label>Размер</label>
+              <span class="info-value">{{ viewingProduct.size }}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Статус</label>
+              <span class="info-value">
+                <span class="status-badge" [class]="viewingProduct.is_active ? 'status-active' : 'status-inactive'">
+                  {{ viewingProduct.is_active ? 'Активен' : 'Неактивен' }}
+                </span>
+              </span>
+            </div>
+
+            <div class="info-group">
+              <label>Избранный</label>
+              <span class="info-value">
+                <span *ngIf="viewingProduct.is_featured" class="featured-badge">⭐ Да</span>
+                <span *ngIf="!viewingProduct.is_featured">Нет</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Дата создания</label>
+              <span class="info-value">{{ formatDateString(viewingProduct.created_at) }}</span>
+            </div>
+
+            <div class="info-group">
+              <label>Дата обновления</label>
+              <span class="info-value">{{ formatDateString(viewingProduct.updated_at) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" (click)="editProduct(viewingProduct)">
+          ✏️ Редактировать
+        </button>
+        <button class="btn btn-secondary" (click)="closeProductView()">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Товары -->
   <div *ngIf="activeTab === 'products'" class="tab-content products-tab">
     <h2>Управление товарами</h2>
     
-    <div class="low-stock-section">
-      <h3>Товары с низким запасом</h3>
-      <div class="table-container">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Название</th>
-              <th>Категория</th>
-              <th>Текущий запас</th>
-              <th>Минимальный запас</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let product of lowStockProducts" [class]="product.currentStock === 0 ? 'out-of-stock' : 'low-stock'">
-              <td>#{{ product.id }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.category }}</td>
-              <td>
-                <span class="stock-badge" [class]="product.currentStock === 0 ? 'stock-empty' : 'stock-low'">
-                  {{ product.currentStock }}
+    <!-- Фильтры товаров -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="product-search">Поиск</label>
+          <input
+            type="text"
+            id="product-search"
+            [(ngModel)]="productFilters.search"
+            placeholder="Название товара..."
+            class="form-control"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="product-category">Категория</label>
+          <input
+            type="text"
+            id="product-category"
+            [(ngModel)]="productFilters.category_id"
+            placeholder="ID категории..."
+            class="form-control"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="product-min-price">Мин. цена</label>
+          <input
+            type="number"
+            id="product-min-price"
+            [(ngModel)]="productFilters.min_price"
+            placeholder="0"
+            class="form-control"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="product-max-price">Макс. цена</label>
+          <input
+            type="number"
+            id="product-max-price"
+            [(ngModel)]="productFilters.max_price"
+            placeholder="999999"
+            class="form-control"
+          >
+        </div>
+      </div>
+
+      <div class="filters-actions">
+        <button class="btn btn-primary" (click)="applyProductFilters()">
+          🔍 Применить фильтры
+        </button>
+        <button class="btn btn-secondary" (click)="resetProductFilters()">
+          🔄 Сбросить
+        </button>
+      </div>
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div *ngIf="productsLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Загрузка товаров...</p>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div *ngIf="productsError && !productsLoading" class="error-message">
+      {{ productsError }}
+      <button class="btn btn-small" (click)="loadProducts()">Повторить</button>
+    </div>
+
+    <!-- Таблица товаров -->
+    <div *ngIf="!productsLoading && !productsError" class="table-container">
+      <div class="table-header">
+        <h3>Всего товаров: {{ totalProducts }}</h3>
+        <div class="table-actions">
+          <button class="btn btn-success" (click)="createProduct()">
+            ➕ Создать товар
+          </button>
+          <button class="btn btn-primary" (click)="loadProducts()">
+            🔄 Обновить
+          </button>
+        </div>
+      </div>
+      
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Изображение</th>
+            <th>Название</th>
+            <th>Категория</th>
+            <th>Цена</th>
+            <th>Запас</th>
+            <th>Статус</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of products">
+            <td>#{{ product.id }}</td>
+            <td>
+              <img 
+                [src]="product.image_url" 
+                [alt]="product.name"
+                class="product-thumbnail"
+                (error)="onImageError($event)"
+              >
+            </td>
+            <td>
+              <div class="product-info">
+                <strong>{{ product.name }}</strong>
+                <small>{{ product.sku }}</small>
+              </div>
+            </td>
+            <td>{{ product.category_id }}</td>
+            <td>{{ formatPrice(product.price) }}</td>
+            <td>
+              <span class="stock-badge" [class]="product.stock === 0 ? 'stock-empty' : product.stock < 10 ? 'stock-low' : 'stock-ok'">
+                {{ product.stock }}
+              </span>
+            </td>
+            <td>
+              <div class="status-indicators">
+                <span class="status-badge" [class]="product.is_active ? 'status-active' : 'status-inactive'">
+                  {{ product.is_active ? 'Активен' : 'Неактивен' }}
                 </span>
-              </td>
-              <td>{{ product.minStock }}</td>
-              <td>
-                <button class="btn btn-small" (click)="viewProductDetails(product)">👁️</button>
-                <button class="btn btn-small btn-primary" (click)="restockProduct(product)">📦</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <span *ngIf="product.is_featured" class="featured-badge">⭐</span>
+              </div>
+            </td>
+            <td>
+              <button class="btn btn-small" (click)="viewProductDetails(product)" title="Просмотр деталей">👁️</button>
+              <button class="btn btn-small btn-primary" (click)="editProduct(product)" title="Редактировать">✏️</button>
+              <button 
+                class="btn btn-small btn-danger" 
+                (click)="deleteProduct(product)" 
+                title="Удалить товар"
+              >
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Пагинация -->
+      <div *ngIf="totalProductPages > 1" class="pagination">
+        <button 
+          class="btn btn-small" 
+          [disabled]="currentPage === 1"
+          (click)="changeProductPage(currentPage - 1)"
+        >
+          ← Предыдущая
+        </button>
+        
+        <span class="page-info">
+          Страница {{ currentPage }} из {{ totalProductPages }}
+        </span>
+        
+        <button 
+          class="btn btn-small" 
+          [disabled]="currentPage === totalProductPages"
+          (click)="changeProductPage(currentPage + 1)"
+        >
+          Следующая →
+        </button>
       </div>
     </div>
   </div>

@@ -1,131 +1,111 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface Product {
   id: number;
   name: string;
-  price: number;
-  image_url: string;
-  category_slug: string;
   description: string;
+  price: number;
+  category_id: number;
+  category_slug?: string;
+  image_url: string;
   stock: number;
   stock_type: string;
+  color?: string;
+  size?: string;
   sku: string;
-  color: string;
-  size: string;
+  sort_order: number;
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
   updated_at: string;
 }
 
-export interface ProductFilters {
-  category_id?: string;
-  search?: string;
-  min_price?: number;
-  max_price?: number;
-}
-
-export interface ProductResponse {
+export interface ProductListResponse {
   products: Product[];
   total: number;
   page: number;
   limit: number;
 }
 
+export interface CreateProductData {
+  name: string;
+  description: string;
+  price: number;
+  category_id: number;
+  image_url: string;
+  stock: number;
+  stock_type: string;
+  color?: string;
+  size?: string;
+  sku: string;
+  sort_order: number;
+  is_active: boolean;
+  is_featured: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private readonly apiUrl = 'http://45.12.229.112:8080/api/v1/products';
+  private apiUrl = 'http://45.12.229.112:8080/api/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  // Получить все продукты с фильтрацией
-  getProducts(filters: ProductFilters = {}, page: number = 1, limit: number = 10): Observable<ProductResponse> {
-    return this.http.get<ProductResponse>(this.apiUrl, { params: this.buildParams(filters, page, limit) });
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  // Получить продукт по ID
-  getProductById(id: number): Observable<Product | null> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  // Получить список товаров с фильтрацией и пагинацией
+  getProducts(params: {
+    page?: number;
+    limit?: number;
+    category_id?: string;
+    search?: string;
+    min_price?: number;
+    max_price?: number;
+  } = {}): Observable<ProductListResponse> {
+    let httpParams = new HttpParams();
+    
+    if (params.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params.category_id) httpParams = httpParams.set('category_id', params.category_id);
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.min_price) httpParams = httpParams.set('min_price', params.min_price.toString());
+    if (params.max_price) httpParams = httpParams.set('max_price', params.max_price.toString());
+
+    return this.http.get<ProductListResponse>(`${this.apiUrl}/products`, { 
+      headers: this.getHeaders(),
+      params: httpParams
+    });
   }
 
-  // Получить категории
-  getCategories(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/categories`);
+  // Получить товар по ID
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/${id}`, { headers: this.getHeaders() });
   }
 
-  // Поиск продуктов
-  searchProducts(query: string): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params: { q: query } });
+  // Создать новый товар
+  createProduct(productData: CreateProductData): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products`, productData, { headers: this.getHeaders() });
   }
 
-  // Проверить доступность продукта
-  checkProductAvailability(productId: number): Observable<boolean> {
-    return this.http.get<{available: boolean}>(`${this.apiUrl}/${productId}/availability`).pipe(
-      map(response => response.available)
-    );
+  // Обновить товар
+  updateProduct(id: number, productData: Partial<CreateProductData>): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/products/${id}`, productData, { headers: this.getHeaders() });
   }
 
-  // Получить похожие продукты
-  getSimilarProducts(productId: number, limit: number = 4): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/${productId}/similar`, { params: { limit } });
-  }
-
-  // // Приватные методы для фильтрации и пагинации
-  // private filterProducts(products: Product[], filters: ProductFilters): Product[] {
-  //   let filtered = [...products];
-
-  //   if (filters.search) {
-  //     const search = filters.search.toLowerCase();
-  //     filtered = filtered.filter(p => 
-  //       p.name.toLowerCase().includes(search) ||
-  //       p.description.toLowerCase().includes(search) ||
-  //       p.sku.toLowerCase().includes(search)
-  //     );
-  //   }
-
-  //   if (filters.category_id) {
-  //     filtered = filtered.filter(p => p.category_slug === filters.category_id);
-  //   }
-
-  //   if (filters.min_price !== undefined) {
-  //     filtered = filtered.filter(p => p.price >= filters.min_price!);
-  //   }
-
-  //   if (filters.max_price !== undefined) {
-  //     filtered = filtered.filter(p => p.price <= filters.max_price!);
-  //   }
-
-  //   return filtered;
-  // }
-
-  // private paginateProducts(products: Product[], page: number, limit: number): ProductResponse {
-  //   const start = (page - 1) * limit;
-  //   const end = start + limit;
-  //   const paginatedProducts = products.slice(start, end);
-
-  //   return {
-  //     products: paginatedProducts,
-  //     total: products.length,
-  //     page,
-  //     limit
-  //   };
-  // }
-
-  private buildParams(filters: ProductFilters, page: number, limit: number): HttpParams {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-
-    if (filters.search) params = params.set('search', filters.search);
-    if (filters.category_id) params = params.set('category_id', filters.category_id);
-    if (filters.min_price) params = params.set('min_price', filters.min_price.toString());
-    if (filters.max_price) params = params.set('max_price', filters.max_price.toString());
-
-    return params;
+  // Удалить товар
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/products/${id}`, { headers: this.getHeaders() });
   }
 }

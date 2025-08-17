@@ -8,7 +8,7 @@ import { Store, Select } from '@ngxs/store';
 import { AddToCart } from '../../store/cart/cart.actions';
 import { CartStateClass } from '../../store/cart';
 import { Observable, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ProductService, Product, ProductFilters, ProductResponse } from '../../services/product.service';
+import { ProductService, Product, ProductListResponse } from '../../services/product.service';
 
 @Component({
   selector: 'app-products',
@@ -30,7 +30,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
   totalProducts: number = 0;
   productsPerPage: number = 10;
   
-  filters: ProductFilters = {};
+  filters = {
+    search: undefined as string | undefined,
+    category_id: undefined as string | undefined,
+    min_price: undefined as number | undefined,
+    max_price: undefined as number | undefined,
+    sort: 'created_at',
+    order: 'desc'
+  };
   
   @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
 
@@ -76,15 +83,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.productService.getProducts(this.filters, this.currentPage, this.productsPerPage)
+    const params = {
+      page: this.currentPage,
+      limit: this.productsPerPage,
+      ...this.filters
+    };
+
+    this.productService.getProducts(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: ProductResponse) => {
+        next: (response: ProductListResponse) => {
           this.products = response.products;
           this.totalProducts = response.total;
           this.loading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           this.error = 'Ошибка загрузки товаров';
           this.loading = false;
           console.error('Error loading products:', error);
@@ -93,16 +106,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   private loadCategories() {
-    this.productService.getCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (categories) => {
-          this.categories = categories;
-        },
-        error: (error) => {
-          console.error('Error loading categories:', error);
-        }
-      });
+    // Временно загружаем пустой массив категорий
+    this.categories = [];
+    // TODO: Добавить API для получения категорий
   }
 
   filterProducts() {
@@ -110,7 +116,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.filters = {
       search: this.searchTerm || undefined,
       category_id: this.selectedCategory || undefined,
-
+      min_price: undefined,
+      max_price: undefined,
+      sort: 'created_at',
+      order: 'desc'
     };
     this.loadProducts();
   }
