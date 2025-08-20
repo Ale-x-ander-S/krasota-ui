@@ -99,3 +99,36 @@ html {
   white-space: nowrap;
   border: 0;
 }
+
+/* Анимации для корзины */
+@keyframes cartPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes countBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-pulse {
+  animation: cartPulse 0.6s ease-in-out;
+}
+
+.count-bounce {
+  animation: countBounce 0.4s ease-in-out;
+}

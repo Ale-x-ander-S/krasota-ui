@@ -46,6 +46,7 @@
       <a routerLink="/contacts" class="nav-link" [class.active]="isActiveRoute('/contacts')">Контакты</a>
       <a routerLink="/cart" class="nav-link cart-icon" [class.active]="isActiveRoute('/cart')">
         <span class="cart-text">Корзина</span>
+        <span class="cart-count" *ngIf="itemCount > 0">{{ itemCount }}</span>
       </a>
       
       <!-- Аутентификация -->
@@ -94,6 +95,7 @@
       <a routerLink="/contacts" class="nav-link" [class.active]="isActiveRoute('/contacts')" (click)="closeMobileMenu()">Контакты</a>
       <a routerLink="/cart" class="nav-link cart-icon" [class.active]="isActiveRoute('/cart')" (click)="closeMobileMenu()">
         <span class="cart-text">Корзина</span>
+        <span class="cart-count" *ngIf="itemCount > 0">{{ itemCount }}</span>
       </a>
       
       <!-- Аутентификация для мобильных -->

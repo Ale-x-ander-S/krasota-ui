@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
 import { CategoryService, Category } from '../../services/category.service';
 import { ProductService, Product } from '../../services/product.service';
+import { CartAnimationService } from '../../services/cart-animation.service';
 
 // Используем интерфейсы из сервисов: Category из CategoryService, Product из ProductService
 
@@ -32,7 +33,8 @@ export class CategoriesComponent implements OnInit {
   constructor(
     private router: Router,
     private categoryService: CategoryService,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartAnimationService: CartAnimationService
   ) {}
 
   ngOnInit() {

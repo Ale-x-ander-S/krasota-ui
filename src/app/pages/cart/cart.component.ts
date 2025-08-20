@@ -1,28 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image_url: string;
-  category_slug: string;
-  quantity: number;
-  stock: number;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image_url: string;
-  category_slug: string;
-  stock: number;
-}
+import { Select, Store } from '@ngxs/store';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { CartState, CartItem } from '../../models/cart.model';
+import { AddToCart, RemoveFromCart, UpdateQuantity, ClearCart } from '../../store/cart/cart.actions';
+import { CartStateClass } from '../../store/cart';
 
 @Component({
   selector: 'app-cart',
@@ -31,68 +18,47 @@ interface Product {
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })
-export class CartComponent implements OnInit {
-  constructor(private router: Router) {}
+export class CartComponent implements OnInit, OnDestroy {
+  @Select(CartStateClass.getCartItems) cartItems$!: Observable<CartItem[]>;
+  @Select(CartStateClass.getCartTotal) cartTotal$!: Observable<number>;
+  @Select(CartStateClass.getItemCount) itemCount$!: Observable<number>;
+  
+  private destroy$ = new Subject<void>();
+  
+  constructor(
+    private router: Router,
+    private store: Store
+  ) {}
   
   showMobileMenu: boolean = false;
   cartItems: CartItem[] = [];
+  cartTotal: number = 0;
+  itemCount: number = 0;
   promoCode: string = '';
   appliedDiscount: number = 0;
   shippingCost: number = 300;
 
-  recommendedProducts: Product[] = [
-    {
-      id: 101,
-      name: 'Беспроводные наушники Sony WH-1000XM4',
-      price: 29999,
-      image_url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzM0Qzc1OSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Tb255IFdILTEwMDBYTTQ8L3RleHQ+PC9zdmc+',
-      category_slug: 'Электроника',
-      stock: 1
-    },
-    {
-      id: 102,
-      name: 'Умные часы Apple Watch Series 7',
-      price: 39999,
-      image_url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzAwMDAwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BcHBsZSBXYXRjaCBTZXJpZXMgNzwvdGV4dD48L3N2Zz4=',
-      category_slug: 'Электроника',
-      stock: 1
-    },
-    {
-      id: 103,
-      name: 'Игровая консоль PlayStation 5',
-      price: 59999,
-      image_url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzAwMDAwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QbGF5U3RhdGlvbiA1PC90ZXh0Pjwvc3ZnPg==',
-      category_slug: 'Электроника',
-      stock: 0
-    }
-  ];
-
   ngOnInit() {
-    this.loadCartItems();
+    this.subscribeToCart();
   }
 
-  loadCartItems() {
-    // Имитация загрузки товаров из корзины
-    this.cartItems = [
-      {
-        id: 1,
-        name: 'Смартфон iPhone 15 Pro',
-        price: 129999,
-        image_url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzAwN0FGRiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5pUGhvbmUgMTUgUHJvPC90ZXh0Pjwvc3ZnPg==',
-        category_slug: 'Электроника',
-        quantity: 1,
-        stock: 1
-      },
-      {
-        id: 2,
-        name: 'Ноутбук MacBook Air M2',
-        price: 149999,
-        image_url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzM0Qzc1OSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NYWNCb29rIEFpcjwvdGV4dD48L3N2Zz4=',
-        category_slug: 'Электроника',
-        quantity: 1,
-        stock: 1
-      }
-    ];
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private subscribeToCart() {
+    this.cartItems$.pipe(takeUntil(this.destroy$)).subscribe(items => {
+      this.cartItems = items;
+    });
+
+    this.cartTotal$.pipe(takeUntil(this.destroy$)).subscribe(total => {
+      this.cartTotal = total;
+    });
+
+    this.itemCount$.pipe(takeUntil(this.destroy$)).subscribe(count => {
+      this.itemCount = count;
+    });
   }
 
   formatPrice(price: number): string {
@@ -104,7 +70,7 @@ export class CartComponent implements OnInit {
   }
 
   getTotalItems(): number {
-    return this.cartItems.reduce((total, item) => total + item.quantity, 0);
+    return this.itemCount;
   }
 
   goToCart(): void {
@@ -113,27 +79,34 @@ export class CartComponent implements OnInit {
   }
 
   increaseQuantity(index: number) {
-    this.cartItems[index].quantity++;
+    const item = this.cartItems[index];
+    if (item && item.quantity < item.stock) {
+      this.store.dispatch(new UpdateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+    }
   }
 
   decreaseQuantity(index: number) {
-    if (this.cartItems[index].quantity > 1) {
-      this.cartItems[index].quantity--;
+    const item = this.cartItems[index];
+    if (item && item.quantity > 1) {
+      this.store.dispatch(new UpdateQuantity({ id: item.id, quantity: item.quantity - 1 }));
     }
   }
 
   removeItem(index: number) {
-    this.cartItems.splice(index, 1);
+    const item = this.cartItems[index];
+    if (item) {
+      this.store.dispatch(new RemoveFromCart(item.id));
+    }
   }
 
   clearCart() {
-    this.cartItems = [];
+    this.store.dispatch(new ClearCart());
     this.appliedDiscount = 0;
     this.promoCode = '';
   }
 
   getSubtotal(): number {
-    return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return this.cartTotal;
   }
 
   getShippingCost(): number {
@@ -167,21 +140,6 @@ export class CartComponent implements OnInit {
     }
   }
 
-  addToCart(product: Product) {
-    const existingItem = this.cartItems.find(item => item.id === product.id);
-    
-    if (existingItem) {
-      existingItem.quantity++;
-    } else {
-      this.cartItems.push({
-        ...product,
-        quantity: 1
-      });
-    }
-    
-    alert(`${product.name} добавлен в корзину`);
-  }
-
   proceedToCheckout() {
     if (!this.canCheckout()) {
       alert('Невозможно оформить заказ. Проверьте наличие товаров.');
@@ -198,5 +156,9 @@ export class CartComponent implements OnInit {
 
   closeMobileMenu(): void {
     this.showMobileMenu = false;
+  }
+
+  onImageError(event: any): void {
+    event.target.src = 'assets/images/placeholder.svg';
   }
 }

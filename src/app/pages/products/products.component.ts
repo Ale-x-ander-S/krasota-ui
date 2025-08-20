@@ -7,6 +7,8 @@ import { FooterComponent } from '../../components/footer';
 import { Store, Select } from '@ngxs/store';
 import { AddToCart } from '../../store/cart/cart.actions';
 import { CartStateClass } from '../../store/cart';
+import { CartItem } from '../../models/cart.model';
+import { CartAnimationService } from '../../services/cart-animation.service';
 import { Observable, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProductService, Product, ProductListResponse } from '../../services/product.service';
 import { CategoryService, Category } from '../../services/category.service';
@@ -50,7 +52,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private store: Store,
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private cartAnimationService: CartAnimationService
   ) {}
 
   ngOnInit() {
@@ -226,7 +229,54 @@ export class ProductsComponent implements OnInit, OnDestroy {
     
     if (product.stock === 0) return;
     
-    this.store.dispatch(new AddToCart(product));
+    // Создаем CartItem с правильной структурой
+    const cartItem: CartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url || 'assets/images/placeholder.svg',
+      category_id: product.category_id,
+      category_name: this.getCategoryName(product.category_id.toString()),
+      quantity: 1,
+      description: product.description,
+      stock: product.stock,
+      stock_type: product.stock_type,
+      sku: product.sku,
+      color: product.color,
+      size: product.size
+    };
+    
+    // Запускаем анимацию
+    this.playAddToCartAnimation(event, product);
+    
+    // Добавляем товар в корзину
+    this.store.dispatch(new AddToCart(cartItem));
+  }
+
+  private playAddToCartAnimation(event: Event, product: Product): void {
+    // Получаем элемент карточки товара
+    const productCard = (event.target as HTMLElement).closest('.product-card') as HTMLElement;
+    if (!productCard) return;
+    
+    // Получаем элемент корзины в хедере
+    const cartElement = document.querySelector('.cart-icon') as HTMLElement;
+    if (!cartElement) return;
+    
+    // Запускаем анимацию
+    this.cartAnimationService.animateAddToCart(productCard, cartElement);
+    
+    // Анимация пульсации корзины
+    setTimeout(() => {
+      this.cartAnimationService.animateCartPulse(cartElement);
+    }, 400);
+    
+    // Анимация счетчика
+    setTimeout(() => {
+      const countElement = cartElement.querySelector('.cart-count');
+      if (countElement) {
+        this.cartAnimationService.animateCountChange(countElement as HTMLElement);
+      }
+    }, 600);
   }
 
   formatPrice(price: number): string {

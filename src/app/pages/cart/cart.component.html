@@ -43,7 +43,11 @@
           <div *ngIf="cartItems.length > 0" class="cart-items-list">
             <div *ngFor="let item of cartItems; let i = index" class="cart-item">
               <div class="item-image">
-                <img [src]="item.image_url || 'assets/placeholder-image.jpg'" [alt]="item.name">
+                <img 
+                  [src]="item.image_url || 'assets/images/placeholder.svg'" 
+                  [alt]="item.name"
+                  (error)="onImageError($event)"
+                >
                 <div *ngIf="item.stock === 0" class="out-of-stock-badge">
                   Нет в наличии
                 </div>
@@ -51,7 +55,7 @@
               
               <div class="item-details">
                 <h3 class="item-name">{{ item.name }}</h3>
-                <p class="item-category">{{ item.category_slug }}</p>
+                <p class="item-category">{{ item.category_name || 'Категория' }}</p>
                 <div class="item-price">{{ formatPrice(item.price) }}</div>
               </div>
               
@@ -181,24 +185,7 @@
       </div>
     </section>
 
-    <!-- Recommended Products -->
-    <section *ngIf="cartItems.length > 0" class="recommended-section">
-      <h2>Рекомендуемые товары</h2>
-      <div class="recommended-grid">
-        <div *ngFor="let product of recommendedProducts" class="recommended-card">
-          <div class="product-image">
-            <img [src]="product.image_url || 'assets/placeholder-image.jpg'" [alt]="product.name">
-          </div>
-          <div class="product-info">
-            <h4>{{ product.name }}</h4>
-            <p class="product-price">{{ formatPrice(product.price) }}</p>
-            <button class="add-to-cart-btn" (click)="addToCart(product)">
-              Добавить в корзину
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
+
   </div>
 </main>
 

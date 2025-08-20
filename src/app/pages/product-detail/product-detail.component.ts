@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
 import { ProductService, Product } from '../../services/product.service';
 import { CategoryService, Category } from '../../services/category.service';
+import { CartAnimationService } from '../../services/cart-animation.service';
 
 // Используем Product из ProductService
 
@@ -35,7 +36,8 @@ export class ProductDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private cartAnimationService: CartAnimationService
   ) {}
 
   ngOnInit() {
@@ -87,10 +89,39 @@ export class ProductDetailComponent implements OnInit {
 
   addToCart() {
     if (this.product && this.product.stock > 0) {
+      // Запускаем анимацию
+      this.playAddToCartAnimation();
+      
       // Здесь логика добавления в корзину
       console.log(`Добавлено в корзину: ${this.product.name}, количество: ${this.quantity}`);
       alert(`Товар "${this.product.name}" добавлен в корзину!`);
     }
+  }
+
+  private playAddToCartAnimation(): void {
+    // Получаем элемент кнопки "Добавить в корзину"
+    const addButton = document.querySelector('.add-to-cart-btn') as HTMLElement;
+    if (!addButton) return;
+    
+    // Получаем элемент корзины в хедере
+    const cartElement = document.querySelector('.cart-icon') as HTMLElement;
+    if (!cartElement) return;
+    
+    // Запускаем анимацию
+    this.cartAnimationService.animateAddToCart(addButton, cartElement);
+    
+    // Анимация пульсации корзины
+    setTimeout(() => {
+      this.cartAnimationService.animateCartPulse(cartElement);
+    }, 400);
+    
+    // Анимация счетчика
+    setTimeout(() => {
+      const countElement = cartElement.querySelector('.cart-count');
+      if (countElement) {
+        this.cartAnimationService.animateCountChange(countElement as HTMLElement);
+      }
+    }, 600);
   }
 
   goBack() {

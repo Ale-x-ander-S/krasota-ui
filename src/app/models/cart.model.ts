@@ -3,14 +3,15 @@ export interface CartItem {
   name: string;
   price: number;
   image_url: string;
-  category_slug: string;
+  category_id: number;
+  category_name?: string;
   quantity: number;
   description: string;
   stock: number;
   stock_type: string;
   sku: string;
-  color: string;
-  size: string;
+  color?: string;
+  size?: string;
 }
 
 export interface CartState {
