@@ -5,10 +5,12 @@ import { Router } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { UserService, User as ApiUser } from '../../services/user.service';
 import { ProductService, Product, CreateProductData } from '../../services/product.service';
+import { CategoryService, Category, CreateCategoryData, UpdateCategoryData } from '../../services/category.service';
 
 interface AdminStats {
   totalUsers: number;
   totalProducts: number;
+  totalCategories: number;
   totalOrders: number;
   totalRevenue: number;
   pendingOrders: number;
@@ -68,6 +70,11 @@ export class AdminComponent implements OnInit {
   totalProducts = 0;
   productsPerPage = 10;
 
+  // Категории из API
+  categories: Category[] = [];
+  categoriesLoading = false;
+  categoriesError = '';
+
   // Фильтры товаров
   productFilters = {
     search: '',
@@ -126,9 +133,29 @@ export class AdminComponent implements OnInit {
   // Просмотр товара
   viewingProduct: Product | null = null;
 
+  // Категории
+  creatingCategory = false;
+  editingCategory: Category | null = null;
+  viewingCategory: Category | null = null;
+  categoryCreateForm: CreateCategoryData = {
+    name: '',
+    description: '',
+    image_url: '',
+    is_active: true,
+    sort_order: 0
+  };
+  categoryEditForm: UpdateCategoryData = {
+    name: '',
+    description: '',
+    image_url: '',
+    is_active: true,
+    sort_order: 0
+  };
+
   // Ошибки валидации
   validationErrors: { [key: string]: string } = {};
   productValidationErrors: { [key: string]: string } = {};
+  categoryValidationErrors: { [key: string]: string } = {};
 
   // Уведомления
   notification = {
@@ -141,6 +168,7 @@ export class AdminComponent implements OnInit {
   stats: AdminStats = {
     totalUsers: 0,
     totalProducts: 0,
+    totalCategories: 0,
     totalOrders: 3456,
     totalRevenue: 12450000,
     pendingOrders: 23,
@@ -227,6 +255,7 @@ export class AdminComponent implements OnInit {
     public authService: AuthService,
     private userService: UserService,
     private productService: ProductService,
+    private categoryService: CategoryService,
     private router: Router
   ) {}
 
@@ -248,9 +277,10 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    // Загружаем пользователей и товары при инициализации
+    // Загружаем пользователей, товары и категории при инициализации
     this.loadUsers();
     this.loadProducts();
+    this.loadCategories();
   }
 
   // Загрузка пользователей с API
@@ -924,5 +954,270 @@ export class AdminComponent implements OnInit {
 
   get popularProductsCount(): number {
     return Math.floor(this.stats.totalProducts * 0.2);
+  }
+
+  // ===== МЕТОДЫ ДЛЯ КАТЕГОРИЙ =====
+
+  // Загрузка категорий
+  loadCategories() {
+    this.categoriesLoading = true;
+    this.categoriesError = '';
+
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.stats.totalCategories = categories.length; // Обновляем статистику
+        this.categoriesLoading = false;
+        console.log('Категории загружены:', categories);
+      },
+      error: (error) => {
+        this.categoriesError = 'Ошибка загрузки категорий: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
+        this.categoriesLoading = false;
+        this.showNotification(`Ошибка загрузки категорий: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
+        console.error('Ошибка загрузки категорий:', error);
+      }
+    });
+  }
+
+  // Создание категории
+  createCategory() {
+    this.creatingCategory = true;
+    this.categoryCreateForm = {
+      name: '',
+      description: '',
+      image_url: '',
+      is_active: true,
+      sort_order: 0
+    };
+    this.categoryValidationErrors = {};
+  }
+
+  // Отмена создания категории
+  cancelCategoryCreate() {
+    this.creatingCategory = false;
+    this.categoryCreateForm = {
+      name: '',
+      description: '',
+      image_url: '',
+      is_active: true,
+      sort_order: 0
+    };
+    this.categoryValidationErrors = {};
+  }
+
+  // Создание новой категории
+  createNewCategory() {
+    if (!this.validateCategoryCreateForm()) {
+      this.showNotification('Пожалуйста, исправьте ошибки в форме', 'error');
+      return;
+    }
+
+    const newCategoryData = {
+      name: this.categoryCreateForm.name.trim(),
+      description: this.categoryCreateForm.description.trim(),
+      image_url: this.categoryCreateForm.image_url.trim() || '',
+      is_active: this.categoryCreateForm.is_active,
+      sort_order: this.categoryCreateForm.sort_order
+    };
+
+    this.categoryService.createCategory(newCategoryData).subscribe({
+      next: (newCategory) => {
+        // Создаем новый массив для плавного обновления
+        const updatedCategories = [...this.categories, newCategory];
+        updatedCategories.sort((a, b) => a.sort_order - b.sort_order);
+        
+        // Плавно обновляем список
+        this.categories = updatedCategories;
+        this.stats.totalCategories = updatedCategories.length; // Обновляем статистику
+        
+        this.showNotification(`Категория "${newCategory.name}" успешно создана`, 'success');
+        this.cancelCategoryCreate();
+      },
+      error: (error) => {
+        this.showNotification(`Ошибка создания категории: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
+      }
+    });
+  }
+
+  // Редактирование категории
+  editCategory(category: Category) {
+    this.editingCategory = category;
+    this.categoryEditForm = {
+      name: category.name,
+      description: category.description,
+      image_url: category.image_url,
+      is_active: category.is_active,
+      sort_order: category.sort_order
+    };
+    this.categoryValidationErrors = {};
+  }
+
+  // Отмена редактирования категории
+  cancelCategoryEdit() {
+    this.editingCategory = null;
+    this.categoryEditForm = {
+      name: '',
+      description: '',
+      image_url: '',
+      is_active: true,
+      sort_order: 0
+    };
+    this.categoryValidationErrors = {};
+  }
+
+  // Сохранение изменений категории
+  saveCategoryChanges() {
+    if (!this.validateCategoryEditForm()) {
+      this.showNotification('Пожалуйста, исправьте ошибки в форме', 'error');
+      return;
+    }
+
+    if (!this.editingCategory) return;
+
+    const updateData = {
+      name: this.categoryEditForm.name?.trim() || '',
+      description: this.categoryEditForm.description?.trim() || '',
+      image_url: this.categoryEditForm.image_url?.trim() || '',
+      is_active: this.categoryEditForm.is_active || true,
+      sort_order: this.categoryEditForm.sort_order || 0
+    };
+
+    this.categoryService.updateCategory(this.editingCategory.id, updateData).subscribe({
+      next: (updatedCategory) => {
+        // Создаем новый массив для плавного обновления
+        const updatedCategories = this.categories.map(c => 
+          c.id === updatedCategory.id ? updatedCategory : c
+        );
+        
+        // Сортируем по новому порядку
+        updatedCategories.sort((a, b) => a.sort_order - b.sort_order);
+        
+        // Плавно обновляем список
+        this.categories = updatedCategories;
+        
+        this.showNotification(`Категория "${updatedCategory.name}" успешно обновлена`, 'success');
+        this.cancelCategoryEdit();
+      },
+      error: (error) => {
+        this.showNotification(`Ошибка обновления категории: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
+      }
+    });
+  }
+
+  // Просмотр деталей категории
+  viewCategoryDetails(category: Category) {
+    this.viewingCategory = category;
+  }
+
+  // Закрытие просмотра категории
+  closeCategoryView() {
+    this.viewingCategory = null;
+  }
+
+  // Удаление категории
+  deleteCategory(category: Category) {
+    if (category.product_count > 0) {
+      this.showNotification('Нельзя удалить категорию, в которой есть товары', 'error');
+      return;
+    }
+
+    if (confirm(`Вы уверены, что хотите удалить категорию "${category.name}"? Это действие нельзя отменить.`)) {
+      this.categoryService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.categories = this.categories.filter(c => c.id !== category.id);
+          this.stats.totalCategories = this.categories.length; // Обновляем статистику
+          this.showNotification(`Категория "${category.name}" успешно удалена`, 'success');
+        },
+        error: (error) => {
+          this.showNotification(`Ошибка удаления категории: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
+        }
+      });
+    }
+  }
+
+  // Валидация формы создания категории
+  validateCategoryCreateForm(): boolean {
+    this.categoryValidationErrors = {};
+
+    if (!this.categoryCreateForm.name.trim()) {
+      this.categoryValidationErrors['name'] = 'Название категории обязательно';
+    } else if (this.categoryCreateForm.name.trim().length < 3) {
+      this.categoryValidationErrors['name'] = 'Название должно содержать минимум 3 символа';
+    } else if (this.categoryCreateForm.name.trim().length > 100) {
+      this.categoryValidationErrors['name'] = 'Название не должно превышать 100 символов';
+    }
+
+    if (!this.categoryCreateForm.description.trim()) {
+      this.categoryValidationErrors['description'] = 'Описание категории обязательно';
+    } else if (this.categoryCreateForm.description.trim().length < 10) {
+      this.categoryValidationErrors['description'] = 'Описание должно содержать минимум 10 символов';
+    }
+
+    // Поле изображения необязательно, но если указано, проверяем формат
+    if (this.categoryCreateForm.image_url.trim() && !this.isValidUrl(this.categoryCreateForm.image_url.trim())) {
+      this.categoryValidationErrors['image_url'] = 'Введите корректный URL изображения';
+    }
+
+    return Object.keys(this.categoryValidationErrors).length === 0;
+  }
+
+  // Валидация формы редактирования категории
+  validateCategoryEditForm(): boolean {
+    this.categoryValidationErrors = {};
+
+    if (!this.categoryEditForm.name?.trim()) {
+      this.categoryValidationErrors['name'] = 'Название категории обязательно';
+    } else if (this.categoryEditForm.name.trim().length < 3) {
+      this.categoryValidationErrors['name'] = 'Название должно содержать минимум 3 символа';
+    } else if (this.categoryEditForm.name.trim().length > 100) {
+      this.categoryValidationErrors['name'] = 'Название не должно превышать 100 символов';
+    }
+
+    if (!this.categoryEditForm.description?.trim()) {
+      this.categoryValidationErrors['description'] = 'Описание категории обязательно';
+    } else if (this.categoryEditForm.description.trim().length < 10) {
+      this.categoryValidationErrors['description'] = 'Описание должно содержать минимум 10 символов';
+    }
+
+    // Поле изображения необязательно, но если указано, проверяем формат
+    if (this.categoryEditForm.image_url?.trim() && !this.isValidUrl(this.categoryEditForm.image_url.trim())) {
+      this.categoryValidationErrors['image_url'] = 'Введите корректный URL изображения';
+    }
+
+    return Object.keys(this.categoryValidationErrors).length === 0;
+  }
+
+  // Методы для работы с ошибками валидации категорий
+  hasCategoryFieldError(field: string): boolean {
+    return !!this.categoryValidationErrors[field];
+  }
+
+  getCategoryFieldError(field: string): string {
+    return this.categoryValidationErrors[field] || '';
+  }
+
+  clearCategoryFieldError(field: string) {
+    delete this.categoryValidationErrors[field];
+  }
+
+  // Обработка ошибок изображений категорий
+  onCategoryImageError(event: any) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/placeholder.svg';
+  }
+
+  // TrackBy функции для оптимизации рендеринга
+  trackByCategoryId(index: number, category: Category): number {
+    return category.id;
+  }
+
+  // Валидация URL
+  private isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

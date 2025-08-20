@@ -22,13 +22,13 @@
       <div class="product-info">
         <div class="product-header">
           <h1 class="product-title">{{ product.name }}</h1>
-          <div class="product-category">{{ product.category }}</div>
+          <div class="product-category">{{ category?.name || 'Категория' }}</div>
         </div>
 
         <div class="product-price">
           <span class="price-amount">{{ formatPrice(product.price) }}</span>
-          <span class="price-availability" [class.in-stock]="product.inStock" [class.out-of-stock]="!product.inStock">
-            {{ product.inStock ? 'В наличии' : 'Нет в наличии' }}
+          <span class="price-availability" [class.in-stock]="product.stock > 0" [class.out-of-stock]="product.stock === 0">
+            {{ getStockText(product.stock) }}
           </span>
         </div>
 
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Quantity Selector -->
-        <div class="quantity-selector" *ngIf="product.inStock">
+        <div class="quantity-selector" *ngIf="product.stock > 0">
           <label for="quantity">Количество:</label>
           <div class="quantity-controls">
             <button class="quantity-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">-</button>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Add to Cart Button -->
-        <div class="add-to-cart-section" *ngIf="product.inStock">
+        <div class="add-to-cart-section" *ngIf="product.stock > 0">
           <button class="add-to-cart-btn" (click)="addToCart()">
             Добавить в корзину
           </button>
@@ -63,41 +63,31 @@
     <!-- Product Details Tabs -->
     <section class="product-tabs">
       <div class="tabs-container">
-        <!-- Specifications Tab -->
-        <div class="tab-content" *ngIf="product.specifications">
-          <h3>Характеристики</h3>
-          <ul class="specifications-list">
-            <li *ngFor="let spec of product.specifications" class="spec-item">
-              {{ spec }}
-            </li>
-          </ul>
+        <!-- Product Description -->
+        <div class="tab-content">
+          <h3>Описание</h3>
+          <p class="product-full-description">{{ product.description }}</p>
         </div>
 
-        <!-- Features Tab -->
-        <div class="tab-content" *ngIf="product.features">
-          <h3>Особенности</h3>
-          <ul class="features-list">
-            <li *ngFor="let feature of product.features" class="feature-item">
-              <span class="feature-icon">✓</span>
-              {{ feature }}
-            </li>
-          </ul>
-        </div>
-
-        <!-- Reviews Tab -->
-        <div class="tab-content" *ngIf="product.reviews && product.reviews.length > 0">
-          <h3>Отзывы ({{ product.reviews.length }})</h3>
-          <div class="reviews-container">
-            <div *ngFor="let review of product.reviews" class="review-item">
-              <div class="review-header">
-                <div class="review-author">{{ review.author }}</div>
-                <div class="review-rating">
-                  <span *ngFor="let star of getRatingStars(review.rating)" class="star filled">★</span>
-                  <span *ngFor="let star of getRatingStars(5 - review.rating)" class="star">☆</span>
-                </div>
-                <div class="review-date">{{ formatDate(review.date) }}</div>
-              </div>
-              <div class="review-comment">{{ review.comment }}</div>
+        <!-- Product Details -->
+        <div class="tab-content">
+          <h3>Детали товара</h3>
+          <div class="product-details-info">
+            <div class="detail-item">
+              <span class="detail-label">Артикул:</span>
+              <span class="detail-value">{{ product.sku }}</span>
+            </div>
+            <div class="detail-item" *ngIf="product.color">
+              <span class="detail-label">Цвет:</span>
+              <span class="detail-value">{{ product.color }}</span>
+            </div>
+            <div class="detail-item" *ngIf="product.size">
+              <span class="detail-label">Размер:</span>
+              <span class="detail-value">{{ product.size }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Тип запаса:</span>
+              <span class="detail-value">{{ product.stock_type }}</span>
             </div>
           </div>
         </div>

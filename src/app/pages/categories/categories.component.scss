@@ -233,6 +233,19 @@ $transition: all 0.3s ease;
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-color: $primary-color;
+    
+    .category-name {
+      color: $primary-color;
+    }
+    
+    .category-icon {
+      background: lighten($primary-color, 45%);
+    }
+  }
+  
+  &:active {
+    transform: translateY(-2px);
   }
 
   @include mobile {
@@ -418,6 +431,53 @@ $transition: all 0.3s ease;
         padding: 10px 20px;
         font-size: 0.9rem;
       }
+    }
+  }
+}
+
+// Loading and Error States
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  margin-bottom: 30px;
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 1.2rem;
+  }
+}
+
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  margin-bottom: 30px;
+  border-left: 4px solid $danger-color;
+
+  p {
+    margin: 0 0 20px 0;
+    color: $danger-color;
+    font-size: 1.1rem;
+  }
+
+  .retry-btn {
+    padding: 10px 20px;
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+      background: darken($primary-color, 10%);
     }
   }
 }

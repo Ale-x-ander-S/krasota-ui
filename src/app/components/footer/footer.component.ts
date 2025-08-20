@@ -31,9 +31,9 @@ export class FooterComponent {
 
   // Контактная информация
   contactInfo = {
-    email: 'info@krasota72.ru',
-    phone: '+7 (999) 123-45-67',
-    address: 'г. Москва, ул. Примерная, д. 123',
+    email: 'krasota72tmn@gmail.com',
+    phone: '+7 (912) 999-37-66',
+    address: 'г. Тюмень, ул. Республики, 249/8',
     workingHours: 'Пн-Пт: 9:00-18:00, Сб: 10:00-16:00'
   };
 }

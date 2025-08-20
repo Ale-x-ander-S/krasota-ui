@@ -475,8 +475,22 @@ body {
       font-size: 1.5rem;
       font-weight: 600;
 
+      .category-filter-info {
+        display: block;
+        margin-top: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: $primary-color;
+        opacity: 0.9;
+      }
+
       @include mobile {
         font-size: 1.3rem;
+        
+        .category-filter-info {
+          font-size: 0.9rem;
+          margin-top: 6px;
+        }
       }
     }
   }
@@ -845,6 +859,18 @@ body {
     font-size: 1rem;
   }
 
+  .empty-state-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    @include mobile {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -856,10 +882,21 @@ body {
     border-radius: $border-radius;
     font-weight: 500;
     transition: $transition;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
 
     &:hover {
       background: darken($primary-color, 10%);
       transform: translateY(-2px);
+    }
+
+    &.btn-secondary {
+      background: $secondary-color;
+
+      &:hover {
+        background: darken($secondary-color, 10%);
+      }
     }
   }
 }

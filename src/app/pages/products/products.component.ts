@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
 import { Store, Select } from '@ngxs/store';
@@ -9,6 +9,7 @@ import { AddToCart } from '../../store/cart/cart.actions';
 import { CartStateClass } from '../../store/cart';
 import { Observable, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProductService, Product, ProductListResponse } from '../../services/product.service';
+import { CategoryService, Category } from '../../services/category.service';
 
 @Component({
   selector: 'app-products',
@@ -23,9 +24,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   selectedCategory: string = '';
 
   products: Product[] = [];
-  categories: string[] = [];
+  categories: Category[] = [];
   loading: boolean = false;
   error: string | null = null;
+  categoriesLoading: boolean = false;
   currentPage: number = 1;
   totalProducts: number = 0;
   productsPerPage: number = 10;
@@ -45,13 +47,34 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private store: Store,
-    private productService: ProductService
+    private productService: ProductService,
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit() {
-    this.loadProducts();
-    this.loadCategories();
+    // Прокручиваем страницу вверх при инициализации
+    window.scrollTo(0, 0);
+    
+    // Обрабатываем query params при переходе из категорий
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['category_id']) {
+        this.selectedCategory = params['category_id'];
+        // Обновляем фильтры и загружаем товары с фильтрацией
+        this.filterProducts();
+      } else {
+        // Если параметр категории отсутствует, сбрасываем фильтр и загружаем все товары
+        this.selectedCategory = '';
+        this.loadProducts();
+      }
+      
+      // Загружаем категории в любом случае
+      this.loadCategories();
+      
+      // Прокручиваем вверх при изменении query params
+      setTimeout(() => window.scrollTo(0, 0), 0);
+    });
     
     // Настройка поиска с debounce
     this.setupSearch();
@@ -89,6 +112,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
       ...this.filters
     };
 
+    console.log('Загрузка товаров с параметрами:', params);
+
     this.productService.getProducts(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -106,9 +131,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   private loadCategories() {
-    // Временно загружаем пустой массив категорий
-    this.categories = [];
-    // TODO: Добавить API для получения категорий
+    this.categoriesLoading = true;
+
+    this.categoryService.getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories: Category[]) => {
+          this.categories = categories.filter(cat => cat.is_active); // Показываем только активные категории
+          this.categoriesLoading = false;
+        },
+        error: (error: any) => {
+          console.error('Error loading categories:', error);
+          this.categories = [];
+          this.categoriesLoading = false;
+        }
+      });
   }
 
   filterProducts() {
@@ -121,15 +158,56 @@ export class ProductsComponent implements OnInit, OnDestroy {
       sort: 'created_at',
       order: 'desc'
     };
+    
+    console.log('Фильтрация товаров:', {
+      selectedCategory: this.selectedCategory,
+      filters: this.filters
+    });
+    
     this.loadProducts();
   }
 
   onSearchChange() {
     this.filterProducts();
+    this.scrollToTop();
   }
 
   onCategoryChange() {
     this.filterProducts();
+    this.scrollToTop();
+  }
+
+  // Плавная прокрутка вверх
+  private scrollToTop() {
+    setTimeout(() => {
+      const productsSection = document.querySelector('.products-section');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 100);
+  }
+
+  // Очистить все фильтры
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedCategory = '';
+    this.currentPage = 1;
+    
+    // Очищаем URL от query параметров
+    this.router.navigate(['/products'], { 
+      queryParams: {},
+      replaceUrl: true 
+    });
+    
+    // Загружаем все товары без фильтров
+    this.loadProducts();
+  }
+
+  // Переход к странице категорий
+  goToCategories() {
+    this.router.navigate(['/categories']);
   }
 
 
@@ -139,6 +217,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   goToProduct(productId: number) {
+    console.log('Переход к товару с ID:', productId);
     this.router.navigate(['/product', productId]);
   }
 
@@ -158,6 +237,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   onPageChange(page: number) {
     this.currentPage = page;
     this.loadProducts();
+    this.scrollToTop();
   }
 
   get totalPages(): number {
@@ -202,5 +282,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const start = (this.currentPage - 1) * this.productsPerPage + 1;
     const end = Math.min(this.currentPage * this.productsPerPage, this.totalProducts);
     return `Показано ${start}-${end} из ${this.totalProducts} товаров`;
+  }
+
+  // Получить название категории по ID
+  getCategoryName(categoryId: string): string {
+    const category = this.categories.find(cat => cat.id.toString() === categoryId);
+    return category ? category.name : 'Неизвестная категория';
+  }
+
+  // Обработчик ошибки загрузки изображения
+  onImageError(event: any): void {
+    event.target.src = 'assets/images/placeholder.svg';
   }
 }

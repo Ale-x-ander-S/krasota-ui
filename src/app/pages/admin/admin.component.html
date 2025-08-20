@@ -79,6 +79,13 @@
     >
       🛍️ Товары
     </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'categories'"
+      (click)="setActiveTab('categories')"
+    >
+      📂 Категории
+    </button>
   </div>
 
   <!-- Дашборд -->
@@ -100,6 +107,14 @@
         <div class="stat-content">
           <h3>{{ stats.totalProducts }}</h3>
           <p>Товаров</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📂</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalCategories }}</h3>
+          <p>Категорий</p>
         </div>
       </div>
       
@@ -1150,6 +1165,381 @@
           (click)="changeProductPage(currentPage + 1)"
         >
           Следующая →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Категории -->
+  <div *ngIf="activeTab === 'categories'" class="tab-content categories-tab">
+    <h2>Управление категориями</h2>
+    
+    <!-- Индикатор загрузки -->
+    <div *ngIf="categoriesLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Загрузка категорий...</p>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div *ngIf="categoriesError && !categoriesLoading" class="error-message">
+      {{ categoriesError }}
+      <button class="btn btn-small" (click)="loadCategories()">Повторить</button>
+    </div>
+
+    <!-- Таблица категорий -->
+    <div *ngIf="!categoriesLoading && !categoriesError" class="table-container">
+      <div class="table-header">
+        <h3>Всего категорий: {{ categories.length }}</h3>
+        <div class="table-actions">
+          <button class="btn btn-success" (click)="createCategory()">
+            ➕ Создать категорию
+          </button>
+          <button class="btn btn-primary" (click)="loadCategories()">
+            🔄 Обновить
+          </button>
+        </div>
+      </div>
+      
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Изображение</th>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Товаров</th>
+            <th>Порядок</th>
+            <th>Статус</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories; trackBy: trackByCategoryId" [attr.data-category-id]="category.id">
+            <td>#{{ category.id }}</td>
+            <td>
+              <img 
+                [src]="category.image_url" 
+                [alt]="category.name"
+                class="category-thumbnail"
+                (error)="onCategoryImageError($event)"
+                *ngIf="category.image_url && category.image_url.trim(); else placeholderImage"
+              >
+              <ng-template #placeholderImage>
+                <div class="category-thumbnail-placeholder">
+                  <img src="assets/images/placeholder.svg" alt="Placeholder" class="placeholder-img">
+                </div>
+              </ng-template>
+            </td>
+            <td>
+              <div class="category-info">
+                <strong>{{ category.name }}</strong>
+              </div>
+            </td>
+            <td>{{ category.description }}</td>
+            <td>
+              <span class="product-count-badge" [class]="category.product_count === 0 ? 'count-zero' : 'count-ok'">
+                {{ category.product_count }}
+              </span>
+            </td>
+            <td>{{ category.sort_order }}</td>
+            <td>
+              <span class="status-badge" [class]="category.is_active ? 'status-active' : 'status-inactive'">
+                {{ category.is_active ? 'Активна' : 'Неактивна' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-small" (click)="viewCategoryDetails(category)" title="Просмотр деталей">👁️</button>
+              <button class="btn btn-small btn-primary" (click)="editCategory(category)" title="Редактировать">✏️</button>
+              <button 
+                class="btn btn-small btn-danger" 
+                (click)="deleteCategory(category)" 
+                [disabled]="category.product_count > 0"
+                title="Удалить категорию"
+              >
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Модальные окна для категорий -->
+  <!-- Модальное окно создания категории -->
+  <div *ngIf="creatingCategory" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Создание новой категории</h3>
+        <button class="modal-close" (click)="cancelCategoryCreate()">×</button>
+      </div>
+      
+      <form (ngSubmit)="createNewCategory()" class="edit-form">
+        <div class="form-group" [class.has-error]="hasCategoryFieldError('name')">
+          <label for="create-category-name">Название категории *</label>
+          <input
+            type="text"
+            id="create-category-name"
+            [(ngModel)]="categoryCreateForm.name"
+            name="name"
+            required
+            class="form-control"
+            (input)="clearCategoryFieldError('name')"
+            [class.error]="hasCategoryFieldError('name')"
+          >
+          <div *ngIf="hasCategoryFieldError('name')" class="error-message">
+            {{ getCategoryFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasCategoryFieldError('description')">
+          <label for="create-category-description">Описание *</label>
+          <textarea
+            id="create-category-description"
+            [(ngModel)]="categoryCreateForm.description"
+            name="description"
+            required
+            class="form-control"
+            rows="3"
+            (input)="clearCategoryFieldError('description')"
+            [class.error]="hasCategoryFieldError('description')"
+          ></textarea>
+          <div *ngIf="hasCategoryFieldError('description')" class="error-message">
+            {{ getCategoryFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="create-category-image">URL изображения</label>
+          <input
+            type="url"
+            id="create-category-image"
+            [(ngModel)]="categoryCreateForm.image_url"
+            name="image_url"
+            class="form-control"
+            placeholder="Оставьте пустым для использования placeholder"
+          >
+          <small class="form-text text-muted">Если не указать URL, будет использовано стандартное изображение</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-category-sort-order">Порядок сортировки</label>
+            <input
+              type="number"
+              id="create-category-sort-order"
+              [(ngModel)]="categoryCreateForm.sort_order"
+              name="sort_order"
+              min="0"
+              class="form-control"
+            >
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryCreateForm.is_active"
+                name="is_active"
+              >
+              Категория активна
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelCategoryCreate()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-success">
+            Создать категорию
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования категории -->
+  <div *ngIf="editingCategory" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Редактирование категории</h3>
+        <button class="modal-close" (click)="cancelCategoryEdit()">×</button>
+      </div>
+      
+      <form (ngSubmit)="saveCategoryChanges()" class="edit-form">
+        <div class="form-group" [class.has-error]="hasCategoryFieldError('name')">
+          <label for="edit-category-name">Название категории *</label>
+          <input
+            type="text"
+            id="edit-category-name"
+            [(ngModel)]="categoryEditForm.name"
+            name="name"
+            required
+            class="form-control"
+            (input)="clearCategoryFieldError('name')"
+            [class.error]="hasCategoryFieldError('name')"
+          >
+          <div *ngIf="hasCategoryFieldError('name')" class="error-message">
+            {{ getCategoryFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group" [class.has-error]="hasCategoryFieldError('description')">
+          <label for="edit-category-description">Описание *</label>
+          <textarea
+            id="edit-category-description"
+            [(ngModel)]="categoryEditForm.description"
+            name="description"
+            required
+            class="form-control"
+            rows="3"
+            (input)="clearCategoryFieldError('description')"
+            [class.error]="hasCategoryFieldError('description')"
+          ></textarea>
+          <div *ngIf="hasCategoryFieldError('description')" class="error-message">
+            {{ getCategoryFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-category-image">URL изображения</label>
+          <input
+            type="url"
+            id="edit-category-image"
+            [(ngModel)]="categoryEditForm.image_url"
+            name="image_url"
+            class="form-control"
+            placeholder="Оставьте пустым для использования placeholder"
+          >
+          <small class="form-text text-muted">Если не указать URL, будет использовано стандартное изображение</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-category-sort-order">Порядок сортировки</label>
+            <input
+              type="number"
+              id="edit-category-sort-order"
+              [(ngModel)]="categoryEditForm.sort_order"
+              name="sort_order"
+              min="0"
+              class="form-control"
+            >
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryEditForm.is_active"
+                name="is_active"
+              >
+              Категория активна
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelCategoryEdit()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Сохранить изменения
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра категории -->
+  <div *ngIf="viewingCategory" class="modal-overlay">
+    <div class="modal-content category-view-modal">
+      <div class="modal-header">
+        <h3>Просмотр категории</h3>
+        <button class="modal-close" (click)="closeCategoryView()">×</button>
+      </div>
+      
+      <div class="category-view-content">
+        <!-- Изображение категории -->
+        <div class="category-image-section">
+          <img 
+            [src]="viewingCategory.image_url" 
+            [alt]="viewingCategory.name"
+            class="category-view-image"
+            (error)="onCategoryImageError($event)"
+            *ngIf="viewingCategory.image_url && viewingCategory.image_url.trim(); else placeholderViewImage"
+          >
+          <ng-template #placeholderViewImage>
+            <div class="category-view-placeholder">
+              <img src="assets/images/placeholder.svg" alt="Placeholder" class="placeholder-img">
+              <p>Изображение не указано</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Основная информация -->
+        <div class="category-info-section">
+          <div class="info-group">
+            <label>ID категории</label>
+            <span class="info-value">#{{ viewingCategory.id }}</span>
+          </div>
+
+          <div class="info-group">
+            <label>Название</label>
+            <span class="info-value category-name">{{ viewingCategory.name }}</span>
+          </div>
+
+          <div class="info-group">
+            <label>Описание</label>
+            <span class="info-value category-description">{{ viewingCategory.description }}</span>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Количество товаров</label>
+              <span class="info-value product-count-value" [class]="viewingCategory.product_count === 0 ? 'count-zero' : 'count-ok'">
+                {{ viewingCategory.product_count }}
+              </span>
+            </div>
+
+            <div class="info-group">
+              <label>Порядок сортировки</label>
+              <span class="info-value">{{ viewingCategory.sort_order }}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Статус</label>
+              <span class="info-value">
+                <span class="status-badge" [class]="viewingCategory.is_active ? 'status-active' : 'status-inactive'">
+                  {{ viewingCategory.is_active ? 'Активна' : 'Неактивна' }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-group">
+              <label>Дата создания</label>
+              <span class="info-value">{{ formatDateString(viewingCategory.created_at) }}</span>
+            </div>
+
+            <div class="info-group">
+              <label>Дата обновления</label>
+              <span class="info-value">{{ formatDateString(viewingCategory.updated_at) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" (click)="editCategory(viewingCategory)">
+          ✏️ Редактировать
+        </button>
+        <button class="btn btn-secondary" (click)="closeCategoryView()">
+          Закрыть
         </button>
       </div>
     </div>
