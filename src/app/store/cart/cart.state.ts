@@ -49,11 +49,17 @@ export class CartStateClass {
     const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
     
-    ctx.setState({
+    const newState = {
       items: newItems,
       total,
       itemCount
-    });
+    };
+    
+    ctx.setState(newState);
+    
+    // Отладочная информация
+    console.log('🛒 Cart updated:', newState);
+    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(RemoveFromCart)
@@ -63,11 +69,17 @@ export class CartStateClass {
     const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
     
-    ctx.setState({
+    const newState = {
       items: newItems,
       total,
       itemCount
-    });
+    };
+    
+    ctx.setState(newState);
+    
+    // Отладочная информация
+    console.log('🗑️ Item removed from cart:', newState);
+    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(UpdateQuantity)
@@ -82,19 +94,31 @@ export class CartStateClass {
     const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
     
-    ctx.setState({
+    const newState = {
       items: newItems,
       total,
       itemCount
-    });
+    };
+    
+    ctx.setState(newState);
+    
+    // Отладочная информация
+    console.log('📊 Quantity updated:', newState);
+    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(ClearCart)
   clearCart(ctx: StateContext<CartState>) {
-    ctx.setState({
+    const newState = {
       items: [],
       total: 0,
       itemCount: 0
-    });
+    };
+    
+    ctx.setState(newState);
+    
+    // Отладочная информация
+    console.log('🧹 Cart cleared:', newState);
+    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 }

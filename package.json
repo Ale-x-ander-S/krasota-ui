@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "./deploy.sh",
+    "deploy:prod": "ng build --configuration production && scp -r dist/krasota-ui/browser/* root@45.12.229.112:/opt/krasota-ui/ && ssh root@45.12.229.112 'systemctl reload nginx'"
   },
   "private": true,
   "dependencies": {

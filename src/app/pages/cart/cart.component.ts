@@ -10,6 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 import { CartState, CartItem } from '../../models/cart.model';
 import { AddToCart, RemoveFromCart, UpdateQuantity, ClearCart } from '../../store/cart/cart.actions';
 import { CartStateClass } from '../../store/cart';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-cart',
@@ -27,7 +28,8 @@ export class CartComponent implements OnInit, OnDestroy {
   
   constructor(
     private router: Router,
-    private store: Store
+    private store: Store,
+    private storageService: StorageService
   ) {}
   
   showMobileMenu: boolean = false;
@@ -40,11 +42,21 @@ export class CartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscribeToCart();
+    this.debugStorage();
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private debugStorage() {
+    console.log('🔍 Storage Debug Info:');
+    console.log('📱 localStorage available:', this.storageService.isLocalStorageAvailable());
+    console.log('📱 sessionStorage available:', this.storageService.isSessionStorageAvailable());
+    console.log('📱 Storage type:', this.storageService.getStorageType());
+    console.log('💾 localStorage cart:', this.storageService.getItem('cart'));
+    console.log('💾 sessionStorage cart:', this.storageService.getItem('cart'));
   }
 
   private subscribeToCart() {

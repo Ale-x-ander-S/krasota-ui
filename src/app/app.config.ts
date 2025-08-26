@@ -18,7 +18,23 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       NgxsModule.forRoot([CartStateClass]),
       NgxsStoragePluginModule.forRoot({
-        key: ['cart'] // Автоматически сохраняет cart в localStorage
+        key: ['cart'],
+        serialize: JSON.stringify,
+        deserialize: JSON.parse,
+        beforeSerialize: (obj: any, key: string) => {
+          // Fallback для мобильных устройств
+          if (key === 'cart' && !localStorage.getItem('cart')) {
+            try {
+              const sessionData = sessionStorage.getItem('cart');
+              if (sessionData) {
+                localStorage.setItem('cart', sessionData);
+              }
+            } catch (e) {
+              console.warn('localStorage not available, using sessionStorage');
+            }
+          }
+          return obj;
+        }
       }),
       NgxsReduxDevtoolsPluginModule.forRoot()
     )
