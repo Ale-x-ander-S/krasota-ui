@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
@@ -10,9 +11,9 @@ export const routes: Routes = [
   { path: 'cart', loadComponent: () => import('./pages/cart').then(m => m.CartComponent) },
   { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent) },
   { path: 'auth', loadComponent: () => import('./pages/auth').then(m => m.AuthComponent) },
-  { path: 'profile', loadComponent: () => import('./pages/profile').then(m => m.ProfileComponent) },
-  { path: 'orders', loadComponent: () => import('./pages/orders').then(m => m.OrdersComponent) },
-  { path: 'order/:id', loadComponent: () => import('./pages/order-detail').then(m => m.OrderDetailComponent) },
+  { path: 'profile', loadComponent: () => import('./pages/profile').then(m => m.ProfileComponent), canActivate: [AuthGuard] },
+  { path: 'orders', loadComponent: () => import('./pages/orders').then(m => m.OrdersComponent), canActivate: [AuthGuard] },
+  { path: 'order/:id', loadComponent: () => import('./pages/order-detail').then(m => m.OrderDetailComponent), canActivate: [AuthGuard] },
   { path: 'admin', loadComponent: () => import('./pages/admin').then(m => m.AdminComponent) },
   { path: 'admin/orders', loadComponent: () => import('./pages/admin-orders').then(m => m.AdminOrdersComponent) },
   { path: '**', redirectTo: '/products' }

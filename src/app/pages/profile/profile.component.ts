@@ -20,22 +20,7 @@ interface UserProfile {
   favorites?: number[]; // Добавляем поле favorites
 }
 
-interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  quantity: number;
-}
 
-interface Order {
-  id: number;
-  date: Date;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  total: number;
-  items: OrderItem[];
-}
 
 interface Product {
   id: number;
@@ -85,48 +70,7 @@ export class ProfileComponent implements OnInit {
 
   editProfile: UserProfile = { ...this.userProfile };
 
-  orders: Order[] = [
-    {
-      id: 1001,
-      date: new Date('2024-01-15'),
-      status: 'delivered',
-      total: 279998,
-      items: [
-        {
-          id: 1,
-          name: 'Смартфон iPhone 15 Pro',
-          price: 129999,
-          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzAwN0FGRiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5pUGhvbmUgMTUgUHJvPC90ZXh0Pjwvc3ZnPg==',
-          category: 'Электроника',
-          quantity: 1
-        },
-        {
-          id: 2,
-          name: 'Ноутбук MacBook Air M2',
-          price: 149999,
-          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzM0Qzc1OSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NYWNCb29rIEFpcjwvdGV4dD48L3N2Zz4=',
-          category: 'Электроника',
-          quantity: 1
-        }
-      ]
-    },
-    {
-      id: 1002,
-      date: new Date('2024-01-10'),
-      status: 'shipped',
-      total: 24999,
-      items: [
-        {
-          id: 3,
-          name: 'Наушники AirPods Pro',
-          price: 24999,
-          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0ZGOTUwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BaXJQb2RzIFBybzwvdGV4dD48L3N2Zz4=',
-          category: 'Электроника',
-          quantity: 1
-        }
-      ]
-    }
-  ];
+
 
   favorites: Product[] = [
     {
@@ -177,6 +121,13 @@ export class ProfileComponent implements OnInit {
   }
 
   private loadUserProfile() {
+    // Проверяем, авторизован ли пользователь
+    if (!this.authService.isAuthenticated()) {
+      console.log('Пользователь не авторизован, перенаправляем на страницу входа');
+      this.router.navigate(['/auth']);
+      return;
+    }
+
     // Получаем профиль через API
     this.authService.getProfile().subscribe({
       next: (user) => {
@@ -205,6 +156,12 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Ошибка загрузки профиля:', error);
+        // Если ошибка 401, перенаправляем на страницу входа
+        if (error.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/auth']);
+          return;
+        }
         // Если API недоступен, используем данные из AuthService
         const currentUser = this.authService.getCurrentUser();
         if (currentUser) {
@@ -247,6 +204,10 @@ export class ProfileComponent implements OnInit {
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+  }
+
+  goToOrders() {
+    this.router.navigate(['/orders']);
   }
 
   formatPrice(price: number): string {
@@ -294,16 +255,7 @@ export class ProfileComponent implements OnInit {
     return this.formatDate(date);
   }
 
-  getStatusText(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'pending': 'Ожидает подтверждения',
-      'processing': 'В обработке',
-      'shipped': 'Отправлен',
-      'delivered': 'Доставлен',
-      'cancelled': 'Отменен'
-    };
-    return statusMap[status] || status;
-  }
+
 
   getRoleText(role: string): string {
     const roleMap: { [key: string]: string } = {
@@ -347,17 +299,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  repeatOrder(order: Order) {
-    // Добавление товаров из заказа в корзину
-    alert(`Товары из заказа #${order.id} добавлены в корзину`);
-    this.router.navigate(['/cart']);
-  }
 
-  viewOrderDetails(order: Order) {
-    const orderDate = order.date instanceof Date ? order.date : new Date(order.date);
-    const formattedDate = this.formatDate(orderDate);
-    alert(`Детали заказа #${order.id}\nСтатус: ${this.getStatusText(order.status)}\nДата: ${formattedDate}`);
-  }
 
   addToCart(product: Product) {
     alert(`${product.name} добавлен в корзину`);

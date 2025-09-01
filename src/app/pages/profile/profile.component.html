@@ -42,8 +42,7 @@
             </button>
             <button 
               class="nav-item" 
-              [class.active]="activeTab === 'orders'"
-              (click)="setActiveTab('orders')"
+              (click)="goToOrders()"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -165,57 +164,7 @@
             </form>
           </div>
 
-          <!-- Orders Tab -->
-          <div *ngIf="activeTab === 'orders'" class="tab-content orders-tab">
-            <h2>История заказов</h2>
-            
-            <div *ngIf="orders.length === 0" class="empty-orders">
-              <div class="empty-icon">📦</div>
-              <h3>У вас пока нет заказов</h3>
-              <p>Сделайте первый заказ и он появится здесь</p>
-              <a routerLink="/products" class="start-shopping-btn">
-                Начать покупки
-              </a>
-            </div>
 
-            <div *ngIf="orders.length > 0" class="orders-list">
-              <div *ngFor="let order of orders" class="order-card">
-                <div class="order-header">
-                  <div class="order-info">
-                    <h4>Заказ #{{ order.id }}</h4>
-                    <p class="order-date">{{ formatDate(order.date) }}</p>
-                    <span class="order-status" [class]="order.status">
-                      {{ getStatusText(order.status) }}
-                    </span>
-                  </div>
-                  <div class="order-total">
-                    <span class="total-amount">{{ formatPrice(order.total) }}</span>
-                    <span class="total-items">{{ order.items.length }} товар(ов)</span>
-                  </div>
-                </div>
-
-                <div class="order-items">
-                  <div *ngFor="let item of order.items" class="order-item">
-                    <img [src]="item.image" [alt]="item.name" class="item-image">
-                    <div class="item-details">
-                      <h5>{{ item.name }}</h5>
-                      <p class="item-category">{{ item.category }}</p>
-                      <div class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="order-actions">
-                  <button class="action-btn" (click)="repeatOrder(order)">
-                    Повторить заказ
-                  </button>
-                  <button class="action-btn secondary" (click)="viewOrderDetails(order)">
-                    Подробности
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Favorites Tab -->
           <div *ngIf="activeTab === 'favorites'" class="tab-content favorites-tab">

@@ -48,7 +48,7 @@
         <span class="cart-text">Корзина</span>
         <span class="cart-count" *ngIf="itemCount > 0">{{ itemCount }}</span>
       </a>
-      <a *ngIf="isAuthenticated$ | async" routerLink="/orders" class="nav-link" [class.active]="isActiveRoute('/orders')">Мои заказы</a>
+
       
       <!-- Аутентификация -->
       <ng-container *ngIf="!(isAuthenticated$ | async); else userMenu">
