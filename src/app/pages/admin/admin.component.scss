@@ -1733,3 +1733,312 @@
     text-align: center;
   }
 }
+
+// Orders Tab
+.orders-tab {
+  .orders-management {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    p {
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .management-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+  }
+}
+
+// ===== СТИЛИ ДЛЯ ЗАКАЗОВ =====
+
+// Фильтры заказов
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+
+    input, select {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      }
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+  }
+}
+
+// Информация о клиенте
+.customer-info {
+  strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  small {
+    color: #6c757d;
+    font-size: 0.8rem;
+  }
+}
+
+.contact-info {
+  div {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+// Статусы заказов
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.status-pending {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.status-confirmed {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  &.status-processing {
+    background: #cce5ff;
+    color: #004085;
+  }
+
+  &.status-shipped {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.status-delivered {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  &.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  &.status-refunded {
+    background: #e2e3e5;
+    color: #383d41;
+  }
+}
+
+// Селект статуса
+.status-select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+}
+
+// Модальное окно заказа
+.order-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .order-details {
+    padding: 1rem 0;
+  }
+
+  .order-info-section {
+    margin-bottom: 2rem;
+
+    h4 {
+      color: #495057;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      span {
+        color: #495057;
+        font-size: 0.95rem;
+
+        &.price {
+          font-weight: 700;
+          color: #28a745;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  .order-items-section {
+    h4 {
+      color: #495057;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+
+      .item-image {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 6px;
+        }
+      }
+
+      .item-details {
+        flex: 1;
+
+        h5 {
+          margin: 0 0 0.5rem 0;
+          color: #495057;
+          font-size: 1rem;
+        }
+
+        .item-price {
+          margin: 0;
+          color: #6c757d;
+          font-size: 0.9rem;
+        }
+      }
+
+      .item-total {
+        font-weight: 700;
+        color: #28a745;
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// Адаптивность для мобильных
+@media (max-width: 768px) {
+  .filters-section {
+    .filters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .order-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+
+    .order-info-section .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .order-item {
+      flex-direction: column;
+      text-align: center;
+
+      .item-image {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  }
+
+  .admin-table {
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 0.5rem 0.25rem;
+    }
+
+    .status-select {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+  }
+}

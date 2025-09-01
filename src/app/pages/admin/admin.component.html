@@ -241,7 +241,143 @@
   <!-- Заказы -->
   <div *ngIf="activeTab === 'orders'" class="tab-content orders-tab">
     <h2>Управление заказами</h2>
-    <p>Здесь будет полное управление заказами</p>
+    
+    <!-- Фильтры заказов -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="orderStatus">Статус заказа</label>
+          <select id="orderStatus" [(ngModel)]="orderFilters.status" (change)="onOrderFilterChange()">
+            <option value="">Все статусы</option>
+            <option value="pending">Ожидает подтверждения</option>
+            <option value="confirmed">Подтвержден</option>
+            <option value="processing">В обработке</option>
+            <option value="shipped">Отправлен</option>
+            <option value="delivered">Доставлен</option>
+            <option value="cancelled">Отменен</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="orderDateFrom">Дата от</label>
+          <input 
+            type="date" 
+            id="orderDateFrom" 
+            [(ngModel)]="orderFilters.date_from" 
+            (change)="onOrderFilterChange()"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="orderDateTo">Дата до</label>
+          <input 
+            type="date" 
+            id="orderDateTo" 
+            [(ngModel)]="orderFilters.date_to" 
+            (change)="onOrderFilterChange()"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="orderSearch">Поиск</label>
+          <input 
+            type="text" 
+            id="orderSearch" 
+            placeholder="Поиск по заказам..."
+            [(ngModel)]="orderFilters.search" 
+            (input)="onOrderFilterChange()"
+          >
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" class="btn btn-secondary" (click)="clearOrderFilters()">
+            Очистить фильтры
+          </button>
+          <button type="button" class="btn btn-primary" (click)="loadOrders()">
+            🔄 Обновить
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div *ngIf="ordersLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Загрузка заказов...</p>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div *ngIf="ordersError && !ordersLoading" class="error-message">
+      {{ ordersError }}
+      <button class="btn btn-small" (click)="loadOrders()">Повторить</button>
+    </div>
+
+    <!-- Таблица заказов -->
+    <div *ngIf="!ordersLoading && !ordersError" class="table-container">
+      <div class="table-header">
+        <h3>Всего заказов: {{ orders.length }}</h3>
+        <a routerLink="/admin/orders" class="btn btn-outline">
+          📦 Расширенное управление
+        </a>
+      </div>
+      
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Клиент</th>
+            <th>Email/Телефон</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+            <th>Дата</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders; trackBy: trackByOrderId">
+            <td>#{{ order.id }}</td>
+            <td>
+              <div class="customer-info">
+                <strong>{{ order.guest_name || 'Гость' }}</strong>
+                <small *ngIf="order.is_anonymous">Анонимный заказ</small>
+              </div>
+            </td>
+            <td>
+              <div class="contact-info">
+                <div *ngIf="order.guest_phone">{{ order.guest_phone }}</div>
+                <div *ngIf="order.guest_email">{{ order.guest_email }}</div>
+              </div>
+            </td>
+            <td>{{ formatPrice(order.total_amount) }}</td>
+            <td>
+              <span class="status-badge" [class]="getOrderStatusClass(order.status)">
+                {{ getOrderStatusText(order.status) }}
+              </span>
+            </td>
+            <td>{{ formatDate(order.created_at) }}</td>
+            <td>
+              <button class="btn btn-small" (click)="viewOrderDetailsModal(order)" title="Просмотр деталей">
+                👁️
+              </button>
+              <select class="status-select" (change)="updateOrderStatusModal(order, $event)">
+                <option value="pending" [selected]="order.status === 'pending'">Ожидает</option>
+                <option value="confirmed" [selected]="order.status === 'confirmed'">Подтвержден</option>
+                <option value="processing" [selected]="order.status === 'processing'">В обработке</option>
+                <option value="shipped" [selected]="order.status === 'shipped'">Отправлен</option>
+                <option value="delivered" [selected]="order.status === 'delivered'">Доставлен</option>
+                <option value="cancelled" [selected]="order.status === 'cancelled'">Отменен</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="orders.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>Заказов не найдено</h3>
+        <p>По выбранным фильтрам заказы не найдены</p>
+      </div>
+    </div>
   </div>
 
   <!-- Пользователи -->
@@ -1539,6 +1675,90 @@
           ✏️ Редактировать
         </button>
         <button class="btn btn-secondary" (click)="closeCategoryView()">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра заказа -->
+  <div *ngIf="showOrderModal" class="modal-overlay" (click)="closeOrderModal()">
+    <div class="modal-content order-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Заказ №{{ selectedOrder?.id }}</h3>
+        <button class="modal-close" (click)="closeOrderModal()">×</button>
+      </div>
+      
+      <div *ngIf="selectedOrder" class="order-details">
+        <!-- Информация о заказе -->
+        <div class="order-info-section">
+          <h4>Информация о заказе</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Статус:</label>
+              <span class="status-badge" [class]="getOrderStatusClass(selectedOrder.status)">
+                {{ getOrderStatusText(selectedOrder.status) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Дата создания:</label>
+              <span>{{ formatDate(selectedOrder.created_at) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Общая сумма:</label>
+              <span class="price">{{ formatPrice(selectedOrder.total_amount) }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.guest_name">
+              <label>Имя клиента:</label>
+              <span>{{ selectedOrder.guest_name }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.guest_phone">
+              <label>Телефон:</label>
+              <span>{{ selectedOrder.guest_phone }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.guest_email">
+              <label>Email:</label>
+              <span>{{ selectedOrder.guest_email }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.shipping_address">
+              <label>Адрес доставки:</label>
+              <span>{{ selectedOrder.shipping_address }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.billing_address">
+              <label>Адрес оплаты:</label>
+              <span>{{ selectedOrder.billing_address }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.notes">
+              <label>Заметки:</label>
+              <span>{{ selectedOrder.notes }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Товары в заказе -->
+        <div class="order-items-section">
+          <h4>Товары в заказе</h4>
+          <div class="items-list">
+            <div *ngFor="let item of selectedOrder.items" class="order-item">
+              <div class="item-image">
+                <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                     [alt]="item.product_name"
+                     (error)="onImageError($event)">
+              </div>
+              <div class="item-details">
+                <h5>{{ item.product_name || 'Товар #' + item.product_id }}</h5>
+                <p class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</p>
+              </div>
+              <div class="item-total">
+                {{ formatPrice(item.total) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-primary" (click)="closeOrderModal()">
           Закрыть
         </button>
       </div>

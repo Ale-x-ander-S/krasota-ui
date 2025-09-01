@@ -1,0 +1,150 @@
+<app-header></app-header>
+
+<div class="orders-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>Мои заказы</h1>
+      <p>Управляйте своими заказами и отслеживайте их статус</p>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="status">Статус заказа</label>
+          <select id="status" [(ngModel)]="filters.status" (change)="onStatusChange(filters.status || '')">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="dateFrom">Дата от</label>
+          <input 
+            type="date" 
+            id="dateFrom" 
+            [(ngModel)]="filters.date_from" 
+            (change)="onDateFromChange(filters.date_from || '')"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="dateTo">Дата до</label>
+          <input 
+            type="date" 
+            id="dateTo" 
+            [(ngModel)]="filters.date_to" 
+            (change)="onDateToChange(filters.date_to || '')"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="search">Поиск</label>
+          <input 
+            type="text" 
+            id="search" 
+            placeholder="Поиск по заказам..."
+            [(ngModel)]="filters.search" 
+            (input)="onSearchChange(filters.search || '')"
+          >
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+            Очистить фильтры
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Состояние загрузки -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Загрузка заказов...</p>
+    </div>
+
+    <!-- Ошибка -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ error }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadOrders()">
+        Попробовать снова
+      </button>
+    </div>
+
+    <!-- Список заказов -->
+    <div *ngIf="!loading && !error" class="orders-list">
+      <div *ngIf="orders.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>Заказов пока нет</h3>
+        <p>Когда вы сделаете заказ, он появится здесь</p>
+        <a routerLink="/products" class="btn btn-primary">Перейти к товарам</a>
+      </div>
+
+      <div *ngFor="let order of orders" class="order-card">
+        <div class="order-header">
+          <div class="order-info">
+            <h3>Заказ №{{ order.id }}</h3>
+            <span class="order-date">{{ formatDate(order.created_at) }}</span>
+          </div>
+          <div class="order-status">
+            <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="order-content">
+          <div class="order-items">
+            <div *ngFor="let item of order.items" class="order-item">
+              <div class="item-image">
+                <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                     [alt]="item.product_name"
+                     (error)="onImageError($event)">
+              </div>
+              <div class="item-details">
+                <h4>{{ item.product_name || 'Товар #' + item.product_id }}</h4>
+                <p class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</p>
+              </div>
+              <div class="item-total">
+                {{ formatPrice(item.total) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Адрес доставки:</span>
+              <span>{{ order.shipping_address }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Способ оплаты:</span>
+              <span>{{ getPaymentMethodLabel(order.payment_method) }}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Итого:</span>
+              <span>{{ formatPrice(order.total_amount) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-actions">
+          <button type="button" class="btn btn-outline" (click)="viewOrder(order.id)">
+            Подробнее
+          </button>
+          <button 
+            *ngIf="canCancelOrder(order)" 
+            type="button" 
+            class="btn btn-danger" 
+            (click)="cancelOrder(order.id)"
+          >
+            Отменить заказ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

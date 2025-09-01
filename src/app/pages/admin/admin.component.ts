@@ -6,6 +6,8 @@ import { AuthService, User } from '../../services/auth.service';
 import { UserService, User as ApiUser } from '../../services/user.service';
 import { ProductService, Product, CreateProductData } from '../../services/product.service';
 import { CategoryService, Category, CreateCategoryData, UpdateCategoryData } from '../../services/category.service';
+import { OrderService } from '../../services/order.service';
+import { Order, OrderStatus, OrderFilters } from '../../models/order.model';
 
 interface AdminStats {
   totalUsers: number;
@@ -74,6 +76,14 @@ export class AdminComponent implements OnInit {
   categories: Category[] = [];
   categoriesLoading = false;
   categoriesError = '';
+
+  // Заказы из API
+  orders: Order[] = [];
+  ordersLoading = false;
+  ordersError = '';
+  orderFilters: OrderFilters = {};
+  selectedOrder: Order | null = null;
+  showOrderModal = false;
 
   // Фильтры товаров
   productFilters = {
@@ -256,6 +266,7 @@ export class AdminComponent implements OnInit {
     private userService: UserService,
     private productService: ProductService,
     private categoryService: CategoryService,
+    private orderService: OrderService,
     private router: Router
   ) {}
 
@@ -271,11 +282,23 @@ export class AdminComponent implements OnInit {
     console.log('Текущий пользователь:', this.currentUser);
     console.log('=====================================');
     
+    // Проверяем токен
+    if (!this.authService.getToken()) {
+      console.error('Токен отсутствует');
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
     // Проверяем, является ли пользователь админом
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    const userRole = this.authService.getRoleFromToken();
+    if (!userRole || userRole !== 'admin') {
+      console.error('Пользователь не является администратором. Роль:', userRole);
       this.router.navigate(['/']);
       return;
     }
+
+    // Загружаем статистику при инициализации
+    this.loadInitialStats();
 
     // Загружаем пользователей, товары и категории при инициализации
     this.loadUsers();
@@ -288,6 +311,14 @@ export class AdminComponent implements OnInit {
     this.usersLoading = true;
     this.usersError = '';
 
+    // Проверяем токен перед запросом
+    if (!this.authService.getToken()) {
+      this.usersError = 'Токен аутентификации отсутствует';
+      this.usersLoading = false;
+      this.router.navigate(['/auth']);
+      return;
+    }
+
     this.userService.getUsers().subscribe({
       next: (users) => {
         this.users = users;
@@ -296,10 +327,20 @@ export class AdminComponent implements OnInit {
         console.log('Пользователи загружены:', users);
       },
       error: (error) => {
-        this.usersError = 'Ошибка загрузки пользователей: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
         this.usersLoading = false;
-        this.showNotification(`Ошибка загрузки пользователей: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
         console.error('Ошибка загрузки пользователей:', error);
+        
+        if (error.status === 401) {
+          this.usersError = 'Ошибка аутентификации. Токен недействителен или истек';
+          this.router.navigate(['/auth']);
+        } else if (error.status === 403) {
+          this.usersError = 'Доступ запрещен. Требуются права администратора';
+          this.router.navigate(['/']);
+        } else {
+          this.usersError = 'Ошибка загрузки пользователей: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
+        }
+        
+        this.showNotification(this.usersError, 'error');
       }
     });
   }
@@ -455,6 +496,17 @@ export class AdminComponent implements OnInit {
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+    
+    // Загружаем данные при переключении на соответствующий таб
+    if (tab === 'orders' && this.orders.length === 0) {
+      this.loadOrders();
+    } else if (tab === 'users' && this.users.length === 0) {
+      this.loadUsers();
+    } else if (tab === 'products' && this.products.length === 0) {
+      this.loadProducts();
+    } else if (tab === 'categories' && this.categories.length === 0) {
+      this.loadCategories();
+    }
   }
 
   formatPrice(price: number): string {
@@ -465,14 +517,15 @@ export class AdminComponent implements OnInit {
     }).format(price);
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('ru-RU', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }).format(date);
+    }).format(dateObj);
   }
 
   // Форматирование даты из строки
@@ -520,8 +573,9 @@ export class AdminComponent implements OnInit {
     return roleClassMap[role] || '';
   }
 
-  // Действия администратора
+  // Действия администратора для дашборда
   viewOrderDetails(order: RecentOrder) {
+    // Для дашборда показываем простой alert
     alert(`Детали заказа #${order.id}\nКлиент: ${order.customerName}\nEmail: ${order.customerEmail}\nСумма: ${this.formatPrice(order.total)}\nСтатус: ${this.getStatusText(order.status)}`);
   }
 
@@ -1219,5 +1273,128 @@ export class AdminComponent implements OnInit {
     } catch {
       return false;
     }
+  }
+
+  // ===== МЕТОДЫ ДЛЯ РАБОТЫ С ЗАКАЗАМИ =====
+
+  // Загрузка заказов
+  loadOrders() {
+    this.ordersLoading = true;
+    this.ordersError = '';
+    
+    this.orderService.getAllOrders(this.orderFilters).subscribe({
+      next: (response) => {
+        this.orders = response.orders;
+        this.ordersLoading = false;
+        this.updateOrderStats();
+      },
+      error: (error) => {
+        this.ordersError = 'Ошибка загрузки заказов';
+        this.ordersLoading = false;
+        console.error('Error loading orders:', error);
+      }
+    });
+  }
+
+  // Обновление статистики заказов
+  updateOrderStats() {
+    this.stats.totalOrders = this.orders.length;
+    this.stats.pendingOrders = this.orders.filter(o => o.status === OrderStatus.PENDING).length;
+    this.stats.totalRevenue = this.orders
+      .filter(o => o.status === OrderStatus.DELIVERED)
+      .reduce((sum, o) => sum + o.total_amount, 0);
+  }
+
+  // Просмотр деталей заказа
+  viewOrderDetailsModal(order: Order) {
+    this.selectedOrder = order;
+    this.showOrderModal = true;
+  }
+
+  // Закрытие модального окна заказа
+  closeOrderModal() {
+    this.showOrderModal = false;
+    this.selectedOrder = null;
+  }
+
+  // Изменение статуса заказа
+  updateOrderStatusModal(order: Order, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const newStatus = target.value as OrderStatus;
+    
+    if (newStatus === order.status) return;
+
+    this.orderService.updateOrder(order.id, { status: newStatus }).subscribe({
+      next: () => {
+        order.status = newStatus;
+        this.updateOrderStats();
+        this.showNotification('Статус заказа обновлен', 'success');
+      },
+      error: (error) => {
+        this.showNotification('Ошибка обновления статуса', 'error');
+        console.error('Error updating order status:', error);
+        // Возвращаем предыдущее значение
+        target.value = order.status;
+      }
+    });
+  }
+
+  // Получение класса для статуса заказа
+  getOrderStatusClass(status: OrderStatus): string {
+    const statusClasses: { [key in OrderStatus]: string } = {
+      [OrderStatus.PENDING]: 'status-pending',
+      [OrderStatus.CONFIRMED]: 'status-confirmed',
+      [OrderStatus.PROCESSING]: 'status-processing',
+      [OrderStatus.SHIPPED]: 'status-shipped',
+      [OrderStatus.DELIVERED]: 'status-delivered',
+      [OrderStatus.CANCELLED]: 'status-cancelled',
+      [OrderStatus.REFUNDED]: 'status-refunded'
+    };
+    return statusClasses[status] || 'status-unknown';
+  }
+
+  // Получение текста статуса заказа
+  getOrderStatusText(status: OrderStatus): string {
+    const statusTexts: { [key in OrderStatus]: string } = {
+      [OrderStatus.PENDING]: 'Ожидает подтверждения',
+      [OrderStatus.CONFIRMED]: 'Подтвержден',
+      [OrderStatus.PROCESSING]: 'В обработке',
+      [OrderStatus.SHIPPED]: 'Отправлен',
+      [OrderStatus.DELIVERED]: 'Доставлен',
+      [OrderStatus.CANCELLED]: 'Отменен',
+      [OrderStatus.REFUNDED]: 'Возвращен'
+    };
+    return statusTexts[status] || 'Неизвестно';
+  }
+
+  // Фильтрация заказов
+  onOrderFilterChange() {
+    this.loadOrders();
+  }
+
+  // Очистка фильтров заказов
+  clearOrderFilters() {
+    this.orderFilters = {};
+    this.loadOrders();
+  }
+
+  // TrackBy функция для заказов
+  trackByOrderId(index: number, order: Order): number {
+    return order.id;
+  }
+
+  // Загрузка начальной статистики
+  loadInitialStats() {
+    // Загружаем заказы для статистики
+    this.orderService.getAllOrders().subscribe({
+      next: (response) => {
+        this.orders = response.orders;
+        this.updateOrderStats();
+      },
+      error: (error) => {
+        console.error('Error loading orders for stats:', error);
+        // Оставляем заглушки если не удалось загрузить
+      }
+    });
   }
 }

@@ -1,0 +1,320 @@
+<app-header></app-header>
+
+<div class="admin-orders-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>Управление заказами</h1>
+      <p>Административная панель для управления заказами</p>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="status">Статус заказа</label>
+          <select id="status" [(ngModel)]="filters.status" (change)="onStatusChange(filters.status || '')">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="dateFrom">Дата от</label>
+          <input 
+            type="date" 
+            id="dateFrom" 
+            [(ngModel)]="filters.date_from" 
+            (change)="onDateFromChange(filters.date_from || '')"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="dateTo">Дата до</label>
+          <input 
+            type="date" 
+            id="dateTo" 
+            [(ngModel)]="filters.date_to" 
+            (change)="onDateToChange(filters.date_to || '')"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="search">Поиск</label>
+          <input 
+            type="text" 
+            id="search" 
+            placeholder="Поиск по заказам..."
+            [(ngModel)]="filters.search" 
+            (input)="onSearchChange(filters.search || '')"
+          >
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+            Очистить фильтры
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Статистика заказов -->
+    <div *ngIf="!loading && !error && orders.length > 0" class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-content">
+            <h3>{{ orderStats.total }}</h3>
+            <p>Всего заказов</p>
+          </div>
+        </div>
+        
+        <div class="stat-card pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-content">
+            <h3>{{ orderStats.pending }}</h3>
+            <p>Ожидают подтверждения</p>
+          </div>
+        </div>
+        
+        <div class="stat-card processing">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-content">
+            <h3>{{ orderStats.processing }}</h3>
+            <p>В обработке</p>
+          </div>
+        </div>
+        
+        <div class="stat-card delivered">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h3>{{ orderStats.delivered }}</h3>
+            <p>Доставлено</p>
+          </div>
+        </div>
+        
+        <div class="stat-card revenue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <h3>{{ formatPrice(orderStats.totalRevenue) }}</h3>
+            <p>Общая выручка</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Массовые операции -->
+    <div *ngIf="showBulkActions" class="bulk-actions">
+      <div class="bulk-info">
+        <span>Выбрано заказов: {{ selectedOrders.size }}</span>
+        <button type="button" class="btn btn-outline btn-sm" (click)="clearSelection()">
+          Очистить выбор
+        </button>
+      </div>
+      
+      <div class="bulk-buttons">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="bulkUpdateStatus(OrderStatus.CONFIRMED)">
+          Подтвердить
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="bulkUpdateStatus(OrderStatus.PROCESSING)">
+          В обработку
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="bulkUpdateStatus(OrderStatus.SHIPPED)">
+          Отправить
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="bulkCancelOrders()">
+          Отменить
+        </button>
+      </div>
+    </div>
+
+    <!-- Состояние загрузки -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Загрузка заказов...</p>
+    </div>
+
+    <!-- Ошибка -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ error }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadOrders()">
+        Попробовать снова
+      </button>
+    </div>
+
+    <!-- Список заказов -->
+    <div *ngIf="!loading && !error" class="orders-list">
+      <div *ngIf="orders.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>Заказов не найдено</h3>
+        <p>По выбранным фильтрам заказы не найдены</p>
+      </div>
+
+      <!-- Заголовок с чекбоксом "Выбрать все" -->
+      <div *ngIf="orders.length > 0" class="orders-header">
+        <div class="select-all">
+          <input 
+            type="checkbox" 
+            id="selectAll"
+            [checked]="selectedOrders.size === orders.length && orders.length > 0"
+            (change)="selectedOrders.size === orders.length ? clearSelection() : selectAllOrders()"
+          >
+          <label for="selectAll">Выбрать все</label>
+        </div>
+        <span class="orders-count">Найдено заказов: {{ orders.length }}</span>
+      </div>
+
+      <div *ngFor="let order of orders" class="order-card" [class.selected]="selectedOrders.has(order.id)">
+        <div class="order-checkbox">
+          <input 
+            type="checkbox" 
+            [id]="'order-' + order.id"
+            [checked]="selectedOrders.has(order.id)"
+            (change)="toggleOrderSelection(order.id)"
+          >
+        </div>
+        
+        <div class="order-content">
+          <div class="order-header">
+            <div class="order-info">
+              <h3>Заказ №{{ order.id }}</h3>
+              <span class="order-date">{{ formatDate(order.created_at) }}</span>
+              <span class="order-customer" *ngIf="order.guest_name">
+                {{ order.guest_name }} ({{ order.guest_phone }})
+              </span>
+            </div>
+            <div class="order-status">
+              <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="order-items">
+            <div *ngFor="let item of order.items" class="order-item">
+              <div class="item-image">
+                <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                     [alt]="item.product_name"
+                     (error)="onImageError($event)">
+              </div>
+              <div class="item-details">
+                <h4>{{ item.product_name || 'Товар #' + item.product_id }}</h4>
+                <p class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</p>
+              </div>
+              <div class="item-total">
+                {{ formatPrice(item.total) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Оплата:</span>
+              <span>{{ getPaymentMethodLabel(order.payment_method) }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Адрес доставки:</span>
+              <span>{{ order.shipping_address }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Адрес для счета:</span>
+              <span>{{ order.billing_address }}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Итого:</span>
+              <span>{{ formatPrice(order.total_amount) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-actions">
+          <button type="button" class="btn btn-outline" (click)="viewOrder(order.id)">
+            Подробнее
+          </button>
+          <button 
+            *ngIf="canUpdateOrder(order)" 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="openUpdateModal(order)"
+          >
+            Изменить
+          </button>
+          <button 
+            *ngIf="canCancelOrder(order)" 
+            type="button" 
+            class="btn btn-danger" 
+            (click)="cancelOrder(order.id)"
+          >
+            Отменить
+          </button>
+        </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Модальное окно обновления заказа -->
+<div *ngIf="showUpdateModal" class="modal-overlay" (click)="closeUpdateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Редактирование заказа №{{ selectedOrder?.id }}</h2>
+      <button type="button" class="close-btn" (click)="closeUpdateModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="updateOrder()">
+        <div class="form-group">
+          <label for="status">Статус заказа</label>
+          <select id="status" [(ngModel)]="updateForm.status" name="status">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="shippingAddress">Адрес доставки</label>
+          <textarea 
+            id="shippingAddress" 
+            [(ngModel)]="updateForm.shipping_address" 
+            name="shippingAddress"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="billingAddress">Адрес для счета</label>
+          <textarea 
+            id="billingAddress" 
+            [(ngModel)]="updateForm.billing_address" 
+            name="billingAddress"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Примечания</label>
+          <textarea 
+            id="notes" 
+            [(ngModel)]="updateForm.notes" 
+            name="notes"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeUpdateModal()">
+            Отмена
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Сохранить изменения
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
+

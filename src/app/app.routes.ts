@@ -11,6 +11,9 @@ export const routes: Routes = [
   { path: 'checkout', loadComponent: () => import('./pages/checkout').then(m => m.CheckoutComponent) },
   { path: 'auth', loadComponent: () => import('./pages/auth').then(m => m.AuthComponent) },
   { path: 'profile', loadComponent: () => import('./pages/profile').then(m => m.ProfileComponent) },
+  { path: 'orders', loadComponent: () => import('./pages/orders').then(m => m.OrdersComponent) },
+  { path: 'order/:id', loadComponent: () => import('./pages/order-detail').then(m => m.OrderDetailComponent) },
   { path: 'admin', loadComponent: () => import('./pages/admin').then(m => m.AdminComponent) },
+  { path: 'admin/orders', loadComponent: () => import('./pages/admin-orders').then(m => m.AdminOrdersComponent) },
   { path: '**', redirectTo: '/products' }
 ];

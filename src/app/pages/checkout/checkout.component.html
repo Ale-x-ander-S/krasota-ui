@@ -13,10 +13,25 @@
 
     <!-- Checkout Content -->
     <section class="checkout-content">
+      <!-- Ошибка -->
+      <div *ngIf="error" class="error-message">
+        <div class="error-icon">⚠️</div>
+        <p>{{ error }}</p>
+      </div>
+
       <div class="checkout-layout">
         <!-- Checkout Form -->
         <div class="checkout-form-section">
           <form (ngSubmit)="onSubmit()" #checkoutFormElement="ngForm">
+            <!-- Auto-fill notification -->
+            <div *ngIf="isFormAutoFilled" class="auto-fill-notification">
+              <div class="auto-fill-icon">✅</div>
+              <div class="auto-fill-content">
+                <h3>Форма автозаполнена</h3>
+                <p>Данные из вашего профиля автоматически заполнены. Вы можете изменить их при необходимости.</p>
+              </div>
+            </div>
+
             <!-- Personal Information -->
             <div class="form-section">
               <h2>Личные данные</h2>
@@ -168,8 +183,9 @@
 
             <!-- Submit Button -->
             <div class="form-actions">
-              <button type="submit" class="submit-btn" [disabled]="!validateForm()">
-                Оформить заказ
+              <button type="submit" class="submit-btn" [disabled]="!validateForm() || loading">
+                <span *ngIf="loading" class="spinner"></span>
+                {{ loading ? 'Обработка...' : 'Оформить заказ' }}
               </button>
             </div>
           </form>
@@ -184,11 +200,11 @@
             <div class="cart-items">
               <div *ngFor="let item of cartItems" class="cart-item">
                 <div class="item-image">
-                  <img [src]="item.image" [alt]="item.name">
+                  <img [src]="item.image_url" [alt]="item.name">
                 </div>
                 <div class="item-details">
                   <h3 class="item-name">{{ item.name }}</h3>
-                  <p class="item-category">{{ item.category }}</p>
+                  <p class="item-category">{{ item.category_name || 'Категория не указана' }}</p>
                   <div class="item-quantity">Количество: {{ item.quantity }}</div>
                 </div>
                 <div class="item-price">{{ formatPrice(item.price * item.quantity) }}</div>
@@ -223,6 +239,28 @@
     </section>
   </div>
 </main>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccessModal" class="modal-overlay" (click)="closeSuccessModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="success-icon">✅</div>
+    <h2>Заказ успешно оформлен!</h2>
+    <p>Ваш заказ №{{ createdOrder?.id }} принят в обработку.</p>
+    <p>Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
+    
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline" (click)="closeSuccessModal()">
+        Продолжить покупки
+      </button>
+      <button type="button" class="btn btn-primary" (click)="viewOrder()">
+        Посмотреть заказ
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="goToOrders()">
+        Мои заказы
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Footer -->
 <app-footer></app-footer>

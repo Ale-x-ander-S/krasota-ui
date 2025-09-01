@@ -1,0 +1,145 @@
+<app-header></app-header>
+
+<div class="order-detail-container">
+  <div class="container">
+    <!-- Кнопка назад -->
+    <div class="back-button">
+      <button type="button" class="btn btn-outline" (click)="goBack()">
+        ← Назад к заказам
+      </button>
+    </div>
+
+    <!-- Состояние загрузки -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Загрузка заказа...</p>
+    </div>
+
+    <!-- Ошибка -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ error }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadOrder()">
+        Попробовать снова
+      </button>
+    </div>
+
+    <!-- Детали заказа -->
+    <div *ngIf="!loading && !error && order" class="order-detail">
+      <!-- Заголовок заказа -->
+      <div class="order-header">
+        <div class="order-title">
+          <h1>Заказ №{{ order.id }}</h1>
+          <span class="order-date">{{ formatDate(order.created_at) }}</span>
+        </div>
+        <div class="order-status">
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ getStatusLabel(order.status) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Описание статуса -->
+      <div class="status-description">
+        <p>{{ getStatusDescription(order.status) }}</p>
+      </div>
+
+      <!-- Основная информация -->
+      <div class="order-content">
+        <div class="order-sections">
+          <!-- Товары в заказе -->
+          <div class="section">
+            <h2>Товары в заказе</h2>
+            <div class="items-list">
+              <div *ngFor="let item of order.items" class="order-item">
+                <div class="item-image">
+                  <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                       [alt]="item.product_name"
+                       (error)="onImageError($event)">
+                </div>
+                <div class="item-details">
+                  <h3>{{ item.product_name || 'Товар #' + item.product_id }}</h3>
+                  <div class="item-meta">
+                    <span class="item-price">{{ formatPrice(item.price) }}</span>
+                    <span class="item-quantity">× {{ item.quantity }}</span>
+                  </div>
+                </div>
+                <div class="item-total">
+                  {{ formatPrice(item.total) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Информация о доставке -->
+          <div class="section">
+            <h2>Информация о доставке</h2>
+            <div class="delivery-info">
+              <div class="info-row" *ngIf="order.guest_name">
+                <span class="label">Получатель:</span>
+                <span class="value">{{ order.guest_name }}</span>
+              </div>
+              <div class="info-row" *ngIf="order.guest_phone">
+                <span class="label">Телефон:</span>
+                <span class="value">{{ order.guest_phone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Адрес доставки:</span>
+                <span class="value">{{ order.shipping_address }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Адрес для счета:</span>
+                <span class="value">{{ order.billing_address }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Информация об оплате -->
+          <div class="section">
+            <h2>Информация об оплате</h2>
+            <div class="payment-info">
+              <div class="info-row">
+                <span class="label">Способ оплаты:</span>
+                <span class="value">{{ getPaymentMethodLabel(order.payment_method) }}</span>
+              </div>
+              <div class="info-row" *ngIf="order.payment_status">
+                <span class="label">Статус оплаты:</span>
+                <span class="value">{{ getPaymentStatusLabel(order.payment_status) }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Сумма заказа:</span>
+                <span class="value total-amount">{{ formatPrice(order.total_amount) }}</span>
+              </div>
+              <div class="info-row" *ngIf="order.discount_amount && order.discount_amount > 0">
+                <span class="label">Скидка:</span>
+                <span class="value discount">-{{ formatPrice(order.discount_amount) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Примечания -->
+          <div *ngIf="order.notes" class="section">
+            <h2>Примечания к заказу</h2>
+            <div class="notes">
+              <p>{{ order.notes }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Действия с заказом -->
+        <div class="order-actions">
+          <button 
+            *ngIf="canCancelOrder()" 
+            type="button" 
+            class="btn btn-danger" 
+            (click)="cancelOrder()"
+          >
+            Отменить заказ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

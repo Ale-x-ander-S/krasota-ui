@@ -53,6 +53,26 @@ $border-radius: 15px;
   z-index: 2;
 }
 
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .error-icon {
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
 .checkout-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -258,6 +278,15 @@ $border-radius: 15px;
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
 }
 
 // Order Summary
@@ -390,6 +419,11 @@ $border-radius: 15px;
   }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 // Responsive Design
 @media (max-width: 768px) {
   .hero-content h1 {
@@ -414,6 +448,108 @@ $border-radius: 15px;
   }
 }
 
+// Success Modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: bounce 0.6s ease-out;
+}
+
+.modal-content h2 {
+  color: $success-color;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.modal-content p {
+  color: $text-secondary;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.modal-actions .btn {
+  min-width: 140px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background: $text-secondary;
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background: darken($text-secondary, 10%);
+  transform: translateY(-2px);
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
 @media (max-width: 480px) {
   .hero-content h1 {
     font-size: 2rem;
@@ -427,5 +563,57 @@ $border-radius: 15px;
   .submit-btn {
     padding: 15px;
     font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+// Auto-fill notification
+.auto-fill-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 1px solid #10b981;
+  border-radius: $border-radius;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+
+  .auto-fill-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .auto-fill-content {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #065f46;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: #047857;
+      line-height: 1.4;
+    }
   }
 }

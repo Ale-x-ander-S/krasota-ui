@@ -108,4 +108,11 @@ export class ProductService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/products/${id}`, { headers: this.getHeaders() });
   }
+
+  // Получить кэшированный продукт (простая реализация)
+  getCachedProduct(id: number): Product | null {
+    // В реальном приложении здесь был бы кэш
+    // Пока возвращаем null, чтобы не усложнять
+    return null;
+  }
 }
