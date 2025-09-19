@@ -32,10 +32,6 @@
           </span>
         </div>
 
-        <div class="product-description">
-          <p>{{ product.description }}</p>
-        </div>
-
         <!-- Quantity Selector -->
         <div class="quantity-selector" *ngIf="product.stock > 0">
           <label for="quantity">Количество:</label>
@@ -85,9 +81,9 @@
               <span class="detail-label">Размер:</span>
               <span class="detail-value">{{ product.size }}</span>
             </div>
-            <div class="detail-item">
-              <span class="detail-label">Тип запаса:</span>
-              <span class="detail-value">{{ product.stock_type }}</span>
+            <div class="detail-item" *ngIf="product.stock_type === 'уп' && product.package_quantity && product.package_quantity_type">
+              <span class="detail-label">В упаковке:</span>
+              <span class="detail-value">{{ getStockTypeText(product) }}</span>
             </div>
           </div>
         </div>

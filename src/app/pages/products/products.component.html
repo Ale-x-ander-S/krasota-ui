@@ -73,7 +73,7 @@
 
     <!-- Products Section -->
     <section *ngIf="!loading && !error" class="products-section">
-      <div class="products-header">
+      <div class="products-header" *ngIf="hasActiveFilters">
         <h2>
           Найдено товаров: {{ totalProducts }}
           <span *ngIf="selectedCategory" class="category-filter-info">
@@ -99,6 +99,9 @@
             <div *ngIf="product.stock === 0" class="out-of-stock-badge">
               Нет в наличии
             </div>
+            <div *ngIf="product.size" class="size-badge">
+              {{ product.size }}
+            </div>
           </div>
           
           <div class="product-info">
@@ -114,9 +117,8 @@
             </div>
             
             <!-- Product Details -->
-            <div class="product-details" *ngIf="product.color || product.size">
-              <div *ngIf="product.color" class="product-color">{{ product.color }}</div>
-              <div *ngIf="product.size" class="product-size">{{ product.size }}</div>
+            <div class="product-details" *ngIf="product.color">
+              <div class="product-color">{{ product.color }}</div>
             </div>
             
             <div class="product-actions">

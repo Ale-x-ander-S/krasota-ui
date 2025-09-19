@@ -144,5 +144,23 @@ export class ProductDetailComponent implements OnInit {
     return stock > 0 ? `В наличии: ${stock} шт.` : 'Нет в наличии';
   }
 
+  getStockTypeText(product: Product): string {
+    if (product.stock_type === 'уп' && product.package_quantity && product.package_quantity_type) {
+      return `${product.package_quantity} ${product.package_quantity_type}`;
+    }
+    
+    // Словарь для других типов запаса
+    const stockTypeMap: { [key: string]: string } = {
+      'шт': 'штука',
+      'кг': 'килограмм',
+      'л': 'литр',
+      'м': 'метр',
+      'уп': 'упаковка',
+      'piece': 'штука'
+    };
+    
+    return stockTypeMap[product.stock_type] || product.stock_type;
+  }
+
 
 }

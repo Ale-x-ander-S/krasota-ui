@@ -334,6 +334,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return `Показано ${start}-${end} из ${this.totalProducts} товаров`;
   }
 
+  // Проверяем, активны ли фильтры или поиск
+  get hasActiveFilters(): boolean {
+    return !!(this.searchTerm || this.selectedCategory || this.filters.search || this.filters.category_id);
+  }
+
   // Получить название категории по ID
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(cat => cat.id.toString() === categoryId);

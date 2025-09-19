@@ -1146,6 +1146,7 @@
             type="text"
             id="product-search"
             [(ngModel)]="productFilters.search"
+            (input)="onProductSearchChange()"
             placeholder="Название товара..."
             class="form-control"
           >
@@ -1153,44 +1154,52 @@
 
         <div class="filter-group">
           <label for="product-category">Категория</label>
-          <input
-            type="text"
+          <select
             id="product-category"
             [(ngModel)]="productFilters.category_id"
-            placeholder="ID категории..."
+            (change)="onProductSearchChange()"
             class="form-control"
           >
+            <option value="">Все категории</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
         </div>
 
         <div class="filter-group">
-          <label for="product-min-price">Мин. цена</label>
-          <input
-            type="number"
-            id="product-min-price"
-            [(ngModel)]="productFilters.min_price"
-            placeholder="0"
+          <label for="product-status">Статус</label>
+          <select
+            id="product-status"
+            [(ngModel)]="productFilters.is_active"
+            (change)="onProductSearchChange()"
             class="form-control"
           >
+            <option value="">Все товары</option>
+            <option value="true">Активные</option>
+            <option value="false">Неактивные</option>
+          </select>
         </div>
 
         <div class="filter-group">
-          <label for="product-max-price">Макс. цена</label>
-          <input
-            type="number"
-            id="product-max-price"
-            [(ngModel)]="productFilters.max_price"
-            placeholder="999999"
+          <label for="product-stock">Запас</label>
+          <select
+            id="product-stock"
+            [(ngModel)]="productFilters.stock_status"
+            (change)="onProductSearchChange()"
             class="form-control"
           >
+            <option value="">Любой запас</option>
+            <option value="in_stock">В наличии</option>
+            <option value="low_stock">Мало (< 10)</option>
+            <option value="out_of_stock">Нет в наличии</option>
+          </select>
         </div>
       </div>
 
       <div class="filters-actions">
-        <button class="btn btn-primary" (click)="applyProductFilters()">
-          🔍 Применить фильтры
-        </button>
         <button class="btn btn-secondary" (click)="resetProductFilters()">
-          🔄 Сбросить
+          🔄 Сбросить фильтры
         </button>
       </div>
     </div>
@@ -1251,7 +1260,7 @@
                 <small>{{ product.sku }}</small>
               </div>
             </td>
-            <td>{{ product.category_id }}</td>
+            <td>{{ getCategoryName(product.category_id) }}</td>
             <td>{{ formatPrice(product.price) }}</td>
             <td>
               <span class="stock-badge" [class]="product.stock === 0 ? 'stock-empty' : product.stock < 10 ? 'stock-low' : 'stock-ok'">

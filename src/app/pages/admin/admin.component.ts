@@ -89,8 +89,8 @@ export class AdminComponent implements OnInit {
   productFilters = {
     search: '',
     category_id: '',
-    min_price: undefined as number | undefined,
-    max_price: undefined as number | undefined
+    is_active: '',
+    stock_status: ''
   };
 
   // Редактирование пользователя
@@ -812,7 +812,7 @@ export class AdminComponent implements OnInit {
     this.notification.show = false;
   }
 
-  // Загрузка товаров с API
+  // Загрузка товаров с API (для администраторов - все товары включая неактивные)
   loadProducts() {
     this.productsLoading = true;
     this.productsError = '';
@@ -823,13 +823,14 @@ export class AdminComponent implements OnInit {
       ...this.productFilters
     };
 
-    this.productService.getProducts(params).subscribe({
+    // Используем админский эндпоинт для получения всех товаров включая неактивные
+    this.productService.getAllProducts(params).subscribe({
       next: (response) => {
         this.products = response.products;
         this.totalProducts = response.total;
         this.stats.totalProducts = response.total; // Обновляем статистику дашборда
         this.productsLoading = false;
-        console.log('Товары загружены:', response);
+        console.log('Все товары загружены (включая неактивные):', response);
       },
       error: (error) => {
         this.productsError = 'Ошибка загрузки товаров: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
@@ -840,9 +841,11 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  // Применение фильтров товаров
-  applyProductFilters() {
+  // Динамический поиск товаров
+  onProductSearchChange() {
+    // Сбрасываем на первую страницу при поиске
     this.currentPage = 1;
+    // Загружаем товары с новыми фильтрами
     this.loadProducts();
   }
 
@@ -851,8 +854,8 @@ export class AdminComponent implements OnInit {
     this.productFilters = {
       search: '',
       category_id: '',
-      min_price: undefined,
-      max_price: undefined
+      is_active: '',
+      stock_status: ''
     };
     this.currentPage = 1;
     this.loadProducts();
@@ -1396,5 +1399,11 @@ export class AdminComponent implements OnInit {
         // Оставляем заглушки если не удалось загрузить
       }
     });
+  }
+
+  // Получить название категории по ID
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find(cat => cat.id === categoryId);
+    return category ? category.name : `Категория #${categoryId}`;
   }
 }

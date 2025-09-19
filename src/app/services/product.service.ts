@@ -13,6 +13,8 @@ export interface Product {
   image_url: string;
   stock: number;
   stock_type: string;
+  package_quantity?: number;
+  package_quantity_type?: string;
   color?: string;
   size?: string;
   sku: string;
@@ -92,6 +94,35 @@ export class ProductService {
   // Получить товар по ID
   getProductById(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/products/${id}`, { headers: this.getHeaders() });
+  }
+
+  // Получить все товары для администраторов (включая неактивные)
+  getAllProducts(params: {
+    page?: number;
+    limit?: number;
+    category_id?: string;
+    search?: string;
+    is_active?: string;
+    stock_status?: string;
+  } = {}): Observable<ProductListResponse> {
+    let httpParams = new HttpParams();
+    
+    if (params.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params.category_id) httpParams = httpParams.set('category_id', params.category_id);
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.is_active) httpParams = httpParams.set('is_active', params.is_active);
+    if (params.stock_status) httpParams = httpParams.set('stock_status', params.stock_status);
+
+    return this.http.get<ProductListResponse>(`${this.apiUrl}/products/all`, { 
+      headers: this.getHeaders(),
+      params: httpParams
+    });
+  }
+
+  // Получить товар по ID для администраторов (включая неактивные)
+  getProductByIdAdmin(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/all/${id}`, { headers: this.getHeaders() });
   }
 
   // Создать новый товар
