@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ImageUploadComponent } from '../../components/image-upload';
+import { CategoryImageUploadComponent } from '../../components/image-upload/category-image-upload.component';
 import { AuthService, User } from '../../services/auth.service';
 import { UserService, User as ApiUser } from '../../services/user.service';
 import { ProductService, Product, CreateProductData } from '../../services/product.service';
@@ -50,7 +51,7 @@ interface LowStockProduct {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImageUploadComponent],
+  imports: [CommonModule, FormsModule, ImageUploadComponent, CategoryImageUploadComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
@@ -1377,6 +1378,16 @@ export class AdminComponent implements OnInit {
   onCreateCategoryChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.productCreateForm.category_id = target.value ? Number(target.value) : 0;
+  }
+
+  // Обработка загрузки изображения для создания категории
+  onCreateCategoryImageUploaded(imageUrl: string) {
+    this.categoryCreateForm.image_url = imageUrl;
+  }
+
+  // Обработка загрузки изображения для редактирования категории
+  onEditCategoryImageUploaded(imageUrl: string) {
+    this.categoryEditForm.image_url = imageUrl;
   }
 
   // Обновление последних заказов для дашборда

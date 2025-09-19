@@ -1510,16 +1510,11 @@
         </div>
 
         <div class="form-group">
-          <label for="create-category-image">URL изображения</label>
-          <input
-            type="url"
-            id="create-category-image"
-            [(ngModel)]="categoryCreateForm.image_url"
-            name="image_url"
-            class="form-control"
-            placeholder="Оставьте пустым для использования placeholder"
-          >
-          <small class="form-text text-muted">Если не указать URL, будет использовано стандартное изображение</small>
+          <label>Изображение категории</label>
+          <app-category-image-upload
+            [currentImageUrl]="categoryCreateForm.image_url || ''"
+            (imageUploaded)="onCreateCategoryImageUploaded($event)"
+          ></app-category-image-upload>
         </div>
 
         <div class="form-row">
@@ -1603,16 +1598,11 @@
         </div>
 
         <div class="form-group">
-          <label for="edit-category-image">URL изображения</label>
-          <input
-            type="url"
-            id="edit-category-image"
-            [(ngModel)]="categoryEditForm.image_url"
-            name="image_url"
-            class="form-control"
-            placeholder="Оставьте пустым для использования placeholder"
-          >
-          <small class="form-text text-muted">Если не указать URL, будет использовано стандартное изображение</small>
+          <label>Изображение категории</label>
+          <app-category-image-upload
+            [currentImageUrl]="categoryEditForm.image_url || ''"
+            (imageUploaded)="onEditCategoryImageUploaded($event)"
+          ></app-category-image-upload>
         </div>
 
         <div class="form-row">
