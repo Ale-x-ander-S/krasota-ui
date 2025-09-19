@@ -1,0 +1,49 @@
+<div class="image-upload-component">
+  <!-- Текущее изображение -->
+  <div *ngIf="currentImageUrl && !uploading" class="current-image">
+    <img [src]="currentImageUrl" alt="Текущее изображение" />
+    <button type="button" class="remove-btn" (click)="removeImage()" title="Удалить изображение">
+      ×
+    </button>
+  </div>
+
+  <!-- Загрузка -->
+  <div *ngIf="uploading" class="upload-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+    </div>
+    <span class="progress-text">Загрузка {{ uploadProgress }}%</span>
+  </div>
+
+  <!-- Кнопка загрузки -->
+  <div class="upload-area" [class.uploading]="uploading">
+    <input 
+      type="file" 
+      #fileInput 
+      (change)="onFileSelected($event)"
+      accept="image/*"
+      [disabled]="uploading"
+      class="file-input"
+    />
+    
+    <button 
+      type="button" 
+      class="upload-btn"
+      (click)="fileInput.click()"
+      [disabled]="uploading"
+    >
+      <span class="upload-icon">📁</span>
+      {{ currentImageUrl ? 'Заменить изображение' : 'Загрузить изображение' }}
+    </button>
+    
+    <small class="upload-hint">
+      Поддерживаемые форматы: JPG, PNG, GIF. Максимум 5MB.
+    </small>
+  </div>
+
+  <!-- Ошибка -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+</div>
+

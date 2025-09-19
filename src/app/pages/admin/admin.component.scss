@@ -1022,6 +1022,24 @@
   border: 1px solid #e1e5e9;
 }
 
+// Предварительный просмотр изображения в формах
+.image-preview {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  
+  img {
+    max-width: 200px;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
 .product-info {
   strong {
     display: block;

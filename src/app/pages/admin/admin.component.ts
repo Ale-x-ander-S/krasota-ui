@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ImageUploadComponent } from '../../components/image-upload';
 import { AuthService, User } from '../../services/auth.service';
 import { UserService, User as ApiUser } from '../../services/user.service';
 import { ProductService, Product, CreateProductData } from '../../services/product.service';
@@ -49,7 +50,7 @@ interface LowStockProduct {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageUploadComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
@@ -90,7 +91,7 @@ export class AdminComponent implements OnInit {
     search: '',
     category_id: '',
     is_active: '',
-    stock_status: ''
+    stock: ''
   };
 
   // Редактирование пользователя
@@ -114,6 +115,8 @@ export class AdminComponent implements OnInit {
     image_url: '',
     stock: 0,
     stock_type: 'piece',
+    package_quantity: null as number | null,
+    package_quantity_type: '',
     color: '',
     size: '',
     sku: '',
@@ -132,6 +135,8 @@ export class AdminComponent implements OnInit {
     image_url: '',
     stock: 0,
     stock_type: 'piece',
+    package_quantity: null as number | null,
+    package_quantity_type: '',
     color: '',
     size: '',
     sku: '',
@@ -185,81 +190,14 @@ export class AdminComponent implements OnInit {
     lowStockProducts: 7
   };
 
-  // Последние заказы
-  recentOrders: RecentOrder[] = [
-    {
-      id: 1001,
-      customerName: 'Иван Иванов',
-      customerEmail: 'ivan@example.com',
-      total: 129999,
-      status: 'pending',
-      date: new Date('2024-01-20'),
-      items: 2
-    },
-    {
-      id: 1002,
-      customerName: 'Мария Петрова',
-      customerEmail: 'maria@example.com',
-      total: 45999,
-      status: 'processing',
-      date: new Date('2024-01-20'),
-      items: 1
-    },
-    {
-      id: 1003,
-      customerName: 'Алексей Сидоров',
-      customerEmail: 'alex@example.com',
-      total: 89999,
-      status: 'shipped',
-      date: new Date('2024-01-19'),
-      items: 3
-    }
-  ];
+  // Последние заказы (будут загружены из API)
+  recentOrders: RecentOrder[] = [];
 
-  // Последние пользователи
-  recentUsers: RecentUser[] = [
-    {
-      id: 1001,
-      username: 'newuser1',
-      email: 'user1@example.com',
-      role: 'user',
-      registrationDate: new Date('2024-01-20'),
-      lastLogin: new Date('2024-01-20')
-    },
-    {
-      id: 1002,
-      username: 'newuser2',
-      email: 'user2@example.com',
-      role: 'user',
-      registrationDate: new Date('2024-01-19'),
-      lastLogin: new Date('2024-01-19')
-    }
-  ];
+  // Последние пользователи (будут загружены из API)
+  recentUsers: RecentUser[] = [];
 
-  // Товары с низким запасом
-  lowStockProducts: LowStockProduct[] = [
-    {
-      id: 1,
-      name: 'iPhone 15 Pro',
-      currentStock: 2,
-      minStock: 5,
-      category: 'Электроника'
-    },
-    {
-      id: 2,
-      name: 'MacBook Air M2',
-      currentStock: 1,
-      minStock: 3,
-      category: 'Электроника'
-    },
-    {
-      id: 3,
-      name: 'AirPods Pro',
-      currentStock: 0,
-      minStock: 10,
-      category: 'Электроника'
-    }
-  ];
+  // Товары с низким запасом (будут вычислены из загруженных товаров)
+  lowStockProducts: LowStockProduct[] = [];
 
   constructor(
     public authService: AuthService,
@@ -323,6 +261,7 @@ export class AdminComponent implements OnInit {
       next: (users) => {
         this.users = users;
         this.stats.totalUsers = users.length; // Обновляем статистику
+        this.updateRecentUsers(); // Обновляем последних пользователей для дашборда
         this.usersLoading = false;
         console.log('Пользователи загружены:', users);
       },
@@ -623,6 +562,8 @@ export class AdminComponent implements OnInit {
       image_url: product.image_url,
       stock: product.stock,
       stock_type: product.stock_type,
+      package_quantity: product.package_quantity || null,
+      package_quantity_type: product.package_quantity_type || '',
       color: product.color || '',
       size: product.size || '',
       sku: product.sku,
@@ -644,6 +585,8 @@ export class AdminComponent implements OnInit {
       image_url: '',
       stock: 0,
       stock_type: 'piece',
+      package_quantity: null,
+      package_quantity_type: '',
       color: '',
       size: '',
       sku: '',
@@ -732,6 +675,8 @@ export class AdminComponent implements OnInit {
       image_url: this.productEditForm.image_url.trim(),
       stock: this.productEditForm.stock,
       stock_type: this.productEditForm.stock_type,
+      package_quantity: this.productEditForm.package_quantity || undefined,
+      package_quantity_type: this.productEditForm.package_quantity_type.trim() || undefined,
       color: this.productEditForm.color.trim() || undefined,
       size: this.productEditForm.size.trim() || undefined,
       sku: this.productEditForm.sku.trim(),
@@ -829,6 +774,7 @@ export class AdminComponent implements OnInit {
         this.products = response.products;
         this.totalProducts = response.total;
         this.stats.totalProducts = response.total; // Обновляем статистику дашборда
+        this.updateLowStockProducts(); // Обновляем товары с низким запасом
         this.productsLoading = false;
         console.log('Все товары загружены (включая неактивные):', response);
       },
@@ -855,7 +801,7 @@ export class AdminComponent implements OnInit {
       search: '',
       category_id: '',
       is_active: '',
-      stock_status: ''
+      stock: ''
     };
     this.currentPage = 1;
     this.loadProducts();
@@ -891,6 +837,8 @@ export class AdminComponent implements OnInit {
       image_url: '',
       stock: 0,
       stock_type: 'piece',
+      package_quantity: null,
+      package_quantity_type: '',
       color: '',
       size: '',
       sku: '',
@@ -912,6 +860,8 @@ export class AdminComponent implements OnInit {
       image_url: '',
       stock: 0,
       stock_type: 'piece',
+      package_quantity: null,
+      package_quantity_type: '',
       color: '',
       size: '',
       sku: '',
@@ -981,6 +931,8 @@ export class AdminComponent implements OnInit {
       image_url: this.productCreateForm.image_url.trim(),
       stock: this.productCreateForm.stock,
       stock_type: this.productCreateForm.stock_type,
+      package_quantity: this.productCreateForm.package_quantity || undefined,
+      package_quantity_type: this.productCreateForm.package_quantity_type.trim() || undefined,
       color: this.productCreateForm.color.trim() || undefined,
       size: this.productCreateForm.size.trim() || undefined,
       sku: this.productCreateForm.sku.trim(),
@@ -1005,12 +957,8 @@ export class AdminComponent implements OnInit {
   }
 
   // Геттеры для аналитических данных
-  get newUsersCount(): number {
-    return Math.floor(this.stats.totalUsers * 0.15);
-  }
-
-  get popularProductsCount(): number {
-    return Math.floor(this.stats.totalProducts * 0.2);
+  getActiveProductsCount(): number {
+    return this.products.filter(product => product.is_active).length;
   }
 
   // ===== МЕТОДЫ ДЛЯ КАТЕГОРИЙ =====
@@ -1393,6 +1341,8 @@ export class AdminComponent implements OnInit {
       next: (response) => {
         this.orders = response.orders;
         this.updateOrderStats();
+        // Формируем последние заказы для дашборда
+        this.updateRecentOrders();
       },
       error: (error) => {
         console.error('Error loading orders for stats:', error);
@@ -1405,5 +1355,77 @@ export class AdminComponent implements OnInit {
   getCategoryName(categoryId: number): string {
     const category = this.categories.find(cat => cat.id === categoryId);
     return category ? category.name : `Категория #${categoryId}`;
+  }
+
+  // Обработка загрузки изображения для редактирования товара
+  onImageUploaded(imageUrl: string) {
+    this.productEditForm.image_url = imageUrl;
+  }
+
+  // Обработка загрузки изображения для создания товара
+  onCreateImageUploaded(imageUrl: string) {
+    this.productCreateForm.image_url = imageUrl;
+  }
+
+  // Обработка изменения категории в форме редактирования
+  onEditCategoryChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.productEditForm.category_id = target.value ? Number(target.value) : 0;
+  }
+
+  // Обработка изменения категории в форме создания
+  onCreateCategoryChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.productCreateForm.category_id = target.value ? Number(target.value) : 0;
+  }
+
+  // Обновление последних заказов для дашборда
+  updateRecentOrders() {
+    // Берем последние 5 заказов и преобразуем в формат для дашборда
+    this.recentOrders = this.orders
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5)
+      .map(order => ({
+        id: order.id,
+        customerName: order.guest_name || 'Гость',
+        customerEmail: order.guest_email || '',
+        total: order.total_amount,
+        status: order.status,
+        date: new Date(order.created_at),
+        items: order.items.length
+      }));
+  }
+
+  // Обновление последних пользователей для дашборда
+  updateRecentUsers() {
+    // Берем последних 5 пользователей и преобразуем в формат для дашборда
+    this.recentUsers = this.users
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5)
+      .map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        registrationDate: new Date(user.created_at),
+        lastLogin: new Date(user.updated_at) // Используем updated_at как приближение к last_login
+      }));
+  }
+
+  // Обновление товаров с низким запасом
+  updateLowStockProducts() {
+    // Находим товары с запасом меньше 10
+    this.lowStockProducts = this.products
+      .filter(product => product.stock < 10)
+      .map(product => ({
+        id: product.id,
+        name: product.name,
+        currentStock: product.stock,
+        minStock: 10,
+        category: this.getCategoryName(product.category_id)
+      }));
+    
+    // Обновляем счетчик в статистике
+    this.stats.lowStockProducts = this.lowStockProducts.length;
   }
 }

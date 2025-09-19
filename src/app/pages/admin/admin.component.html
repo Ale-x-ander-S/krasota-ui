@@ -159,26 +159,26 @@
           <div class="analytics-icon">📈</div>
           <div class="analytics-content">
             <h4>Продажи за месяц</h4>
-            <p class="analytics-value">{{ formatPrice(1245000) }}</p>
-            <span class="analytics-change positive">+12.5%</span>
+            <p class="analytics-value">{{ formatPrice(stats.totalRevenue) }}</p>
+            <span class="analytics-change positive">Всего</span>
           </div>
         </div>
         
         <div class="analytics-card">
           <div class="analytics-icon">🆕</div>
           <div class="analytics-content">
-            <h4>Новых пользователей</h4>
-            <p class="analytics-value">+{{ newUsersCount }}</p>
-            <span class="analytics-change positive">+15.2%</span>
+            <h4>Всего пользователей</h4>
+            <p class="analytics-value">{{ stats.totalUsers }}</p>
+            <span class="analytics-change neutral">Активно</span>
           </div>
         </div>
         
         <div class="analytics-card">
           <div class="analytics-icon">🔥</div>
           <div class="analytics-content">
-            <h4>Популярные товары</h4>
-            <p class="analytics-value">{{ popularProductsCount }}</p>
-            <span class="analytics-change neutral">Стабильно</span>
+            <h4>Активные товары</h4>
+            <p class="analytics-value">{{ getActiveProductsCount() }}</p>
+            <span class="analytics-change positive">Доступно</span>
           </div>
         </div>
         
@@ -638,18 +638,21 @@
           </div>
 
           <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
-            <label for="edit-product-category">ID категории *</label>
-            <input
-              type="number"
+            <label for="edit-product-category">Категория *</label>
+            <select
               id="edit-product-category"
               [(ngModel)]="productEditForm.category_id"
               name="category_id"
               required
-              min="1"
               class="form-control"
-              (input)="clearProductFieldError('category_id')"
+              (change)="onEditCategoryChange($event); clearProductFieldError('category_id')"
               [class.error]="hasProductFieldError('category_id')"
             >
+              <option value="">Выберите категорию</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
             <div *ngIf="hasProductFieldError('category_id')" class="error-message">
               {{ getProductFieldError('category_id') }}
             </div>
@@ -657,15 +660,11 @@
         </div>
 
         <div class="form-group">
-          <label for="edit-product-image">URL изображения</label>
-          <input
-            type="url"
-            id="edit-product-image"
-            [(ngModel)]="productEditForm.image_url"
-            name="image_url"
-            class="form-control"
-            placeholder="Введите URL изображения"
-          >
+          <label>Изображение товара</label>
+          <app-image-upload
+            [currentImageUrl]="productEditForm.image_url"
+            (imageUploaded)="onImageUploaded($event)"
+          ></app-image-upload>
         </div>
 
         <div class="form-row">
@@ -725,6 +724,33 @@
               name="size"
               class="form-control"
               placeholder="Не указан"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-package-quantity">Количество в упаковке</label>
+            <input
+              type="number"
+              id="edit-package-quantity"
+              [(ngModel)]="productEditForm.package_quantity"
+              name="package_quantity"
+              min="1"
+              class="form-control"
+              placeholder="Не указано"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="edit-package-quantity-type">Тип количества</label>
+            <input
+              type="text"
+              id="edit-package-quantity-type"
+              [(ngModel)]="productEditForm.package_quantity_type"
+              name="package_quantity_type"
+              class="form-control"
+              placeholder="шт, мл, г и т.д."
             >
           </div>
         </div>
@@ -856,18 +882,21 @@
           </div>
 
           <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
-            <label for="create-product-category">ID категории *</label>
-            <input
-              type="number"
+            <label for="create-product-category">Категория *</label>
+            <select
               id="create-product-category"
               [(ngModel)]="productCreateForm.category_id"
               name="category_id"
               required
-              min="1"
               class="form-control"
-              (input)="clearProductFieldError('category_id')"
+              (change)="onCreateCategoryChange($event); clearProductFieldError('category_id')"
               [class.error]="hasProductFieldError('category_id')"
             >
+              <option value="">Выберите категорию</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
             <div *ngIf="hasProductFieldError('category_id')" class="error-message">
               {{ getProductFieldError('category_id') }}
             </div>
@@ -875,15 +904,11 @@
         </div>
 
         <div class="form-group">
-          <label for="create-product-image">URL изображения</label>
-          <input
-            type="url"
-            id="create-product-image"
-            [(ngModel)]="productCreateForm.image_url"
-            name="image_url"
-            class="form-control"
-            placeholder="Введите URL изображения"
-          >
+          <label>Изображение товара</label>
+          <app-image-upload
+            [currentImageUrl]="productCreateForm.image_url"
+            (imageUploaded)="onCreateImageUploaded($event)"
+          ></app-image-upload>
         </div>
 
         <div class="form-row">
@@ -943,6 +968,33 @@
               name="size"
               class="form-control"
               placeholder="Не указан"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-package-quantity">Количество в упаковке</label>
+            <input
+              type="number"
+              id="create-package-quantity"
+              [(ngModel)]="productCreateForm.package_quantity"
+              name="package_quantity"
+              min="1"
+              class="form-control"
+              placeholder="Не указано"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="create-package-quantity-type">Тип количества</label>
+            <input
+              type="text"
+              id="create-package-quantity-type"
+              [(ngModel)]="productCreateForm.package_quantity_type"
+              name="package_quantity_type"
+              class="form-control"
+              placeholder="шт, мл, г и т.д."
             >
           </div>
         </div>
@@ -1185,14 +1237,17 @@
           <label for="product-stock">Запас</label>
           <select
             id="product-stock"
-            [(ngModel)]="productFilters.stock_status"
+            [(ngModel)]="productFilters.stock"
             (change)="onProductSearchChange()"
             class="form-control"
           >
             <option value="">Любой запас</option>
-            <option value="in_stock">В наличии</option>
-            <option value="low_stock">Мало (< 10)</option>
-            <option value="out_of_stock">Нет в наличии</option>
+            <option value="0">Нет в наличии (0)</option>
+            <option value="10">Меньше 10</option>
+            <option value="20">Меньше 20</option>
+            <option value="30">Меньше 30</option>
+            <option value="40">Меньше 40</option>
+            <option value="50">Меньше 50</option>
           </select>
         </div>
       </div>

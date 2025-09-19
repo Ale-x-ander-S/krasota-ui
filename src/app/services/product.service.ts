@@ -40,6 +40,8 @@ export interface CreateProductData {
   image_url: string;
   stock: number;
   stock_type: string;
+  package_quantity?: number;
+  package_quantity_type?: string;
   color?: string;
   size?: string;
   sku: string;
@@ -103,7 +105,7 @@ export class ProductService {
     category_id?: string;
     search?: string;
     is_active?: string;
-    stock_status?: string;
+    stock?: string;
   } = {}): Observable<ProductListResponse> {
     let httpParams = new HttpParams();
     
@@ -112,7 +114,7 @@ export class ProductService {
     if (params.category_id) httpParams = httpParams.set('category_id', params.category_id);
     if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.is_active) httpParams = httpParams.set('is_active', params.is_active);
-    if (params.stock_status) httpParams = httpParams.set('stock_status', params.stock_status);
+    if (params.stock) httpParams = httpParams.set('stock', params.stock);
 
     return this.http.get<ProductListResponse>(`${this.apiUrl}/products/all`, { 
       headers: this.getHeaders(),
