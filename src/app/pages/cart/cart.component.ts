@@ -36,9 +36,7 @@ export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   cartTotal: number = 0;
   itemCount: number = 0;
-  promoCode: string = '';
-  appliedDiscount: number = 0;
-  shippingCost: number = 300;
+  shippingCost: number = 100; // Базовая стоимость доставки
 
   ngOnInit() {
     this.subscribeToCart();
@@ -113,8 +111,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   clearCart() {
     this.store.dispatch(new ClearCart());
-    this.appliedDiscount = 0;
-    this.promoCode = '';
   }
 
   getSubtotal(): number {
@@ -122,11 +118,15 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getShippingCost(): number {
-    return this.cartItems.length > 0 ? this.shippingCost : 0;
+    if (this.cartItems.length === 0) return 0;
+    
+    const subtotal = this.getSubtotal();
+    // Доставка 100 руб если заказ менее 1000 руб, от 1000 - бесплатно
+    return subtotal < 1000 ? 100 : 0;
   }
 
   getDiscount(): number {
-    return this.appliedDiscount;
+    return 0; // Промокоды отключены
   }
 
   getTotal(): number {
@@ -137,20 +137,6 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cartItems.length > 0 && this.cartItems.every(item => item.stock > 0);
   }
 
-  applyPromoCode() {
-    if (this.promoCode.trim() === '') return;
-
-    // Имитация проверки промокода
-    if (this.promoCode.toLowerCase() === 'sale10') {
-      this.appliedDiscount = Math.round(this.getSubtotal() * 0.1);
-      alert('Промокод применен! Скидка 10%');
-    } else if (this.promoCode.toLowerCase() === 'free') {
-      this.shippingCost = 0;
-      alert('Промокод применен! Бесплатная доставка');
-    } else {
-      alert('Неверный промокод');
-    }
-  }
 
   proceedToCheckout() {
     if (!this.canCheckout()) {

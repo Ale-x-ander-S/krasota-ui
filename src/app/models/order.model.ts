@@ -9,6 +9,8 @@ export interface OrderItem {
   // Дополнительные поля для отображения (заполняются на фронтенде)
   product_name?: string;
   product_image?: string;
+  image_url?: string;
+  image?: string;
 }
 
 export interface Order {

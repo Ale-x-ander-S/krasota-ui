@@ -48,13 +48,12 @@
                   >
                 </div>
                 <div class="form-group">
-                  <label for="lastName">Фамилия *</label>
+                  <label for="lastName">Фамилия</label>
                   <input 
                     type="text" 
                     id="lastName" 
                     name="lastName"
                     [(ngModel)]="checkoutForm.lastName"
-                    required
                     class="form-input"
                   >
                 </div>
@@ -103,30 +102,17 @@
                 >
               </div>
               
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="city">Город *</label>
-                  <input 
-                    type="text" 
-                    id="city" 
-                    name="city"
-                    [(ngModel)]="checkoutForm.city"
-                    required
-                    class="form-input"
-                  >
-                </div>
-                <div class="form-group">
-                  <label for="postalCode">Индекс *</label>
-                  <input 
-                    type="text" 
-                    id="postalCode" 
-                    name="postalCode"
-                    [(ngModel)]="checkoutForm.postalCode"
-                    required
-                    class="form-input"
-                    placeholder="123456"
-                  >
-                </div>
+              <div class="form-group">
+                <label for="city">Город</label>
+                <input 
+                  type="text" 
+                  id="city" 
+                  name="city"
+                  [(ngModel)]="checkoutForm.city"
+                  readonly
+                  class="form-input readonly-field"
+                  style="background-color: #f5f5f5; color: #666;"
+                >
               </div>
             </div>
 
@@ -240,25 +226,45 @@
   </div>
 </main>
 
-<!-- Success Modal -->
-<div *ngIf="showSuccessModal" class="modal-overlay" (click)="closeSuccessModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="success-icon">✅</div>
-    <h2>Заказ успешно оформлен!</h2>
-    <p>Ваш заказ №{{ createdOrder?.id }} принят в обработку.</p>
-    <p>Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
-    
-    <div class="modal-actions">
-      <button type="button" class="btn btn-outline" (click)="closeSuccessModal()">
-        Продолжить покупки
-      </button>
-      <button type="button" class="btn btn-primary" (click)="viewOrder()">
-        Посмотреть заказ
-      </button>
-      <button type="button" class="btn btn-secondary" (click)="goToOrders()">
-        Мои заказы
-      </button>
+<!-- Beautiful Success Modal -->
+<div *ngIf="showSuccessModal" class="success-modal-overlay" (click)="closeSuccessModal()">
+  <div class="success-modal-content" (click)="$event.stopPropagation()">
+    <div class="success-animation">
+      <div class="success-circle">
+        <div class="success-checkmark">
+          <div class="checkmark-stem"></div>
+          <div class="checkmark-kick"></div>
+        </div>
+      </div>
     </div>
+    
+    <div class="success-content">
+      <h1 class="success-title">Заказ успешно оформлен!</h1>
+      <p class="success-subtitle">Ваш заказ №{{ createdOrder?.id }} принят в обработку</p>
+      <div class="success-description">
+        <p>Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
+        <p>Спасибо за покупку в Krasota72! 🎉</p>
+      </div>
+      
+      <div class="success-actions">
+        <button type="button" class="success-btn primary" (click)="viewOrder()">
+          <span class="btn-icon">📦</span>
+          Посмотреть заказ
+        </button>
+        <button type="button" class="success-btn secondary" (click)="goToOrders()">
+          <span class="btn-icon">📋</span>
+          Мои заказы
+        </button>
+        <button type="button" class="success-btn outline" (click)="closeSuccessModal()">
+          <span class="btn-icon">🛍️</span>
+          Продолжить покупки
+        </button>
+      </div>
+    </div>
+    
+    <button type="button" class="close-btn" (click)="closeSuccessModal()">
+      <span>×</span>
+    </button>
   </div>
 </div>
 

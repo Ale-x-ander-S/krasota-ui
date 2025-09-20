@@ -7,6 +7,8 @@ import { FooterComponent } from '../../components/footer';
 import { OrderService } from '../../services/order.service';
 import { AuthService } from '../../services/auth.service';
 import { Order, OrderStatus, OrderFilters } from '../../models/order.model';
+import { Store } from '@ngxs/store';
+import { AddToCart } from '../../store/cart/cart.actions';
 
 @Component({
   selector: 'app-orders',
@@ -34,7 +36,8 @@ export class OrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -95,19 +98,6 @@ export class OrdersComponent implements OnInit {
     this.router.navigate(['/order', orderId]);
   }
 
-  cancelOrder(orderId: number) {
-    if (confirm('Вы уверены, что хотите отменить заказ?')) {
-      this.orderService.cancelOrder(orderId).subscribe({
-        next: () => {
-          this.loadOrders();
-        },
-        error: (error) => {
-          this.error = 'Ошибка отмены заказа';
-          console.error('Error cancelling order:', error);
-        }
-      });
-    }
-  }
 
   getStatusLabel(status: OrderStatus): string {
     const statusMap: { [key in OrderStatus]: string } = {
@@ -153,14 +143,64 @@ export class OrdersComponent implements OnInit {
     });
   }
 
-  canCancelOrder(order: Order): boolean {
-    return order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED;
+  canRepeatOrder(order: Order): boolean {
+    return order.status === OrderStatus.DELIVERED;
+  }
+
+  repeatOrder(order: Order): void {
+    if (confirm(`Повторить заказ №${order.id}? Товары будут добавлены в корзину.`)) {
+      // Добавляем товары из заказа в корзину
+      order.items.forEach(item => {
+        this.store.dispatch(new AddToCart({
+          id: item.product_id,
+          name: item.product_name || `Товар #${item.product_id}`,
+          price: item.price,
+          quantity: item.quantity,
+          image_url: this.getProductImage(item),
+          category_id: 1, // Временное значение, так как в OrderItem нет category_id
+          category_name: 'Категория не указана',
+          description: '',
+          stock: 999, // Предполагаем, что товар в наличии
+          stock_type: 'in_stock',
+          sku: `SKU-${item.product_id}`
+        }));
+      });
+      
+      // Переходим в корзину
+      this.router.navigate(['/cart']);
+    }
+  }
+
+  getProductImage(item: any): string {
+    // Проверяем различные возможные пути к изображению
+    if (item.product_image) {
+      return item.product_image;
+    }
+    if (item.image_url) {
+      return item.image_url;
+    }
+    if (item.image) {
+      return item.image;
+    }
+    
+    // Попробуем стандартные пути к изображениям
+    const standardPaths = [
+      `assets/images/products/product_${item.product_id}.jpg`,
+      `assets/images/products/product_${item.product_id}.png`,
+      `assets/images/products/product_${item.product_id}.webp`,
+      `http://45.12.229.112:8080/images/products/${item.product_id}.jpg`,
+      `http://45.12.229.112:8080/images/products/${item.product_id}.png`,
+      `http://45.12.229.112:8080/images/products/${item.product_id}.webp`
+    ];
+    
+    // Возвращаем первый стандартный путь (браузер покажет placeholder если файл не найден)
+    return standardPaths[0];
   }
 
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     if (target) {
-      target.src = '/assets/images/placeholder.svg';
+      target.src = 'assets/images/placeholder.svg';
     }
   }
 

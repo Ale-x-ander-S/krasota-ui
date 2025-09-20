@@ -99,7 +99,7 @@
           <div class="order-items">
             <div *ngFor="let item of order.items" class="order-item">
               <div class="item-image">
-                <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                <img [src]="getProductImage(item)" 
                      [alt]="item.product_name"
                      (error)="onImageError($event)">
               </div>
@@ -134,12 +134,12 @@
             Подробнее
           </button>
           <button 
-            *ngIf="canCancelOrder(order)" 
+            *ngIf="canRepeatOrder(order)" 
             type="button" 
-            class="btn btn-danger" 
-            (click)="cancelOrder(order.id)"
+            class="btn btn-success" 
+            (click)="repeatOrder(order)"
           >
-            Отменить заказ
+            Повторить заказ
           </button>
         </div>
       </div>

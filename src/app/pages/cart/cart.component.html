@@ -128,31 +128,14 @@
             </button>
             
             <div class="payment-methods">
-              <h4>Способы оплаты:</h4>
+              <h4>Способ оплаты:</h4>
               <div class="payment-icons">
-                <div class="payment-icon">💳</div>
-                <div class="payment-icon">🏦</div>
-                <div class="payment-icon">📱</div>
+                <div class="payment-icon">💵</div>
               </div>
+              <p class="payment-description">Наличными при получении</p>
             </div>
           </div>
           
-          <!-- Promo Code -->
-          <div class="promo-card">
-            <h4>Промокод</h4>
-            <div class="promo-input">
-              <input 
-                type="text" 
-                placeholder="Введите промокод"
-                [(ngModel)]="promoCode"
-                name="promoCode"
-              >
-              <button class="apply-promo-btn" (click)="applyPromoCode()">
-                Применить
-              </button>
-            </div>
-            <p class="promo-info">Введите промокод для получения скидки</p>
-          </div>
           
           <!-- Delivery Info -->
           <div class="delivery-info">
@@ -162,21 +145,8 @@
                 <div class="delivery-icon">🚚</div>
                 <div>
                   <h5>Курьерская доставка</h5>
-                  <p>1-3 дня • от 300₽</p>
-                </div>
-              </div>
-              <div class="delivery-option">
-                <div class="delivery-icon">📦</div>
-                <div>
-                  <h5>Почта России</h5>
-                  <p>3-7 дней • от 200₽</p>
-                </div>
-              </div>
-              <div class="delivery-option">
-                <div class="delivery-icon">🏪</div>
-                <div>
-                  <h5>Пункт выдачи</h5>
-                  <p>1-2 дня • от 150₽</p>
+                  <p>1-2 дня • {{ formatPrice(getShippingCost()) }}</p>
+                  <p class="delivery-note">Бесплатно при заказе от 1000₽</p>
                 </div>
               </div>
             </div>

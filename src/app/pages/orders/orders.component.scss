@@ -339,6 +339,15 @@
       background: #c82333;
     }
   }
+
+  &.btn-success {
+    background: #28a745;
+    color: white;
+
+    &:hover {
+      background: #218838;
+    }
+  }
 }
 
 @media (max-width: 768px) {

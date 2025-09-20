@@ -20,7 +20,6 @@ interface CheckoutForm {
   phone: string;
   address: string;
   city: string;
-  postalCode: string;
   deliveryMethod: string;
   paymentMethod: string;
   notes: string;
@@ -50,24 +49,19 @@ export class CheckoutComponent implements OnInit {
     email: '',
     phone: '',
     address: '',
-    city: '',
-    postalCode: '',
+    city: 'Тюмень',
     deliveryMethod: 'courier',
-    paymentMethod: 'card',
+    paymentMethod: 'cash',
     notes: '',
     couponCode: ''
   };
 
   deliveryMethods = [
-    { value: 'courier', label: 'Курьерская доставка', price: 300, time: '1-2 дня' },
-    { value: 'pickup', label: 'Самовывоз', price: 0, time: 'В день заказа' },
-    { value: 'post', label: 'Почта России', price: 150, time: '5-10 дней' }
+    { value: 'courier', label: 'Курьерская доставка', price: 0, time: '1-2 дня' }
   ];
 
   paymentMethods = [
-    { value: 'card', label: 'Банковская карта', icon: '💳' },
-    { value: 'cash', label: 'Наличными при получении', icon: '💵' },
-    { value: 'online', label: 'Онлайн оплата', icon: '🌐' }
+    { value: 'cash', label: 'Наличными при получении', icon: '💵' }
   ];
 
   selectedDelivery = this.deliveryMethods[0];
@@ -145,7 +139,9 @@ export class CheckoutComponent implements OnInit {
   }
 
   getDeliveryCost(): number {
-    return this.selectedDelivery.price;
+    const subtotal = this.getSubtotal();
+    // Доставка 100 руб если заказ менее 1000 руб, от 1000 - бесплатно
+    return subtotal < 1000 ? 100 : 0;
   }
 
   getTotal(): number {
@@ -178,7 +174,7 @@ export class CheckoutComponent implements OnInit {
       this.loading = true;
       this.error = null;
 
-      const fullAddress = `${this.checkoutForm.address}, ${this.checkoutForm.city}, ${this.checkoutForm.postalCode}`;
+      const fullAddress = `${this.checkoutForm.address}, ${this.checkoutForm.city}`;
       const fullName = `${this.checkoutForm.firstName} ${this.checkoutForm.lastName}`;
       
       const orderData = {
@@ -238,7 +234,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode'];
+    const requiredFields = ['firstName', 'email', 'phone', 'address', 'city'];
     return requiredFields.every(field => this.checkoutForm[field as keyof CheckoutForm]?.trim() !== '');
   }
 

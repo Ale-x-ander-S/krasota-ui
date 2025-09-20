@@ -36,7 +36,13 @@ export class OrderService {
       if (filters.search) params = params.set('search', filters.search);
     }
 
-    return this.http.get<OrdersResponse>(`${this.apiUrl}/orders`, { headers, params });
+    return this.http.get<OrdersResponse>(`${this.apiUrl}/orders`, { headers, params })
+      .pipe(
+        map(response => ({
+          ...response,
+          orders: response.orders.map(order => this.enrichOrderWithProductInfo(order))
+        }))
+      );
   }
 
   // Получить все заказы (для админа)
@@ -115,7 +121,35 @@ export class OrderService {
           product_image: product.image_url
         };
       }
-      return item;
+      
+      // Если продукт не найден в кэше, попробуем загрузить его
+      // Для простоты пока используем заглушку, но попробуем загрузить изображение
+      let imageUrl = item.product_image || item.image_url || item.image;
+      
+      // Если изображение не найдено, попробуем загрузить его через API продукта
+      if (!imageUrl) {
+        // Попробуем загрузить продукт по ID
+        this.productService.getProductById(item.product_id).subscribe({
+          next: (product) => {
+            if (product && product.image_url) {
+              // Обновляем изображение в заказе
+              item.product_image = product.image_url;
+              item.product_name = product.name;
+            }
+          },
+          error: (error) => {
+            console.warn(`Failed to load product ${item.product_id}:`, error);
+          }
+        });
+        
+        imageUrl = 'assets/images/placeholder.svg';
+      }
+      
+      return {
+        ...item,
+        product_name: item.product_name || `Товар #${item.product_id}`,
+        product_image: imageUrl
+      };
     });
 
     return {

@@ -540,6 +540,7 @@
       display: flex;
       justify-content: center;
       gap: 15px;
+      margin-bottom: 10px;
       
       @media (max-width: 768px) {
         gap: 12px;
@@ -558,98 +559,20 @@
         }
       }
     }
-  }
-}
-
-// Promo Code
-.promo-card {
-  background: white;
-  padding: 25px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  border: 2px solid #e2e8f0;
-  
-  @media (max-width: 768px) {
-    padding: 20px;
-  }
-  
-  @media (max-width: 480px) {
-    padding: 15px;
-  }
-
-  h4 {
-    margin: 0 0 15px 0;
-    color: #1e293b;
-    font-size: 1.1rem;
     
-    @media (max-width: 768px) {
-      font-size: 1rem;
-      margin-bottom: 12px;
-    }
-  }
-
-  .promo-input {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    
-    @media (max-width: 768px) {
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    input {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      
-      @media (max-width: 768px) {
-        padding: 14px; // Touch-friendly
-        font-size: 16px; // Prevent zoom on iOS
-      }
-
-      &:focus {
-        outline: none;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      }
-    }
-
-    .apply-promo-btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
+    .payment-description {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.9rem;
       font-weight: 500;
-      transition: all 0.3s ease;
       
       @media (max-width: 768px) {
-        padding: 14px 20px;
-        min-height: 48px; // Touch-friendly
-        font-size: 1rem;
+        font-size: 0.85rem;
       }
-
-      &:hover {
-        background: #1d4ed8;
-      }
-    }
-  }
-
-  .promo-info {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #64748b;
-    
-    @media (max-width: 768px) {
-      font-size: 0.85rem;
     }
   }
 }
+
 
 // Delivery Info
 .delivery-info {
@@ -723,6 +646,17 @@
         
         @media (max-width: 768px) {
           font-size: 0.85rem;
+        }
+        
+        &.delivery-note {
+          font-size: 0.8rem;
+          color: #059669;
+          font-weight: 500;
+          margin-top: 4px;
+          
+          @media (max-width: 768px) {
+            font-size: 0.75rem;
+          }
         }
       }
     }
