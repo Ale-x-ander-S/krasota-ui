@@ -112,7 +112,7 @@ export class OrderDetailComponent implements OnInit {
       [OrderStatus.CONFIRMED]: 'Заказ подтвержден и готов к обработке.',
       [OrderStatus.PROCESSING]: 'Заказ находится в процессе обработки и подготовки к отправке.',
       [OrderStatus.SHIPPED]: 'Заказ отправлен и находится в пути к вам.',
-      [OrderStatus.DELIVERED]: 'Заказ успешно доставлен.',
+      [OrderStatus.DELIVERED]: 'Заказ доставлен и получен.',
       [OrderStatus.CANCELLED]: 'Заказ был отменен.',
       [OrderStatus.REFUNDED]: 'Заказ был возвращен.'
     };
@@ -152,7 +152,13 @@ export class OrderDetailComponent implements OnInit {
     return methods[method] || method;
   }
 
-  getPaymentStatusLabel(status: PaymentStatus): string {
+  getPaymentStatusLabel(order: Order): string {
+    // Если заказ доставлен, то он считается оплаченным
+    if (order.status === OrderStatus.DELIVERED) {
+      return 'Оплачен';
+    }
+    
+    // Для остальных статусов используем payment_status из заказа
     const statusMap: { [key in PaymentStatus]: string } = {
       [PaymentStatus.PENDING]: 'Ожидает оплаты',
       [PaymentStatus.PAID]: 'Оплачен',
@@ -160,7 +166,10 @@ export class OrderDetailComponent implements OnInit {
       [PaymentStatus.REFUNDED]: 'Возвращен',
       [PaymentStatus.CANCELLED]: 'Отменен'
     };
-    return statusMap[status] || status;
+    
+    // Если payment_status не указан, показываем "Ожидает оплаты"
+    const paymentStatus = order.payment_status || PaymentStatus.PENDING;
+    return statusMap[paymentStatus] || 'Ожидает оплаты';
   }
 
   onImageError(event: Event): void {

@@ -32,7 +32,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   categoriesLoading: boolean = false;
   currentPage: number = 1;
   totalProducts: number = 0;
-  productsPerPage: number = 10;
+  productsPerPage: number = 12;
   
   filters = {
     search: undefined as string | undefined,

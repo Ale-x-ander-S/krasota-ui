@@ -40,7 +40,7 @@
       </div>
 
       <!-- Описание статуса -->
-      <div class="status-description">
+      <div class="status-description" *ngIf="order.status !== 'delivered'">
         <p>{{ getStatusDescription(order.status) }}</p>
       </div>
 
@@ -102,9 +102,9 @@
                 <span class="label">Способ оплаты:</span>
                 <span class="value">{{ getPaymentMethodLabel(order.payment_method) }}</span>
               </div>
-              <div class="info-row" *ngIf="order.payment_status">
+              <div class="info-row">
                 <span class="label">Статус оплаты:</span>
-                <span class="value">{{ getPaymentStatusLabel(order.payment_status) }}</span>
+                <span class="value">{{ getPaymentStatusLabel(order) }}</span>
               </div>
               <div class="info-row">
                 <span class="label">Сумма заказа:</span>
