@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -53,12 +53,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private store: Store,
     private productService: ProductService,
     private categoryService: CategoryService,
-    private cartAnimationService: CartAnimationService
+    private cartAnimationService: CartAnimationService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
     // Прокручиваем страницу вверх при инициализации
-    window.scrollTo(0, 0);
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo(0, 0);
+    }
     
     // Обрабатываем query params при переходе из категорий
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -80,7 +83,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.loadCategories();
       
       // Прокручиваем вверх при изменении query params
-      setTimeout(() => window.scrollTo(0, 0), 0);
+      if (isPlatformBrowser(this.platformId)) {
+        setTimeout(() => window.scrollTo(0, 0), 0);
+      }
     });
     
     // Настройка поиска с debounce
@@ -201,7 +206,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
       if (productsSection) {
         productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (isPlatformBrowser(this.platformId)) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     }, 100);
   }

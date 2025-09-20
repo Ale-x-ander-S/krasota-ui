@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface LoginCredentials {
   email: string;
@@ -48,7 +49,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loadStoredAuth();
   }
@@ -91,7 +93,10 @@ export class AuthService {
 
   // Получить токен
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(this.tokenKey);
+    }
+    return null;
   }
 
   // Проверить, истек ли токен
@@ -123,7 +128,9 @@ export class AuthService {
       tap(updatedUser => {
         // Обновляем локальные данные пользователя
         this.currentUserSubject.next(updatedUser);
-        localStorage.setItem(this.userKey, JSON.stringify(updatedUser));
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem(this.userKey, JSON.stringify(updatedUser));
+        }
       })
     );
   }
@@ -140,7 +147,9 @@ export class AuthService {
         if (currentUser) {
           currentUser.is_email_active = isEmailActive;
           this.currentUserSubject.next(currentUser);
-          localStorage.setItem(this.userKey, JSON.stringify(currentUser));
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem(this.userKey, JSON.stringify(currentUser));
+          }
         }
       })
     );
@@ -182,22 +191,30 @@ export class AuthService {
 
   // Приватные методы
   private setAuth(token: string, user: User): void {
-    localStorage.setItem(this.tokenKey, token);
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
     
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
   }
 
   private clearAuth(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userKey);
+    }
     
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
 
   private loadStoredAuth(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const token = localStorage.getItem(this.tokenKey);
     const userStr = localStorage.getItem(this.userKey);
     
