@@ -14,9 +14,8 @@ export class FooterComponent {
   
   // Социальные сети
   socialLinks = [
-    { name: 'VK', url: '#', icon: '📘' },
-    { name: 'Telegram', url: '#', icon: '📱' },
-    { name: 'WhatsApp', url: '#', icon: '💬' }
+    { name: 'VK', url: 'https://vk.com/tyumenkrasota72', icon: '📘' },
+    { name: 'Telegram', url: 'https://t.me/krasota72ru', icon: '📱' }
   ];
 
   // Быстрые ссылки

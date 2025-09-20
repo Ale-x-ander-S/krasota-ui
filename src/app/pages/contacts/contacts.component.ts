@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
@@ -11,35 +10,17 @@ interface FaqItem {
   isExpanded: boolean;
 }
 
-interface ContactForm {
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-  agreement: boolean;
-}
 
 @Component({
   selector: 'app-contacts',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss']
 })
 export class ContactsComponent {
   showMobileMenu: boolean = false;
   
-  formData: ContactForm = {
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-    agreement: false
-  };
-
-  isSubmitting = false;
 
   faqs: FaqItem[] = [
     {
@@ -49,62 +30,31 @@ export class ContactsComponent {
     },
     {
       question: 'Какие способы оплаты доступны?',
-      answer: 'Мы принимаем оплату банковскими картами, электронными платежами и наличными при получении. Все платежи защищены современными технологиями безопасности.',
+      answer: 'Мы принимаем оплату наличными при получении товара. Это самый удобный и безопасный способ оплаты.',
       isExpanded: false
     },
     {
-      question: 'Сколько времени занимает доставка?',
-      answer: 'Сроки доставки зависят от вашего местоположения и выбранного способа доставки. В среднем доставка занимает 1-3 рабочих дня по Москве и 3-7 дней по России.',
+      question: 'Сколько стоит доставка?',
+      answer: 'Доставка по городу Тюмень бесплатная при заказе от 1000 рублей. При заказе на меньшую сумму стоимость доставки составляет 100 рублей.',
+      isExpanded: false
+    },
+    {
+      question: 'Как быстро доставляют заказы?',
+      answer: 'Заказы, оформленные в будний день до 13:00, доставляем в тот же день с 13:00 до 19:00. Заказы, оформленные после 13:00, доставляем на следующий рабочий день.',
       isExpanded: false
     },
     {
       question: 'Можно ли вернуть товар?',
-      answer: 'Да, вы можете вернуть товар в течение 14 дней с момента получения, если он не был в использовании и сохранил товарный вид. Подробности в разделе "Возврат и обмен".',
+      answer: 'Да, вы можете вернуть товар в течение 14 дней с момента получения, если он не был в использовании и сохранил товарный вид.',
       isExpanded: false
     },
     {
       question: 'Есть ли гарантия на товары?',
-      answer: 'Все товары имеют гарантию производителя. Срок гарантии зависит от категории товара и составляет от 1 года до 3 лет. Подробная информация указана в описании каждого товара.',
+      answer: 'Все товары имеют гарантию производителя. Срок гарантии зависит от категории товара и составляет от 1 года до 3 лет.',
       isExpanded: false
     }
   ];
 
-  isFormValid(): boolean {
-    return !!(
-      this.formData.name &&
-      this.formData.email &&
-      this.formData.subject &&
-      this.formData.message &&
-      this.formData.agreement
-    );
-  }
-
-  onSubmit(): void {
-    if (!this.isFormValid()) {
-      return;
-    }
-
-    this.isSubmitting = true;
-    
-    // Имитация отправки формы
-    setTimeout(() => {
-      console.log('Форма отправлена:', this.formData);
-      this.isSubmitting = false;
-      
-      // Сброс формы
-      this.formData = {
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-        agreement: false
-      };
-      
-      // Здесь можно показать уведомление об успешной отправке
-      alert('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
-    }, 2000);
-  }
 
   toggleFaq(index: number): void {
     this.faqs[index].isExpanded = !this.faqs[index].isExpanded;

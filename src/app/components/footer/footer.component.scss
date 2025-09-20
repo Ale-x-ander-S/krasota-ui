@@ -168,66 +168,7 @@ $newsletter-btn-hover: #2563eb;
     }
   }
 
-  // Подписка на новости
-  .newsletter {
-    background: $newsletter-bg;
-    padding: 20px;
-    border-radius: 12px;
-
-    h5 {
-      margin-bottom: 8px;
-    }
-
-    p {
-      font-size: 0.9rem;
-      margin-bottom: 15px;
-      opacity: 0.8;
-    }
-
-    .newsletter-form {
-      display: flex;
-      gap: 10px;
-
-      @media (max-width: 480px) {
-        flex-direction: column;
-      }
-
-      .newsletter-input {
-        flex: 1;
-        padding: 10px 12px;
-        border: none;
-        border-radius: 6px;
-        background: $newsletter-input-bg;
-        color: white;
-        font-size: 0.9rem;
-
-        &::placeholder {
-          color: $footer-text;
-        }
-
-        &:focus {
-          outline: none;
-          box-shadow: 0 0 0 2px $footer-link-hover;
-        }
-      }
-
-      .newsletter-btn {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        background: $newsletter-btn-bg;
-        color: white;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background 0.3s ease;
-        white-space: nowrap;
-
-        &:hover {
-          background: $newsletter-btn-hover;
-        }
-      }
-    }
-  }
+  // Newsletter section removed
 
   // Нижняя часть футера
   .footer-bottom {

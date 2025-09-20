@@ -87,8 +87,12 @@ export class CategoriesComponent implements OnInit {
   }
 
   // Получаем количество товаров в категории
-  getCategoryProductCount(categoryId: number): number {
-    return this.products.filter(p => p.category_id === categoryId).length;
+  getCategoryProductCount(category: Category): number {
+    // Используем product_count из API, если он есть, иначе считаем по товарам
+    if (category.product_count !== undefined && category.product_count !== null) {
+      return category.product_count;
+    }
+    return this.products.filter(p => p.category_id === category.id).length;
   }
 
   // Получаем товары для конкретной категории
@@ -96,19 +100,32 @@ export class CategoriesComponent implements OnInit {
     return this.products.filter(p => p.category_id === categoryId);
   }
 
-  // Метод для получения иконки категории (заглушка - в реальной версии это может быть в API)
-  getCategoryIcon(categoryName: string): string {
-    const icons: { [key: string]: string } = {
-      'Электроника': '📱',
-      'Одежда': '👕', 
-      'Обувь': '👟',
-      'Аксессуары': '👜',
-      'Красота': '💄',
-      'Косметика': '💄',
-      'Уход': '🧴',
-      'Парфюмерия': '🌸'
-    };
-    return icons[categoryName] || '📦';
+  // Получаем изображение категории
+  getCategoryImage(category: Category): string {
+    // Проверяем различные возможные поля изображения
+    if (category.image_url) {
+      return category.image_url;
+    }
+    
+    // Если изображение не найдено, используем стандартные пути
+    const standardPaths = [
+      `assets/images/categories/category_${category.id}.jpg`,
+      `assets/images/categories/category_${category.id}.png`,
+      `assets/images/categories/category_${category.id}.webp`,
+      `http://45.12.229.112:8080/images/categories/${category.id}.jpg`,
+      `http://45.12.229.112:8080/images/categories/${category.id}.png`,
+      `http://45.12.229.112:8080/images/categories/${category.id}.webp`
+    ];
+    
+    return standardPaths[0];
+  }
+
+  // Обработка ошибок загрузки изображений
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'assets/images/placeholder.svg';
+    }
   }
 
   getFilteredCategories(): Category[] {
@@ -169,10 +186,6 @@ export class CategoriesComponent implements OnInit {
     return product.stock > 0;
   }
 
-  // Обработчик ошибки загрузки изображения
-  onImageError(event: any): void {
-    event.target.src = 'assets/images/placeholder.svg';
-  }
 
   goToProduct(productId: number) {
     this.router.navigate(['/product', productId]);

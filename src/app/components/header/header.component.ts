@@ -6,6 +6,7 @@ import { Store, Select } from '@ngxs/store';
 import { CartStateClass } from '../../store/cart';
 import { Observable } from 'rxjs';
 import { AuthService, User } from '../../services/auth.service';
+import { ScrollService } from '../../services/scroll.service';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +28,8 @@ export class HeaderComponent implements OnInit {
   constructor(
     private router: Router,
     private store: Store,
-    private authService: AuthService
+    private authService: AuthService,
+    private scrollService: ScrollService
   ) {}
 
   get itemCount(): number {
@@ -80,6 +82,12 @@ export class HeaderComponent implements OnInit {
 
   goToAdmin() {
     this.router.navigate(['/admin']);
+    this.closeMobileMenu();
+  }
+
+  goToHome() {
+    this.router.navigate(['/']);
+    this.scrollService.scrollToTop();
     this.closeMobileMenu();
   }
 }

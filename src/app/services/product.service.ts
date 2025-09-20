@@ -82,10 +82,16 @@ export class ProductService {
     
     if (params.page) httpParams = httpParams.set('page', params.page.toString());
     if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    if (params.category_id) httpParams = httpParams.set('category_id', params.category_id);
+    if (params.category_id) httpParams = httpParams.set('category_id', params.category_id.toString());
     if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.min_price) httpParams = httpParams.set('min_price', params.min_price.toString());
     if (params.max_price) httpParams = httpParams.set('max_price', params.max_price.toString());
+
+    console.log('ProductService: Отправляем запрос с параметрами:', {
+      url: `${this.apiUrl}/products`,
+      params: params,
+      httpParams: httpParams.toString()
+    });
 
     return this.http.get<ProductListResponse>(`${this.apiUrl}/products`, { 
       headers: this.getHeaders(),

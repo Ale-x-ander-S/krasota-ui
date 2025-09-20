@@ -85,62 +85,19 @@
             title="Перейти к товарам категории {{ category.name }}"
           >
             <div class="category-header">
-              <div class="category-icon">{{ getCategoryIcon(category.name) }}</div>
+              <div class="category-image">
+                <img 
+                  [src]="getCategoryImage(category)" 
+                  [alt]="category.name"
+                  (error)="onImageError($event)"
+                >
+              </div>
               <div class="category-info">
                 <h3 class="category-name">{{ category.name }}</h3>
-                <div class="category-count">{{ getCategoryProductCount(category.id) }} товаров</div>
-              </div>
-            </div>
-            
-            <div class="category-description">
-              <p>{{ category.description }}</p>
-            </div>
-
-            <!-- Category Products Preview -->
-            <div class="products-preview" *ngIf="getFilteredProducts(category).length > 0">
-              <h4>Популярные товары в категории:</h4>
-              <div class="products-grid">
-                <div 
-                  *ngFor="let product of getFilteredProducts(category)" 
-                  class="product-preview-card"
-                  [class.out-of-stock]="!isProductInStock(product)"
-                  (click)="goToProduct(product.id); $event.stopPropagation()"
-                  style="cursor: pointer;"
-                >
-                  <div class="product-image">
-                    <img 
-                      [src]="product.image_url || 'assets/images/placeholder.svg'" 
-                      [alt]="product.name"
-                      (error)="onImageError($event)"
-                    >
-                    <div *ngIf="!isProductInStock(product)" class="out-of-stock-badge">
-                      Нет в наличии
-                    </div>
-                  </div>
-                  
-                  <div class="product-info">
-                    <h5 class="product-name">{{ product.name }}</h5>
-                    <div class="product-price">{{ formatPrice(product.price) }}</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="view-all-products" *ngIf="getCategoryProductCount(category.id) > 3">
-                <a 
-                  routerLink="/products" 
-                  [queryParams]="{category_id: category.id, category_name: category.name}" 
-                  class="view-all-btn"
-                  (click)="$event.stopPropagation()"
-                >
-                  Посмотреть все товары в категории "{{ category.name }}"
-                </a>
+                <div class="category-count">{{ getCategoryProductCount(category) }} товаров</div>
               </div>
             </div>
 
-            <!-- Empty State for Category -->
-            <div class="empty-category" *ngIf="getFilteredProducts(category).length === 0">
-              <p>В данной категории товары не найдены</p>
-            </div>
           </div>
         </div>
 

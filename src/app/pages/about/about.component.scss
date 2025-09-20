@@ -192,8 +192,8 @@ $transition: all 0.3s ease;
   }
 }
 
-// Values Section
-.values-section {
+// Categories Section
+.categories-section {
   background: white;
   padding: 60px 0;
   margin-bottom: 50px;
@@ -205,11 +205,15 @@ $transition: all 0.3s ease;
     margin-bottom: 30px;
   }
 
-  .values-grid {
+  .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-top: 40px;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
     @include mobile {
       grid-template-columns: 1fr;
@@ -217,11 +221,11 @@ $transition: all 0.3s ease;
       margin-top: 30px;
     }
 
-    .value-card {
-      text-align: center;
-      padding: 30px 20px;
+    .category-card {
       background: $light-bg;
       border-radius: $border-radius;
+      padding: 30px 20px;
+      text-align: center;
       transition: $transition;
 
       &:hover {
@@ -229,29 +233,30 @@ $transition: all 0.3s ease;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
 
-      .value-icon {
+      .category-icon {
         font-size: 3rem;
         margin-bottom: 20px;
       }
 
-      .value-title {
-        font-size: 1.5rem;
+      h3 {
+        font-size: 1.3rem;
         font-weight: 600;
         color: $text-primary;
         margin: 0 0 15px 0;
       }
 
-      .value-description {
+      p {
         color: $text-secondary;
         line-height: 1.6;
         margin: 0;
+        font-size: 0.9rem;
       }
     }
   }
 }
 
-// History Section
-.history-section {
+// Audience Section
+.audience-section {
   background: white;
   padding: 60px 0;
   margin-bottom: 50px;
@@ -263,124 +268,15 @@ $transition: all 0.3s ease;
     margin-bottom: 30px;
   }
 
-  .timeline {
-    margin-top: 40px;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: $primary-color;
-      transform: translateX(-50%);
-
-      @include mobile {
-        left: 20px;
-      }
-    }
-
-    .timeline-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 40px;
-      position: relative;
-
-      @include mobile {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-left: 40px;
-      }
-
-      &:nth-child(even) {
-        flex-direction: row-reverse;
-
-        @include mobile {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-
-      .timeline-year {
-        background: $primary-color;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 25px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        min-width: 80px;
-        text-align: center;
-        position: relative;
-        z-index: 2;
-
-        @include mobile {
-          margin-bottom: 15px;
-        }
-      }
-
-      .timeline-content {
-        background: $light-bg;
-        padding: 25px;
-        border-radius: $border-radius;
-        margin: 0 30px;
-        flex: 1;
-        max-width: 400px;
-
-        @include mobile {
-          margin: 0;
-          max-width: none;
-        }
-
-        .timeline-title {
-          font-size: 1.3rem;
-          font-weight: 600;
-          color: $text-primary;
-          margin: 0 0 10px 0;
-        }
-
-        .timeline-description {
-          color: $text-secondary;
-          line-height: 1.6;
-          margin: 0;
-        }
-      }
-    }
-  }
-}
-
-// Team Section
-.team-section {
-  background: white;
-  padding: 60px 0;
-  margin-bottom: 50px;
-  border-radius: $border-radius;
-  box-shadow: $shadow;
-
-  @include mobile {
-    padding: 40px 0;
-    margin-bottom: 30px;
-  }
-
-  .team-intro {
-    font-size: 1.2rem;
-    color: $text-secondary;
-    max-width: 700px;
-    margin: 0 auto 40px auto;
-    line-height: 1.6;
-
-    @include mobile {
-      font-size: 1rem;
-      margin-bottom: 30px;
-    }
-  }
-
-  .team-grid {
+  .audience-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-top: 40px;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
     @include mobile {
       grid-template-columns: 1fr;
@@ -388,10 +284,11 @@ $transition: all 0.3s ease;
       margin-top: 30px;
     }
 
-    .team-member {
+    .audience-item {
       background: $light-bg;
       border-radius: $border-radius;
-      overflow: hidden;
+      padding: 25px 20px;
+      text-align: center;
       transition: $transition;
 
       &:hover {
@@ -399,44 +296,121 @@ $transition: all 0.3s ease;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
 
-      .member-image {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: $transition;
-
-          &:hover {
-            transform: scale(1.1);
-          }
-        }
+      h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 10px 0;
       }
 
-      .member-info {
-        padding: 25px;
+      p {
+        color: $text-secondary;
+        line-height: 1.5;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
 
-        .member-name {
-          font-size: 1.3rem;
-          font-weight: 600;
-          color: $text-primary;
-          margin: 0 0 8px 0;
-        }
+// Advantages Section
+.advantages-section {
+  background: white;
+  padding: 60px 0;
+  margin-bottom: 50px;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
 
-        .member-position {
-          color: $primary-color;
-          font-weight: 500;
-          margin-bottom: 15px;
-        }
+  @include mobile {
+    padding: 40px 0;
+    margin-bottom: 30px;
+  }
 
-        .member-description {
-          color: $text-secondary;
-          line-height: 1.6;
-          margin: 0;
-        }
+  .advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .advantage-item {
+      background: $light-bg;
+      border-radius: $border-radius;
+      padding: 30px 20px;
+      text-align: center;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .advantage-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+      }
+
+      h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 15px 0;
+      }
+
+      p {
+        color: $text-secondary;
+        line-height: 1.6;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// SEO Content Section
+.seo-content-section {
+  background: white;
+  padding: 60px 0;
+  margin-bottom: 50px;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+
+  @include mobile {
+    padding: 40px 0;
+    margin-bottom: 30px;
+  }
+
+  .seo-text {
+    text-align: left;
+    max-width: 800px;
+    margin: 0 auto;
+
+    p {
+      color: $text-secondary;
+      line-height: 1.7;
+      margin: 0 0 20px 0;
+      font-size: 1rem;
+
+      @include mobile {
+        font-size: 0.9rem;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: $text-primary;
+        font-weight: 600;
       }
     }
   }
