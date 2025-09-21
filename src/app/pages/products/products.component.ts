@@ -242,18 +242,30 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   private touchStartTime = 0;
   private touchMoved = false;
+  private touchStartY = 0;
 
   onProductTouchStart(event: TouchEvent) {
     this.touchStartTime = Date.now();
     this.touchMoved = false;
+    this.touchStartY = event.touches[0].clientY;
+  }
+
+  onProductTouchMove(event: TouchEvent) {
+    const currentY = event.touches[0].clientY;
+    const deltaY = Math.abs(currentY - this.touchStartY);
+    
+    // Если пользователь сдвинул палец больше чем на 10px, считаем это scroll
+    if (deltaY > 10) {
+      this.touchMoved = true;
+    }
   }
 
   onProductTouchEnd(event: TouchEvent, productId: number) {
-    event.preventDefault();
-    
     // Проверяем что это был tap, а не scroll
     const touchDuration = Date.now() - this.touchStartTime;
     if (touchDuration < 500 && !this.touchMoved) {
+      event.preventDefault();
+      event.stopPropagation();
       this.goToProduct(productId);
     }
   }
@@ -275,6 +287,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToCart(event: Event, product: Product) {
     event.stopPropagation();
+    event.preventDefault();
     
     if (product.stock === 0) return;
     

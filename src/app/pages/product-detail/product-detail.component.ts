@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngxs/store';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer';
 import { ProductService, Product } from '../../services/product.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { CartAnimationService } from '../../services/cart-animation.service';
+import { CartItem } from '../../models';
+import { AddToCart } from '../../store/cart/cart.actions';
 
 // Используем Product из ProductService
 
@@ -37,7 +40,8 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
     private productService: ProductService,
     private categoryService: CategoryService,
-    private cartAnimationService: CartAnimationService
+    private cartAnimationService: CartAnimationService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -92,9 +96,27 @@ export class ProductDetailComponent implements OnInit {
       // Запускаем анимацию
       this.playAddToCartAnimation();
       
-      // Здесь логика добавления в корзину
+      // Создаем CartItem для добавления в корзину
+      const cartItem: CartItem = {
+        id: this.product.id,
+        name: this.product.name,
+        price: this.product.price,
+        quantity: this.quantity,
+        image_url: this.product.image_url || '',
+        stock: this.product.stock,
+        stock_type: this.product.stock_type || 'шт',
+        description: this.product.description || '',
+        sku: this.product.sku || '',
+        category_id: this.product.category_id || 0,
+        category_name: this.category?.name || '',
+        color: this.product.color,
+        size: this.product.size
+      };
+
+      // Добавляем в корзину через store
+      this.store.dispatch(new AddToCart(cartItem));
+      
       console.log(`Добавлено в корзину: ${this.product.name}, количество: ${this.quantity}`);
-      alert(`Товар "${this.product.name}" добавлен в корзину!`);
     }
   }
 

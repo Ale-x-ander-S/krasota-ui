@@ -600,6 +600,15 @@ body {
 
     // Мобильные touch стили
     @include mobile {
+      // Улучшаем touch взаимодействие
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      
       &:active {
         transform: scale(0.98);
         transition: transform 0.1s ease;
@@ -788,6 +797,22 @@ body {
               background: $text-secondary;
               cursor: not-allowed;
               transform: none;
+            }
+
+            // Мобильные стили для кнопок
+            @include mobile {
+              touch-action: manipulation;
+              -webkit-tap-highlight-color: transparent;
+              min-height: 44px; // Минимальный размер для touch
+              
+              &:hover {
+                transform: none; // Убираем hover на мобильных
+              }
+              
+              &:active {
+                background: darken($primary-color, 15%);
+                transform: scale(0.98);
+              }
             }
           }
 
