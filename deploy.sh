@@ -13,7 +13,8 @@ fi
 
 # Deploy browser files to server
 echo "📤 Deploying browser files to server..."
-scp -r dist/krasota-ui/browser/* root@45.12.229.112:/opt/krasota-ui/
+ssh root@45.12.229.112 "mkdir -p /opt/krasota-ui/browser"
+scp -r dist/krasota-ui/browser/* root@45.12.229.112:/opt/krasota-ui/browser/
 
 if [ $? -ne 0 ]; then
     echo "❌ Browser files deploy failed!"
