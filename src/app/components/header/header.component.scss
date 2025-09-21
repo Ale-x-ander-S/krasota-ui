@@ -1,11 +1,11 @@
-// Variables
-$primary-color: #667eea;
-$secondary-color: #764ba2;
-$text-primary: #333;
-$text-secondary: #64748b;
-$border-color: #e2e8f0;
-$light-bg: #f8f9fa;
-$shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+// Variables - Using CSS Custom Properties from global theme
+$primary-color: var(--primary-green);
+$secondary-color: var(--secondary-green);
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$border-color: var(--border-light);
+$light-bg: var(--bg-secondary);
+$shadow: 0 4px 6px -1px var(--shadow-light);
 $border-radius: 8px;
 
 // Header styles
@@ -41,9 +41,6 @@ $border-radius: 8px;
       text-decoration: none;
       color: inherit;
       transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 12px;
       cursor: pointer;
       padding: 8px;
       border-radius: $border-radius;
@@ -52,8 +49,8 @@ $border-radius: 8px;
         transform: scale(1.05);
         background: rgba($primary-color, 0.05);
         
-        .logo-icon svg {
-          transform: rotate(15deg) scale(1.1);
+        .logo-icon img {
+          transform: scale(1.1);
         }
       }
 
@@ -68,9 +65,9 @@ $border-radius: 8px;
       align-items: center;
       justify-content: center;
       
-      svg {
+      img {
         transition: all 0.4s ease;
-        filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.3));
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
       }
     }
 
@@ -523,7 +520,8 @@ $border-radius: 8px;
       font-size: 1.3rem;
     }
 
-    .logo-icon svg {
+    .logo-icon svg,
+    .logo-icon img {
       width: 32px;
       height: 32px;
     }

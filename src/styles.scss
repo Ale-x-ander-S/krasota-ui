@@ -1,4 +1,57 @@
 /* Global styles for Krasota72 e-commerce */
+
+/* Color Palette - Based on Lotus Logo */
+:root {
+  /* Primary Colors - From Lotus Petals */
+  --primary-green: #059669;        /* Bright green - main brand color */
+  --primary-green-hover: #047857;  /* Darker green for hover states */
+  --primary-green-light: #86efac;  /* Light green for backgrounds */
+  --primary-green-pale: #dcfce7;   /* Very light green for subtle backgrounds */
+  
+  /* Secondary Colors - From Lotus Gradient */
+  --secondary-green: #16a34a;      /* Deep forest green */
+  --secondary-lime: #84cc16;       /* Lime accent from logo */
+  --secondary-emerald: #10b981;    /* Emerald for success states */
+  
+  /* Accent Colors */
+  --accent-yellow: #d97706;        /* Golden yellow from lotus center */
+  --accent-orange: #f59e0b;        /* Orange accent */
+  
+  /* Neutral Colors */
+  --text-primary: #1f2937;         /* Dark charcoal for main text */
+  --text-secondary: #6b7280;       /* Medium gray for secondary text */
+  --text-muted: #9ca3af;           /* Light gray for muted text */
+  --text-white: #ffffff;           /* Pure white text */
+  
+  /* Background Colors */
+  --bg-primary: #ffffff;           /* White background */
+  --bg-secondary: #f9fafb;         /* Light gray background */
+  --bg-muted: #f3f4f6;             /* Muted background */
+  --bg-dark: #1f2937;              /* Dark background */
+  
+  /* Border & Divider Colors */
+  --border-light: #e5e7eb;         /* Light borders */
+  --border-medium: #d1d5db;        /* Medium borders */
+  --border-dark: #9ca3af;          /* Dark borders */
+  
+  /* Status Colors */
+  --success: var(--secondary-emerald);
+  --warning: var(--accent-orange);
+  --error: #ef4444;
+  --info: var(--primary-green);
+  
+  /* Shadow Colors */
+  --shadow-light: rgba(34, 197, 94, 0.1);
+  --shadow-medium: rgba(34, 197, 94, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.1);
+  
+  /* Component Specific */
+  --button-primary: var(--primary-green);
+  --button-primary-hover: var(--primary-green-hover);
+  --button-secondary: var(--secondary-green);
+  --link-color: var(--primary-green);
+  --link-hover: var(--primary-green-hover);
+}
 * {
   margin: 0;
   padding: 0;

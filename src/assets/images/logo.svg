@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="700" height="440" viewBox="0 0 700 440" xml:space="preserve">
+<desc>Sdelano: LOGOZA.RU</desc>
+<defs>
+
+                <style type="text/css">
+                    @import url(http://fonts.googleapis.com/css?family=Open+Sans:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i)
+                </style>
+            
+                <style type="text/css">
+                    @import url(http://fonts.googleapis.com/css?family=Open+Sans:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i)
+                </style>
+            
+</defs>
+<rect x="0" y="0" width="100%" height="100%" fill="#fefefe"></rect>
+<g transform="matrix(1 0 0 1 350 220)"  >
+<g style=""   >
+		<g transform="matrix(0.2 0 0 0.2 -107.24 0)"  >
+<filter id="SVGID_113" y="-20%" height="140%" x="-20%" width="140%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="0"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<g style="filter: url(#SVGID_113);"   >
+		<g transform="matrix(1 0 0 1 -128 77.37)" id="Layer_1"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(195,234,33); fill-rule: nonzero; opacity: 1;"  transform=" translate(-128, -333.37)" d="M 149.404 266.065 C 220.096 288.547 256 374.073 256 374.073 s -78.711 49.076 -149.404 26.594 C 35.904 378.185 0 292.658 0 292.658 S 78.711 243.583 149.404 266.065 z" stroke-linecap="round" />
+</g>
+		<g transform="matrix(1 0 0 1 -78.84 9.33)" id="Layer_1"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(138,219,83); fill-rule: nonzero; opacity: 1;"  transform=" translate(-177.16, -265.33)" d="M 234.332 223.876 C 277.876 283.933 256 374.073 256 374.073 s -92.475 -7.23 -136.019 -67.287 S 98.313 156.589 98.313 156.589 S 190.788 163.82 234.332 223.876 z" stroke-linecap="round" />
+</g>
+		<g transform="matrix(1 0 0 1 128 77.37)" id="Layer_1"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(32,107,52); fill-rule: nonzero; opacity: 1;"  transform=" translate(-384, -333.37)" d="M 362.597 266.065 C 291.904 288.547 256 374.073 256 374.073 s 78.711 49.076 149.404 26.594 C 476.096 378.185 512 292.658 512 292.658 S 433.289 243.583 362.597 266.065 z" stroke-linecap="round" />
+</g>
+		<g transform="matrix(1 0 0 1 78.84 9.33)" id="Layer_1"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(54,145,81); fill-rule: nonzero; opacity: 1;"  transform=" translate(-334.84, -265.33)" d="M 277.668 223.876 C 234.124 283.933 256 374.073 256 374.073 s 92.475 -7.23 136.019 -67.287 s 21.668 -150.197 21.668 -150.197 S 321.212 163.82 277.668 223.876 z" stroke-linecap="round" />
+</g>
+		<g transform="matrix(1 0 0 1 0 -16.24)" id="Layer_1"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(79,193,110); fill-rule: nonzero; opacity: 1;"  transform=" translate(-256, -239.76)" d="M 326.623 239.756 c 0 74.181 -70.623 134.317 -70.623 134.317 s -70.623 -60.136 -70.623 -134.317 S 256 105.439 256 105.439 S 326.623 165.575 326.623 239.756 z" stroke-linecap="round" />
+</g>
+</g>
+</g>
+		<g transform="matrix(1 0 0 1 54.76 0)" style="filter: url(#SVGID_114);"  >
+<linearGradient id="SVGID_115" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -102.48 -24.58)"  x1="0" y1="0" x2="204.96826171875" y2="0">
+<stop offset="0%" style="stop-color:rgb(146,242,42);stop-opacity: 1"/>
+<stop offset="100%" style="stop-color:rgb(39,174,96);stop-opacity: 1"/>
+</linearGradient>
+<filter id="SVGID_114" y="-20%" height="140%" x="-20%" width="140%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="0"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+		<text xml:space="preserve" font-family="Open Sans" font-size="43.5" font-style="normal" font-weight="400" style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: url(#SVGID_115); fill-rule: nonzero; opacity: 1; white-space: pre;" paint-order="stroke"  ><tspan x="-102.48" y="13.67" >Krasota72</tspan></text>
+</g>
+</g>
+</g>
+</svg>

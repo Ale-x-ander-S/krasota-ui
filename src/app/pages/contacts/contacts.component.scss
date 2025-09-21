@@ -1,6 +1,6 @@
 .contacts-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: #333;
 }
 
@@ -73,13 +73,13 @@
 .info-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  border-color: #059669;
 }
 
 .info-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #059669, #047857);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -167,7 +167,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #059669;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -210,8 +210,8 @@
   }
 
   input[type="checkbox"]:checked + &::before {
-    background: #667eea;
-    border-color: #667eea;
+    background: #059669;
+    border-color: #059669;
     position: relative;
   }
 
@@ -226,13 +226,13 @@
   }
 
   &:hover::before {
-    border-color: #667eea;
+    border-color: #059669;
     background: rgba(102, 126, 234, 0.1);
   }
 }
 
 .link {
-  color: #667eea;
+  color: #059669;
   text-decoration: none;
   font-weight: 600;
 }
@@ -244,7 +244,7 @@
 .submit-btn {
   width: 100%;
   padding: 18px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #059669, #047857);
   color: white;
   border: none;
   border-radius: 10px;
@@ -389,7 +389,7 @@
 }
 
 .faq-item:hover {
-  border-color: #667eea;
+  border-color: #059669;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 

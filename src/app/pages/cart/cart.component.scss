@@ -1,7 +1,7 @@
 // Cart Page Styles
 .cart-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: #333;
 }
 
@@ -178,7 +178,7 @@
 
   .continue-shopping-btn {
     display: inline-block;
-    background: #2563eb;
+    background: #059669;
     color: white;
     text-decoration: none;
     padding: 15px 30px;
@@ -302,7 +302,7 @@
     .item-price {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #2563eb;
+      color: #059669;
       
       @media (max-width: 768px) {
         font-size: 1rem;
@@ -351,7 +351,7 @@
         }
 
         &:hover:not(:disabled) {
-          border-color: #2563eb;
+          border-color: #059669;
           background: #f8fafc;
         }
 
@@ -488,7 +488,7 @@
 
   .checkout-btn {
     width: 100%;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background: linear-gradient(135deg, #059669, #1d4ed8);
     color: white;
     border: none;
     padding: 18px;
@@ -691,7 +691,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      border-color: #2563eb;
+      border-color: #059669;
       transform: translateY(-5px);
       box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     }
@@ -719,13 +719,13 @@
       .product-price {
         font-size: 1.2rem;
         font-weight: 600;
-        color: #2563eb;
+        color: #059669;
         margin-bottom: 20px;
       }
 
       .add-to-cart-btn {
         width: 100%;
-        background: #2563eb;
+        background: #059669;
         color: white;
         border: none;
         padding: 12px;
