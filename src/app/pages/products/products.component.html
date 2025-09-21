@@ -87,8 +87,10 @@
           *ngFor="let product of products" 
           class="product-card"
           [class.out-of-stock]="product.stock === 0"
-          (click)="goToProduct(product.id)"
-          style="cursor: pointer;"
+          (click)="onProductClick($event, product.id)"
+          (touchstart)="onProductTouchStart($event)"
+          (touchend)="onProductTouchEnd($event, product.id)"
+          style="cursor: pointer; -webkit-tap-highlight-color: transparent;"
         >
           <div class="product-image">
             <img 

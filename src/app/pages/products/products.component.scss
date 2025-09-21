@@ -587,10 +587,28 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    // Мобильные touch стили
+    @include mobile {
+      &:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+      }
+
+      &:hover {
+        transform: none; // Убираем hover эффект на мобильных
+        box-shadow: $shadow;
+      }
     }
 
     &.out-of-stock {

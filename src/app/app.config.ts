@@ -9,7 +9,6 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { routes } from './app.routes';
 import { CartStateClass } from './store/cart/cart.state';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { provideClientHydration } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -38,6 +37,6 @@ export const appConfig: ApplicationConfig = {
         }
       }),
       NgxsReduxDevtoolsPluginModule.forRoot()
-    ), provideClientHydration()
+    )
   ]
 };

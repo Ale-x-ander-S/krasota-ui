@@ -240,6 +240,34 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.viewMode = mode;
   }
 
+  private touchStartTime = 0;
+  private touchMoved = false;
+
+  onProductTouchStart(event: TouchEvent) {
+    this.touchStartTime = Date.now();
+    this.touchMoved = false;
+  }
+
+  onProductTouchEnd(event: TouchEvent, productId: number) {
+    event.preventDefault();
+    
+    // Проверяем что это был tap, а не scroll
+    const touchDuration = Date.now() - this.touchStartTime;
+    if (touchDuration < 500 && !this.touchMoved) {
+      this.goToProduct(productId);
+    }
+  }
+
+  onProductClick(event: MouseEvent, productId: number) {
+    // На мобильных устройствах используем только touch события
+    if ('ontouchstart' in window) {
+      event.preventDefault();
+      return;
+    }
+    
+    this.goToProduct(productId);
+  }
+
   goToProduct(productId: number) {
     console.log('Переход к товару с ID:', productId);
     this.router.navigate(['/product', productId]);
