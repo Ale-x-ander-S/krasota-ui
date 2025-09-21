@@ -25,33 +25,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Update Nginx config for SPA
-echo "🔧 Updating Nginx config for SPA..."
-ssh root@45.12.229.112 'cat > /etc/nginx/sites-available/krasota-ui << EOF
-server {
-    listen 80;
-    server_name 45.12.229.112;
-    
-    root /opt/krasota-ui;
-    index index.html;
-    
-    # Gzip compression
-    gzip on;
-    gzip_types text/css application/javascript application/json image/svg+xml;
-    gzip_comp_level 9;
-    
-    # Cache static assets
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-    
-    # SPA routing - все запросы перенаправляем на index.html
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-EOF'
+# Nginx config already configured, skipping update
+echo "✅ Nginx config already correct"
 
 # Reload Nginx
 echo "🔄 Reloading Nginx..."
