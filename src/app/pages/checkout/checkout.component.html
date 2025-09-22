@@ -23,14 +23,6 @@
         <!-- Checkout Form -->
         <div class="checkout-form-section">
           <form (ngSubmit)="onSubmit()" #checkoutFormElement="ngForm">
-            <!-- Auto-fill notification -->
-            <div *ngIf="isFormAutoFilled" class="auto-fill-notification">
-              <div class="auto-fill-icon">✅</div>
-              <div class="auto-fill-content">
-                <h3>Форма автозаполнена</h3>
-                <p>Данные из вашего профиля автоматически заполнены. Вы можете изменить их при необходимости.</p>
-              </div>
-            </div>
 
             <!-- Personal Information -->
             <div class="form-section">
@@ -128,9 +120,24 @@
                 >
                   <div class="method-info">
                     <div class="method-label">{{ method.label }}</div>
-                    <div class="method-time">{{ method.time }}</div>
                   </div>
-                  <div class="method-price">{{ formatPrice(method.price) }}</div>
+                  <div class="method-price">{{ formatPrice(getDeliveryCost()) }}</div>
+                </div>
+              </div>
+              
+              <!-- Delivery Date Selection -->
+              <div class="delivery-date-section">
+                <h3>Выберите дату доставки</h3>
+                <div class="date-selection">
+                  <div 
+                    *ngFor="let date of getAvailableDeliveryDates()" 
+                    class="date-option"
+                    [class.selected]="checkoutForm.deliveryDate === date"
+                    (click)="checkoutForm.deliveryDate = date"
+                  >
+                    <div class="date-display">{{ formatDateForDisplay(date) }}</div>
+                    <div class="date-value">{{ formatDateForValue(date) }}</div>
+                  </div>
                 </div>
               </div>
             </div>

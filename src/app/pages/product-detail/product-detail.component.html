@@ -30,6 +30,10 @@
           <span class="price-availability" [class.in-stock]="product.stock > 0" [class.out-of-stock]="product.stock === 0">
             {{ getStockText(product.stock) }}
           </span>
+          <div class="package-info" *ngIf="product.package_quantity && product.package_quantity_type">
+            <span class="package-label">В упаковке:</span>
+            <span class="package-value">{{ product.package_quantity }} {{ product.package_quantity_type }}</span>
+          </div>
         </div>
 
         <!-- Quantity Selector -->
@@ -81,9 +85,9 @@
               <span class="detail-label">Размер:</span>
               <span class="detail-value">{{ product.size }}</span>
             </div>
-            <div class="detail-item" *ngIf="product.stock_type === 'уп' && product.package_quantity && product.package_quantity_type">
+            <div class="detail-item" *ngIf="product.package_quantity && product.package_quantity_type">
               <span class="detail-label">В упаковке:</span>
-              <span class="detail-value">{{ getStockTypeText(product) }}</span>
+              <span class="detail-value">{{ product.package_quantity }} {{ product.package_quantity_type }}</span>
             </div>
           </div>
         </div>

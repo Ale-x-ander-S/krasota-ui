@@ -207,6 +207,37 @@ $transition: all 0.3s ease;
         border: 1px solid rgba(239, 68, 68, 0.3);
       }
     }
+
+    .package-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(5, 150, 105, 0.1);
+      border-radius: 25px;
+      border: 1px solid rgba(5, 150, 105, 0.2);
+
+      .package-label {
+        font-size: 0.9rem;
+        color: $text-secondary;
+        font-weight: 500;
+      }
+
+      .package-value {
+        font-size: 0.9rem;
+        color: $primary-color;
+        font-weight: 600;
+      }
+
+      @include mobile {
+        padding: 6px 12px;
+        
+        .package-label,
+        .package-value {
+          font-size: 0.8rem;
+        }
+      }
+    }
   }
 
 }

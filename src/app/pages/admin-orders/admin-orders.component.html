@@ -181,7 +181,7 @@
               <h3>Заказ №{{ order.id }}</h3>
               <span class="order-date">{{ formatDate(order.created_at) }}</span>
               <span class="order-customer" *ngIf="order.guest_name">
-                {{ order.guest_name }} ({{ order.guest_phone }})
+                {{ order.guest_name }} ({{ order.guest_phone }}) - {{ order.guest_email }}
               </span>
             </div>
             <div class="order-status">

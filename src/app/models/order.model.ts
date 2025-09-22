@@ -28,6 +28,7 @@ export interface Order {
   billing_address: string;
   payment_method: PaymentMethod;
   payment_status?: PaymentStatus;
+  delivery_date?: string;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -42,6 +43,7 @@ export interface CreateOrderRequest {
   billing_address: string;
   shipping_address: string;
   payment_method: PaymentMethod;
+  delivery_date?: string;
   notes?: string;
   coupon_code?: string;
   guest_email?: string;
@@ -57,6 +59,7 @@ export interface CreateGuestOrderRequest {
   billing_address: string;
   shipping_address: string;
   payment_method: PaymentMethod;
+  delivery_date?: string;
   notes?: string;
   coupon_code?: string;
   guest_email: string;
@@ -93,7 +96,8 @@ export enum PaymentStatus {
 export enum PaymentMethod {
   CARD = 'card',
   CASH = 'cash',
-  ONLINE = 'online'
+  ONLINE = 'online',
+  BANK_TRANSFER = 'bank_transfer'
 }
 
 export interface OrderFilters {

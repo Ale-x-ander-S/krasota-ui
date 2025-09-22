@@ -114,7 +114,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getSubtotal(): number {
-    return this.cartTotal;
+    return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   }
 
   getShippingCost(): number {

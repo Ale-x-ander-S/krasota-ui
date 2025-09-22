@@ -21,6 +21,7 @@ interface CheckoutForm {
   address: string;
   city: string;
   deliveryMethod: string;
+  deliveryDate: string;
   paymentMethod: string;
   notes: string;
   couponCode: string;
@@ -39,7 +40,6 @@ export class CheckoutComponent implements OnInit {
   error: string | null = null;
   showSuccessModal = false;
   createdOrder: Order | null = null;
-  isFormAutoFilled = false;
   
   @Select(CartStateClass.getCartItems) cartItems$!: Observable<CartItem[]>;
   cartItems: CartItem[] = [];
@@ -51,17 +51,19 @@ export class CheckoutComponent implements OnInit {
     address: '',
     city: 'Тюмень',
     deliveryMethod: 'courier',
+    deliveryDate: '',
     paymentMethod: 'cash',
     notes: '',
     couponCode: ''
   };
 
   deliveryMethods = [
-    { value: 'courier', label: 'Курьерская доставка', price: 0, time: '1-2 дня' }
+    { value: 'courier', label: 'Курьерская доставка', time: '1-2 дня' }
   ];
 
   paymentMethods = [
-    { value: 'cash', label: 'Наличными при получении', icon: '💵' }
+    { value: 'cash', label: 'Наличными при получении', icon: '💵' },
+    { value: 'bank_transfer', label: 'По счету', icon: '🏦' }
   ];
 
   selectedDelivery = this.deliveryMethods[0];
@@ -81,6 +83,9 @@ export class CheckoutComponent implements OnInit {
 
     // Автозаполнение формы для залогиненного пользователя
     this.autoFillFormForLoggedInUser();
+    
+    // Инициализация даты доставки
+    this.initializeDeliveryDate();
   }
 
   autoFillFormForLoggedInUser() {
@@ -123,16 +128,76 @@ export class CheckoutComponent implements OnInit {
           hasAutoFilledData = true;
         }
         
-        // Устанавливаем флаг автозаполнения
-        this.isFormAutoFilled = hasAutoFilledData;
-        
         console.log('✅ Форма автозаполнена:', this.checkoutForm);
-        console.log('🏷️ Флаг автозаполнения:', this.isFormAutoFilled);
       }
     }
   }
 
+  initializeDeliveryDate() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Если сейчас до 13:00, можно выбрать сегодняшний день
+    // Если после 13:00, можно выбрать только завтрашний день
+    const startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    
+    // Устанавливаем дату по умолчанию
+    this.checkoutForm.deliveryDate = this.formatDateForInput(startDate);
+  }
 
+  getAvailableDeliveryDates(): string[] {
+    const dates: string[] = [];
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Если сейчас до 13:00, можно выбрать сегодняшний день
+    const startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    
+    // Генерируем доступные даты на 8 дней вперед
+    for (let i = 0; i < 8; i++) {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      dates.push(this.formatDateForInput(date));
+    }
+    
+    return dates;
+  }
+
+  formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  formatDateForDisplay(dateString: string): string {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    
+    if (this.isSameDay(date, today)) {
+      return 'Сегодня';
+    } else if (this.isSameDay(date, tomorrow)) {
+      return 'Завтра';
+    } else {
+      return date.toLocaleDateString('ru-RU', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+    }
+  }
+
+  formatDateForValue(dateString: string): string {
+    // Конвертируем YYYY-MM-DD в DD-MM-YYYY
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateString;
+  }
+
+  private isSameDay(date1: Date, date2: Date): boolean {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  }
 
   getSubtotal(): number {
     return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -185,6 +250,7 @@ export class CheckoutComponent implements OnInit {
         billing_address: fullAddress,
         shipping_address: fullAddress,
         payment_method: this.checkoutForm.paymentMethod,
+        delivery_date: this.checkoutForm.deliveryDate,
         notes: this.checkoutForm.notes,
         coupon_code: this.checkoutForm.couponCode || undefined,
         guest_email: this.checkoutForm.email,

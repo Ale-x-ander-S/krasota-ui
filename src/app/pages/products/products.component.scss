@@ -696,17 +696,6 @@ body {
         padding: 15px;
       }
 
-      .product-title {
-        margin: 0 0 10px 0;
-        color: $text-primary;
-        font-size: 1.1rem;
-        font-weight: 600;
-        line-height: 1.4;
-
-        @include mobile {
-          font-size: 1rem;
-        }
-      }
 
       .product-description {
         color: $text-secondary;
@@ -722,55 +711,87 @@ body {
         max-height: 4.2em;
       }
 
-      .product-meta {
+      .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 10px;
+
+        .product-title {
+          flex: 1;
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: $text-primary;
+          line-height: 1.3;
+
+          @include mobile {
+            font-size: 1rem;
+          }
+        }
+
+        .product-color {
+          background: rgba(5, 150, 105, 0.1);
+          color: $primary-color;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          white-space: nowrap;
+          border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+      }
+
+      .product-specs {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 15px;
+        padding: 12px;
+        background: rgba(5, 150, 105, 0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(5, 150, 105, 0.1);
+
+        .spec-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.85rem;
+
+          .spec-label {
+            color: $text-secondary;
+            font-weight: 500;
+          }
+
+          .spec-value {
+            color: $text-primary;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .product-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
+        gap: 15px;
+        margin-top: auto;
 
         .product-price {
-          font-size: 1.2rem;
+          font-size: 1.3rem;
           font-weight: 700;
           color: $primary-color;
 
           @include mobile {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
           }
-        }
-
-        .product-rating {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: $accent-color;
-          font-size: 0.9rem;
-        }
-      }
-
-      .product-details {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
-        font-size: 0.85rem;
-        color: $text-secondary;
-
-        .product-brand {
-          font-weight: 600;
-          color: $primary-color;
-        }
-
-        .product-weight {
-          opacity: 0.8;
         }
       }
 
       .product-actions {
-        display: flex;
-        gap: 10px;
-
         .btn {
-          flex: 1;
-          padding: 10px 16px;
+          padding: 10px 20px;
           border: none;
           border-radius: $border-radius;
           font-weight: 500;
@@ -783,6 +804,7 @@ body {
           justify-content: center;
           gap: 8px;
           font-size: 0.9rem;
+          min-width: 120px;
 
           &.btn-primary {
             background: $primary-color;
