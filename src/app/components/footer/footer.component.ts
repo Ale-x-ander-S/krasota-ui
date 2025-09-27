@@ -23,7 +23,6 @@ export class FooterComponent {
     { name: 'О нас', route: '/about' },
     { name: 'Контакты', route: '/contacts' },
     { name: 'Доставка', route: '/delivery' },
-    { name: 'Возврат', route: '/returns' },
     { name: 'Политика конфиденциальности', route: '/privacy' },
     { name: 'Условия использования', route: '/terms' }
   ];

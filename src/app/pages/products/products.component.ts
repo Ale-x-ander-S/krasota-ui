@@ -243,19 +243,30 @@ export class ProductsComponent implements OnInit, OnDestroy {
   private touchStartTime = 0;
   private touchMoved = false;
   private touchStartY = 0;
+  private touchStartX = 0;
+  private touchThreshold = 15; // Увеличиваем порог для более точного определения скролла
+  
+  // Переменные для кнопки
+  private buttonTouchStartTime = 0;
+  private buttonTouchMoved = false;
+  private buttonTouchStartY = 0;
+  private buttonTouchStartX = 0;
 
   onProductTouchStart(event: TouchEvent) {
     this.touchStartTime = Date.now();
     this.touchMoved = false;
     this.touchStartY = event.touches[0].clientY;
+    this.touchStartX = event.touches[0].clientX;
   }
 
   onProductTouchMove(event: TouchEvent) {
     const currentY = event.touches[0].clientY;
+    const currentX = event.touches[0].clientX;
     const deltaY = Math.abs(currentY - this.touchStartY);
+    const deltaX = Math.abs(currentX - this.touchStartX);
     
-    // Если пользователь сдвинул палец больше чем на 10px, считаем это scroll
-    if (deltaY > 10) {
+    // Если пользователь сдвинул палец больше чем на threshold пикселей, считаем это scroll
+    if (deltaY > this.touchThreshold || deltaX > this.touchThreshold) {
       this.touchMoved = true;
     }
   }
@@ -263,7 +274,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   onProductTouchEnd(event: TouchEvent, productId: number) {
     // Проверяем что это был tap, а не scroll
     const touchDuration = Date.now() - this.touchStartTime;
-    if (touchDuration < 500 && !this.touchMoved) {
+    
+    // Более строгие условия для определения тапа
+    if (touchDuration < 300 && !this.touchMoved && touchDuration > 50) {
       event.preventDefault();
       event.stopPropagation();
       this.goToProduct(productId);
@@ -280,14 +293,53 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.goToProduct(productId);
   }
 
+  // Методы для обработки touch событий кнопки
+  onButtonTouchStart(event: TouchEvent) {
+    this.buttonTouchStartTime = Date.now();
+    this.buttonTouchMoved = false;
+    this.buttonTouchStartY = event.touches[0].clientY;
+    this.buttonTouchStartX = event.touches[0].clientX;
+  }
+
+  onButtonTouchMove(event: TouchEvent) {
+    const currentY = event.touches[0].clientY;
+    const currentX = event.touches[0].clientX;
+    const deltaY = Math.abs(currentY - this.buttonTouchStartY);
+    const deltaX = Math.abs(currentX - this.buttonTouchStartX);
+    
+    // Если пользователь сдвинул палец больше чем на threshold пикселей, считаем это scroll
+    if (deltaY > this.touchThreshold || deltaX > this.touchThreshold) {
+      this.buttonTouchMoved = true;
+    }
+  }
+
+  onButtonTouchEnd(event: TouchEvent, product: Product) {
+    // Проверяем что это был tap, а не scroll
+    const touchDuration = Date.now() - this.buttonTouchStartTime;
+    
+    // Более строгие условия для определения тапа на кнопке
+    if (touchDuration < 300 && !this.buttonTouchMoved && touchDuration > 50) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      this.addToCart(event, product);
+    }
+  }
+
   goToProduct(productId: number) {
     console.log('Переход к товару с ID:', productId);
     this.router.navigate(['/product', productId]);
   }
 
   addToCart(event: Event, product: Product) {
+    // Останавливаем всплытие события
     event.stopPropagation();
     event.preventDefault();
+    
+    // Для touch событий дополнительно останавливаем всплытие
+    if (event.type === 'touchend') {
+      event.stopImmediatePropagation();
+    }
     
     if (product.stock === 0) return;
     

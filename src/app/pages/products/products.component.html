@@ -137,7 +137,9 @@
                   class="btn btn-primary"
                   [disabled]="product.stock === 0"
                   (click)="addToCart($event, product)"
-                  (touchend)="addToCart($event, product)"
+                  (touchstart)="onButtonTouchStart($event)"
+                  (touchmove)="onButtonTouchMove($event)"
+                  (touchend)="onButtonTouchEnd($event, product)"
                   style="-webkit-tap-highlight-color: transparent;"
                 >
                   {{ product.stock > 0 ? 'В корзину' : 'Нет в наличии' }}

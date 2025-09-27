@@ -826,6 +826,10 @@ body {
               touch-action: manipulation;
               -webkit-tap-highlight-color: transparent;
               min-height: 44px; // Минимальный размер для touch
+              -webkit-touch-callout: none;
+              -webkit-user-select: none;
+              user-select: none;
+              pointer-events: auto; // Обеспечиваем обработку событий кнопкой
               
               &:hover {
                 transform: none; // Убираем hover на мобильных
@@ -834,6 +838,7 @@ body {
               &:active {
                 background: darken($primary-color, 15%);
                 transform: scale(0.98);
+                transition: all 0.1s ease;
               }
             }
           }

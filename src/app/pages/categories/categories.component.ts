@@ -78,13 +78,6 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  getTotalProducts(): number {
-    return this.products.length;
-  }
-
-  getTotalInStock(): number {
-    return this.products.filter(p => p.stock > 0).length;
-  }
 
   // Получаем количество товаров в категории
   getCategoryProductCount(category: Category): number {
