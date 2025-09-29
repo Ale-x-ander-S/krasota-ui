@@ -191,12 +191,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onSearchChange() {
     this.filterProducts();
-    this.scrollToTop();
   }
 
   onCategoryChange() {
     this.filterProducts();
-    this.scrollToTop();
   }
 
   // Плавная прокрутка вверх
