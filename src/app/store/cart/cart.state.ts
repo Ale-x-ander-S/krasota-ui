@@ -58,8 +58,6 @@ export class CartStateClass {
     ctx.setState(newState);
     
     // Отладочная информация
-    console.log('🛒 Cart updated:', newState);
-    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(RemoveFromCart)
@@ -78,8 +76,6 @@ export class CartStateClass {
     ctx.setState(newState);
     
     // Отладочная информация
-    console.log('🗑️ Item removed from cart:', newState);
-    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(UpdateQuantity)
@@ -103,8 +99,6 @@ export class CartStateClass {
     ctx.setState(newState);
     
     // Отладочная информация
-    console.log('📊 Quantity updated:', newState);
-    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 
   @Action(ClearCart)
@@ -118,7 +112,5 @@ export class CartStateClass {
     ctx.setState(newState);
     
     // Отладочная информация
-    console.log('🧹 Cart cleared:', newState);
-    console.log('💾 localStorage cart:', localStorage.getItem('cart'));
   }
 }

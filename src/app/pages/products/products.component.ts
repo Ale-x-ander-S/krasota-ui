@@ -65,17 +65,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     
     // Обрабатываем query params при переходе из категорий
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      console.log('Query params получены:', params);
-      
       if (params['category_id']) {
         this.selectedCategory = params['category_id'];
-        console.log('Установлена категория:', this.selectedCategory);
         // Обновляем фильтры и загружаем товары с фильтрацией
         this.filterProducts();
       } else {
         // Если параметр категории отсутствует, сбрасываем фильтр и загружаем все товары
         this.selectedCategory = '';
-        console.log('Сброшена категория, загружаем все товары');
         this.loadProducts();
       }
       
@@ -124,21 +120,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
       ...this.filters
     };
 
-    console.log('Загрузка товаров с параметрами:', params);
-    console.log('Текущие фильтры:', this.filters);
-    console.log('Выбранная категория:', this.selectedCategory);
-
     this.productService.getProducts(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: ProductListResponse) => {
-          console.log('Ответ от сервера:', response);
           this.products = response.products || [];
           this.totalProducts = response.total || 0;
           this.loading = false;
-          
-          console.log('Загружено товаров:', this.products.length);
-          console.log('Общее количество:', this.totalProducts);
         },
         error: (error: any) => {
           this.error = 'Ошибка загрузки товаров';
@@ -178,12 +166,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       sort: 'created_at',
       order: 'desc'
     };
-    
-    console.log('Фильтрация товаров:', {
-      selectedCategory: this.selectedCategory,
-      searchTerm: this.searchTerm,
-      filters: this.filters
-    });
     
     // Загружаем товары с обновленными фильтрами
     this.loadProducts();
@@ -325,7 +307,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   goToProduct(productId: number) {
-    console.log('Переход к товару с ID:', productId);
     this.router.navigate(['/product', productId]);
   }
 

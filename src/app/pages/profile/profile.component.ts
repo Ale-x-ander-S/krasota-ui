@@ -123,7 +123,6 @@ export class ProfileComponent implements OnInit {
   private loadUserProfile() {
     // Проверяем, авторизован ли пользователь
     if (!this.authService.isAuthenticated()) {
-      console.log('Пользователь не авторизован, перенаправляем на страницу входа');
       this.router.navigate(['/auth']);
       return;
     }
@@ -321,7 +320,6 @@ export class ProfileComponent implements OnInit {
     
     this.authService.updateProfile(profileData).subscribe({
       next: (updatedUser) => {
-        console.log('Товар удален из избранного');
       },
       error: (error) => {
         console.error('Ошибка обновления избранного:', error);

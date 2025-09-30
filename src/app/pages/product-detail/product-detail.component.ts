@@ -116,7 +116,6 @@ export class ProductDetailComponent implements OnInit {
       // Добавляем в корзину через store
       this.store.dispatch(new AddToCart(cartItem));
       
-      console.log(`Добавлено в корзину: ${this.product.name}, количество: ${this.quantity}`);
     }
   }
 

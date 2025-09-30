@@ -87,12 +87,6 @@ export class ProductService {
     if (params.min_price) httpParams = httpParams.set('min_price', params.min_price.toString());
     if (params.max_price) httpParams = httpParams.set('max_price', params.max_price.toString());
 
-    console.log('ProductService: Отправляем запрос с параметрами:', {
-      url: `${this.apiUrl}/products`,
-      params: params,
-      httpParams: httpParams.toString()
-    });
-
     return this.http.get<ProductListResponse>(`${this.apiUrl}/products`, { 
       headers: this.getHeaders(),
       params: httpParams

@@ -92,7 +92,6 @@ export class CheckoutComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       const currentUser = this.authService.getCurrentUser();
       if (currentUser) {
-        console.log('👤 Автозаполнение формы данными пользователя:', currentUser);
         
         let hasAutoFilledData = false;
         
@@ -128,7 +127,6 @@ export class CheckoutComponent implements OnInit {
           hasAutoFilledData = true;
         }
         
-        console.log('✅ Форма автозаполнена:', this.checkoutForm);
       }
     }
   }
@@ -258,8 +256,6 @@ export class CheckoutComponent implements OnInit {
         guest_phone: this.checkoutForm.phone
       };
 
-      console.log('📦 Отправляемые данные заказа:', orderData);
-      console.log('🛒 Товары в корзине:', this.cartItems);
 
       const isAuthenticated = this.authService.isAuthenticated();
       

@@ -49,12 +49,6 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private debugStorage() {
-    console.log('🔍 Storage Debug Info:');
-    console.log('📱 localStorage available:', this.storageService.isLocalStorageAvailable());
-    console.log('📱 sessionStorage available:', this.storageService.isSessionStorageAvailable());
-    console.log('📱 Storage type:', this.storageService.getStorageType());
-    console.log('💾 localStorage cart:', this.storageService.getItem('cart'));
-    console.log('💾 sessionStorage cart:', this.storageService.getItem('cart'));
   }
 
   private subscribeToCart() {

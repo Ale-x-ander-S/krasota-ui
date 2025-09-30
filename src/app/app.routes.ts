@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/products', pathMatch: 'full' },
+  { path: '', redirectTo: '/categories', pathMatch: 'full' },
   { path: 'products', loadComponent: () => import('./pages/products').then(m => m.ProductsComponent) },
   { path: 'product/:id', loadComponent: () => import('./pages/product-detail').then(m => m.ProductDetailComponent) },
   { path: 'categories', loadComponent: () => import('./pages/categories').then(m => m.CategoriesComponent) },

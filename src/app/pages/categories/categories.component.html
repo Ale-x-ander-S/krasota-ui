@@ -20,7 +20,7 @@
       <div class="filters-container">
         <!-- Search -->
         <div class="filter-group">
-          <label for="search">Поиск по категориям:</label>
+          <label for="search">Поиск:</label>
           <input 
             type="text" 
             id="search" 
@@ -80,11 +80,13 @@
           <div 
             *ngFor="let category of getFilteredCategories()" 
             class="category-card"
-            (click)="goToCategoryProducts(category.id, category.name)"
-            style="cursor: pointer;"
-            title="Перейти к товарам категории {{ category.name }}"
           >
-            <div class="category-header">
+            <div 
+              class="category-header"
+              (click)="goToCategoryProducts(category.id, category.name)"
+              style="cursor: pointer;"
+              title="Перейти к товарам категории {{ category.name }}"
+            >
               <div class="category-image">
                 <img 
                   [src]="getCategoryImage(category)" 
@@ -98,12 +100,42 @@
               </div>
             </div>
 
+            <!-- Мини-карточки найденных товаров при поиске -->
+            <div *ngIf="searchTerm && getSearchedProductsForCategory(category).length > 0" class="category-products-preview">
+              <div class="preview-header">
+                <span>Найдено товаров: {{ getSearchedProductsForCategory(category).length }}</span>
+              </div>
+              <div class="mini-products-grid">
+                <div 
+                  *ngFor="let product of getSearchedProductsForCategory(category).slice(0, 4)" 
+                  class="mini-product-card"
+                  (click)="goToProduct(product.id)"
+                  title="{{ product.name }}"
+                >
+                  <div class="mini-product-image">
+                    <img 
+                      [src]="product.image_url || 'assets/images/placeholder.svg'" 
+                      [alt]="product.name"
+                      (error)="onImageError($event)"
+                    >
+                  </div>
+                  <div class="mini-product-info">
+                    <div class="mini-product-name">{{ product.name }}</div>
+                    <div class="mini-product-price">{{ formatPrice(product.price) }}</div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="getSearchedProductsForCategory(category).length > 4" class="show-more-hint">
+                +{{ getSearchedProductsForCategory(category).length - 4 }} ещё...
+              </div>
+            </div>
+
           </div>
         </div>
 
         <!-- Empty State for All Categories -->
         <div *ngIf="getFilteredCategories().length === 0" class="empty-state">
-          <h3>Категории не найдены</h3>
+          <h3>Ничего не найдено</h3>
           <p>Попробуйте изменить параметры поиска</p>
           <button class="clear-filters-btn" (click)="clearFilters()">
             Очистить фильтры

@@ -213,13 +213,6 @@ export class AdminComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     
     // Отладочная информация о токене
-    console.log('=== Отладочная информация о токене ===');
-    console.log('Токен:', this.authService.getToken());
-    console.log('Информация из токена:', this.authService.getTokenInfo());
-    console.log('Роль из токена:', this.authService.getRoleFromToken());
-    console.log('ID пользователя из токена:', this.authService.getUserIdFromToken());
-    console.log('Текущий пользователь:', this.currentUser);
-    console.log('=====================================');
     
     // Проверяем токен
     if (!this.authService.getToken()) {
@@ -264,7 +257,6 @@ export class AdminComponent implements OnInit {
         this.stats.totalUsers = users.length; // Обновляем статистику
         this.updateRecentUsers(); // Обновляем последних пользователей для дашборда
         this.usersLoading = false;
-        console.log('Пользователи загружены:', users);
       },
       error: (error) => {
         this.usersLoading = false;
@@ -777,7 +769,6 @@ export class AdminComponent implements OnInit {
         this.stats.totalProducts = response.total; // Обновляем статистику дашборда
         this.updateLowStockProducts(); // Обновляем товары с низким запасом
         this.productsLoading = false;
-        console.log('Все товары загружены (включая неактивные):', response);
       },
       error: (error) => {
         this.productsError = 'Ошибка загрузки товаров: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
@@ -974,7 +965,6 @@ export class AdminComponent implements OnInit {
         this.categories = categories;
         this.stats.totalCategories = categories.length; // Обновляем статистику
         this.categoriesLoading = false;
-        console.log('Категории загружены:', categories);
       },
       error: (error) => {
         this.categoriesError = 'Ошибка загрузки категорий: ' + (error.error?.message || error.message || 'Неизвестная ошибка');

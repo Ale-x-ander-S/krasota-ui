@@ -48,7 +48,7 @@ export class CategoriesComponent implements OnInit {
 
     this.categoryService.getCategories().subscribe({
       next: (categories) => {
-        this.categories = categories.filter(cat => cat.is_active); // Показываем только активные категории
+        this.categories = categories; // Показываем все категории
         this.categoriesLoading = false;
         console.log('Категории загружены:', categories);
       },
@@ -64,7 +64,8 @@ export class CategoriesComponent implements OnInit {
     this.productsLoading = true;
     this.productsError = '';
 
-    this.productService.getProducts().subscribe({
+    // Загружаем ВСЕ товары для поиска по категориям
+    this.productService.getProducts({ limit: 10000 }).subscribe({
       next: (response) => {
         this.products = response.products;
         this.productsLoading = false;
@@ -129,10 +130,21 @@ export class CategoriesComponent implements OnInit {
     }
 
     if (this.searchTerm) {
-      filtered = filtered.filter(cat => 
-        cat.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        cat.description.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      const searchLower = this.searchTerm.toLowerCase();
+      
+      filtered = filtered.filter(cat => {
+        // Поиск по названию и описанию категории
+        const matchesCategory = cat.name.toLowerCase().includes(searchLower) ||
+                               (cat.description && cat.description.toLowerCase().includes(searchLower));
+        
+        // Поиск по товарам внутри категории
+        const matchesProducts = this.getCategoryProducts(cat.id).some(product =>
+          product.name.toLowerCase().includes(searchLower) ||
+          (product.description && product.description.toLowerCase().includes(searchLower))
+        );
+        
+        return matchesCategory || matchesProducts;
+      });
     }
 
     return filtered;
@@ -201,5 +213,20 @@ export class CategoriesComponent implements OnInit {
 
   goToCart(): void {
     this.router.navigate(['/cart']);
+  }
+
+  // Получаем найденные товары для конкретной категории
+  getSearchedProductsForCategory(category: Category): Product[] {
+    if (!this.searchTerm) {
+      return [];
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    const categoryProducts = this.getCategoryProducts(category.id);
+    
+    return categoryProducts.filter(product =>
+      product.name.toLowerCase().includes(searchLower) ||
+      (product.description && product.description.toLowerCase().includes(searchLower))
+    );
   }
 }
