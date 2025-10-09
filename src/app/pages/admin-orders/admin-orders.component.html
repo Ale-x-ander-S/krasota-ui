@@ -10,14 +10,14 @@
     <!-- Фильтры -->
     <div class="filters-section">
       <div class="filters-grid">
-        <div class="filter-group">
+        <!-- <div class="filter-group">
           <label for="status">Статус заказа</label>
           <select id="status" [(ngModel)]="filters.status" (change)="onStatusChange(filters.status || '')">
             <option *ngFor="let option of statusOptions" [value]="option.value">
               {{ option.label }}
             </option>
           </select>
-        </div>
+        </div> -->
 
         <div class="filter-group">
           <label for="dateFrom">Дата от</label>
@@ -122,9 +122,9 @@
         <button type="button" class="btn btn-secondary btn-sm" (click)="bulkUpdateStatus(OrderStatus.SHIPPED)">
           Отправить
         </button>
-        <button type="button" class="btn btn-danger btn-sm" (click)="bulkCancelOrders()">
+        <!-- <button type="button" class="btn btn-danger btn-sm" (click)="bulkCancelOrders()">
           Отменить
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -184,11 +184,11 @@
                 {{ order.guest_name }} ({{ order.guest_phone }}) - {{ order.guest_email }}
               </span>
             </div>
-            <div class="order-status">
+            <!-- <div class="order-status">
               <span class="status-badge" [ngClass]="getStatusClass(order.status)">
                 {{ getStatusLabel(order.status) }}
               </span>
-            </div>
+            </div> -->
           </div>
 
           <div class="order-items">
@@ -240,14 +240,14 @@
           >
             Изменить
           </button>
-          <button 
+          <!-- <button 
             *ngIf="canCancelOrder(order)" 
             type="button" 
             class="btn btn-danger" 
             (click)="cancelOrder(order.id)"
           >
             Отменить
-          </button>
+          </button> -->
         </div>
         </div>
       </div>
@@ -264,14 +264,14 @@
 
     <div class="modal-body">
       <form (ngSubmit)="updateOrder()">
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="status">Статус заказа</label>
           <select id="status" [(ngModel)]="updateForm.status" name="status">
             <option *ngFor="let option of statusOptions" [value]="option.value">
               {{ option.label }}
             </option>
           </select>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="shippingAddress">Адрес доставки</label>

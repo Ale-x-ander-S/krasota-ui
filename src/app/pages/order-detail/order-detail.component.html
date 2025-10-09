@@ -32,17 +32,17 @@
           <h1>Заказ №{{ order.id }}</h1>
           <span class="order-date">{{ formatDate(order.created_at) }}</span>
         </div>
-        <div class="order-status">
+        <!-- <div class="order-status">
           <span class="status-badge" [ngClass]="getStatusClass(order.status)">
             {{ getStatusLabel(order.status) }}
           </span>
-        </div>
+        </div> -->
       </div>
 
       <!-- Описание статуса -->
-      <div class="status-description" *ngIf="order.status !== 'delivered'">
+      <!-- <div class="status-description" *ngIf="order.status !== 'delivered'">
         <p>{{ getStatusDescription(order.status) }}</p>
-      </div>
+      </div> -->
 
       <!-- Основная информация -->
       <div class="order-content">
@@ -127,7 +127,7 @@
         </div>
 
         <!-- Действия с заказом -->
-        <div class="order-actions">
+        <!-- <div class="order-actions">
           <button 
             *ngIf="canCancelOrder()" 
             type="button" 
@@ -136,7 +136,7 @@
           >
             Отменить заказ
           </button>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

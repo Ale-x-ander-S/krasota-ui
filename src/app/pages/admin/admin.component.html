@@ -204,7 +204,7 @@
               <th>Клиент</th>
               <th>Email</th>
               <th>Сумма</th>
-              <th>Статус</th>
+              <!-- <th>Статус</th> -->
               <th>Дата</th>
               <th>Действия</th>
             </tr>
@@ -215,21 +215,21 @@
               <td>{{ order.customerName }}</td>
               <td>{{ order.customerEmail }}</td>
               <td>{{ formatPrice(order.total) }}</td>
-              <td>
+              <!-- <td>
                 <span class="status-badge" [class]="getStatusClass(order.status)">
                   {{ getStatusText(order.status) }}
                 </span>
-              </td>
+              </td> -->
               <td>{{ formatDate(order.date) }}</td>
               <td>
                 <button class="btn btn-small" (click)="viewOrderDetails(order)">👁️</button>
-                <select class="status-select" (change)="updateOrderStatus(order, $event)">
+                <!-- <select class="status-select" (change)="updateOrderStatus(order, $event)">
                   <option value="pending" [selected]="order.status === 'pending'">Ожидает</option>
                   <option value="processing" [selected]="order.status === 'processing'">В обработке</option>
                   <option value="shipped" [selected]="order.status === 'shipped'">Отправлен</option>
                   <option value="delivered" [selected]="order.status === 'delivered'">Доставлен</option>
                   <option value="cancelled" [selected]="order.status === 'cancelled'">Отменен</option>
-                </select>
+                </select> -->
               </td>
             </tr>
           </tbody>
@@ -245,7 +245,7 @@
     <!-- Фильтры заказов -->
     <div class="filters-section">
       <div class="filters-grid">
-        <div class="filter-group">
+        <!-- <div class="filter-group">
           <label for="orderStatus">Статус заказа</label>
           <select id="orderStatus" [(ngModel)]="orderFilters.status" (change)="onOrderFilterChange()">
             <option value="">Все статусы</option>
@@ -256,7 +256,7 @@
             <option value="delivered">Доставлен</option>
             <option value="cancelled">Отменен</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="filter-group">
           <label for="orderDateFrom">Дата от</label>
@@ -328,7 +328,7 @@
             <th>Клиент</th>
             <th>Email/Телефон</th>
             <th>Сумма</th>
-            <th>Статус</th>
+            <!-- <th>Статус</th> -->
             <th>Дата</th>
             <th>Действия</th>
           </tr>
@@ -349,24 +349,24 @@
               </div>
             </td>
             <td>{{ formatPrice(order.total_amount) }}</td>
-            <td>
+            <!-- <td>
               <span class="status-badge" [class]="getOrderStatusClass(order.status)">
                 {{ getOrderStatusText(order.status) }}
               </span>
-            </td>
+            </td> -->
             <td>{{ formatDate(order.created_at) }}</td>
             <td>
               <button class="btn btn-small" (click)="viewOrderDetailsModal(order)" title="Просмотр деталей">
                 👁️
               </button>
-              <select class="status-select" (change)="updateOrderStatusModal(order, $event)">
+              <!-- <select class="status-select" (change)="updateOrderStatusModal(order, $event)">
                 <option value="pending" [selected]="order.status === 'pending'">Ожидает</option>
                 <option value="confirmed" [selected]="order.status === 'confirmed'">Подтвержден</option>
                 <option value="processing" [selected]="order.status === 'processing'">В обработке</option>
                 <option value="shipped" [selected]="order.status === 'shipped'">Отправлен</option>
                 <option value="delivered" [selected]="order.status === 'delivered'">Доставлен</option>
                 <option value="cancelled" [selected]="order.status === 'cancelled'">Отменен</option>
-              </select>
+              </select> -->
             </td>
           </tr>
         </tbody>
@@ -1748,12 +1748,12 @@
         <div class="order-info-section">
           <h4>Информация о заказе</h4>
           <div class="info-grid">
-            <div class="info-item">
+            <!-- <div class="info-item">
               <label>Статус:</label>
               <span class="status-badge" [class]="getOrderStatusClass(selectedOrder.status)">
                 {{ getOrderStatusText(selectedOrder.status) }}
               </span>
-            </div>
+            </div> -->
             <div class="info-item">
               <label>Дата создания:</label>
               <span>{{ formatDate(selectedOrder.created_at) }}</span>
