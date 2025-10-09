@@ -53,14 +53,26 @@
         <h4>Мы в соцсетях</h4>
         <div class="social-links">
           <a 
-            *ngFor="let social of socialLinks" 
-            [href]="social.url" 
+            href="https://vk.com/tyumenkrasota72" 
             class="social-link"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span class="social-icon">{{ social.icon }}</span>
-            <span class="social-name">{{ social.name }}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="social-icon">
+              <path d="M12.785 16.241s.327-.039.495-.186c.151-.133.146-.382.146-.382s-.021-1.305.653-1.496c.667-.186.1.526 3.006 2.971 2.133 1.906 2.373 1.515 2.373 1.515h2.938s1.219-.076.641-1.022c-.048-.077-.346-.729-1.781-2.413-1.504-1.674-1.301-.14.507-2.066.695-.744 1.218-1.197 1.109-1.39-.104-.186-.746-.137-.746-.137l-2.895.018s-.214-.029-.372.095c-.128.103-.207.333-.207.333s-.389 1.032-.906 1.911c-1.095 1.864-1.533 1.963-1.713.597-.065-.498-.978-2.094-.978-2.094s-.081-.186-.227-.286c-.175-.118-.419-.016-.419-.016l-2.901.018s-1.073.033-1.466.5c-.321.381-.021 1.164-.021 1.164s1.658 3.109 3.526 4.676c1.718 1.468 3.67 1.371 3.67 1.371h.857z"/>
+            </svg>
+            <span class="social-name">VK</span>
+          </a>
+          <a 
+            href="https://t.me/krasota72ru" 
+            class="social-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="social-icon">
+              <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>
+            </svg>
+            <span class="social-name">Telegram</span>
           </a>
         </div>
         

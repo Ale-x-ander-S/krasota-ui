@@ -138,7 +138,6 @@ export class OrderService {
             }
           },
           error: (error) => {
-            console.warn(`Failed to load product ${item.product_id}:`, error);
           }
         });
         

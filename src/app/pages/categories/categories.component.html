@@ -15,6 +15,25 @@
       </div>
     </section>
 
+    <!-- Price List Download Section -->
+    <section class="price-list-section">
+      <div class="price-list-container">
+        <div class="price-list-header">
+          <h3>📋 Прайс-листы</h3>
+        </div>
+        <div class="download-buttons">
+          <button class="download-btn excel-btn" (click)="downloadPriceListExcel()" title="Скачать прайс-лист в формате Excel">
+            <span class="download-icon">📊</span>
+            <span class="download-text">Excel</span>
+          </button>
+          <button class="download-btn csv-btn" (click)="downloadPriceList()" title="Скачать прайс-лист в формате CSV">
+            <span class="download-icon">📄</span>
+            <span class="download-text">CSV</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Filters Section -->
     <section class="filters-section">
       <div class="filters-container">

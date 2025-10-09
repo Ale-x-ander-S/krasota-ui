@@ -55,7 +55,6 @@ export class OrderDetailComponent implements OnInit {
       error: (error) => {
         this.error = 'Ошибка загрузки заказа';
         this.loading = false;
-        console.error('Error loading order:', error);
       }
     });
   }
@@ -70,7 +69,6 @@ export class OrderDetailComponent implements OnInit {
         },
         error: (error) => {
           this.error = 'Ошибка отмены заказа';
-          console.error('Error cancelling order:', error);
         }
       });
     }

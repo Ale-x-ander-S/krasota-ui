@@ -84,6 +84,118 @@ $transition: all 0.3s ease;
   }
 }
 
+// Price List Section
+.price-list-section {
+  background: white;
+  border-radius: $border-radius;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: $shadow;
+  border-left: 4px solid $primary-color;
+
+  @include mobile {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .price-list-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    @include mobile {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+    }
+  }
+
+  .price-list-header {
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      @include mobile {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .download-buttons {
+    display: flex;
+    gap: 12px;
+
+    @include mobile {
+      justify-content: center;
+    }
+  }
+
+  .download-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: $border-radius;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    min-width: 100px;
+    justify-content: center;
+
+    @include mobile {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      min-width: 80px;
+    }
+
+    .download-icon {
+      font-size: 1.2rem;
+    }
+
+    .download-text {
+      font-weight: 600;
+    }
+
+    &.excel-btn {
+      background: $success-color;
+      color: white;
+
+      &:hover {
+        background: darken($success-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($success-color, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    &.csv-btn {
+      background: $accent-color;
+      color: white;
+
+      &:hover {
+        background: darken($accent-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($accent-color, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
 // Filters Section
 .filters-section {
   background: white;
@@ -166,6 +278,7 @@ $transition: all 0.3s ease;
         font-size: 0.9rem;
       }
     }
+
   }
 }
 

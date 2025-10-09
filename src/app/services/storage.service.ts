@@ -56,7 +56,6 @@ export class StorageService {
         return true;
       }
     } catch (e) {
-      console.warn('Storage not available:', e);
       return false;
     }
   }
@@ -71,7 +70,6 @@ export class StorageService {
         return (window as any).__memoryStorage__?.[key] || null;
       }
     } catch (e) {
-      console.warn('Storage not available:', e);
       return null;
     }
   }
@@ -91,7 +89,6 @@ export class StorageService {
         return true;
       }
     } catch (e) {
-      console.warn('Storage not available:', e);
       return false;
     }
   }
@@ -109,7 +106,6 @@ export class StorageService {
         return true;
       }
     } catch (e) {
-      console.warn('Storage not available:', e);
       return false;
     }
   }

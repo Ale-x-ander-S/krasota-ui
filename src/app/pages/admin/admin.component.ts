@@ -216,7 +216,6 @@ export class AdminComponent implements OnInit {
     
     // Проверяем токен
     if (!this.authService.getToken()) {
-      console.error('Токен отсутствует');
       this.router.navigate(['/auth']);
       return;
     }
@@ -224,7 +223,6 @@ export class AdminComponent implements OnInit {
     // Проверяем, является ли пользователь админом
     const userRole = this.authService.getRoleFromToken();
     if (!userRole || userRole !== 'admin') {
-      console.error('Пользователь не является администратором. Роль:', userRole);
       this.router.navigate(['/']);
       return;
     }
@@ -260,7 +258,6 @@ export class AdminComponent implements OnInit {
       },
       error: (error) => {
         this.usersLoading = false;
-        console.error('Ошибка загрузки пользователей:', error);
         
         if (error.status === 401) {
           this.usersError = 'Ошибка аутентификации. Токен недействителен или истек';
@@ -774,7 +771,6 @@ export class AdminComponent implements OnInit {
         this.productsError = 'Ошибка загрузки товаров: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
         this.productsLoading = false;
         this.showNotification(`Ошибка загрузки товаров: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
-        console.error('Ошибка загрузки товаров:', error);
       }
     });
   }
@@ -970,7 +966,6 @@ export class AdminComponent implements OnInit {
         this.categoriesError = 'Ошибка загрузки категорий: ' + (error.error?.message || error.message || 'Неизвестная ошибка');
         this.categoriesLoading = false;
         this.showNotification(`Ошибка загрузки категорий: ${error.error?.message || error.message || 'Неизвестная ошибка'}`, 'error');
-        console.error('Ошибка загрузки категорий:', error);
       }
     });
   }
@@ -1233,7 +1228,6 @@ export class AdminComponent implements OnInit {
       error: (error) => {
         this.ordersError = 'Ошибка загрузки заказов';
         this.ordersLoading = false;
-        console.error('Error loading orders:', error);
       }
     });
   }
@@ -1274,7 +1268,6 @@ export class AdminComponent implements OnInit {
       },
       error: (error) => {
         this.showNotification('Ошибка обновления статуса', 'error');
-        console.error('Error updating order status:', error);
         // Возвращаем предыдущее значение
         target.value = order.status;
       }
@@ -1336,7 +1329,6 @@ export class AdminComponent implements OnInit {
         this.updateRecentOrders();
       },
       error: (error) => {
-        console.error('Error loading orders for stats:', error);
         // Оставляем заглушки если не удалось загрузить
       }
     });

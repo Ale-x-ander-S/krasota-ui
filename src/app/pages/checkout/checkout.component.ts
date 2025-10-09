@@ -273,7 +273,6 @@ export class CheckoutComponent implements OnInit {
           error: (error: any) => {
             this.loading = false;
             this.error = 'Ошибка создания заказа';
-            console.error('Error creating order:', error);
           }
         });
       } else {
@@ -288,7 +287,6 @@ export class CheckoutComponent implements OnInit {
           error: (error: any) => {
             this.loading = false;
             this.error = 'Ошибка создания заказа';
-            console.error('Error creating guest order:', error);
           }
         });
       }

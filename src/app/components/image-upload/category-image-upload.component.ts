@@ -74,7 +74,6 @@ export class CategoryImageUploadComponent {
         this.uploading = false;
         this.uploadProgress = 0;
         this.error = error.error?.error || error.error?.message || 'Ошибка загрузки изображения';
-        console.error('Upload error:', error);
       }
     });
   }

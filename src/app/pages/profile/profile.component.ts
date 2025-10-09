@@ -154,7 +154,6 @@ export class ProfileComponent implements OnInit {
         this.loadFavorites();
       },
       error: (error) => {
-        console.error('Ошибка загрузки профиля:', error);
         // Если ошибка 401, перенаправляем на страницу входа
         if (error.status === 401) {
           this.authService.logout();
@@ -289,7 +288,6 @@ export class ProfileComponent implements OnInit {
         }, 3000);
       },
       error: (error) => {
-        console.error('Ошибка обновления профиля:', error);
         this.isUpdating = false;
         
         // Показываем ошибку
@@ -322,7 +320,6 @@ export class ProfileComponent implements OnInit {
       next: (updatedUser) => {
       },
       error: (error) => {
-        console.error('Ошибка обновления избранного:', error);
         // Возвращаем товар обратно при ошибке
         this.favorites.push(product);
         if (this.userProfile.favorites) {
@@ -340,7 +337,6 @@ export class ProfileComponent implements OnInit {
         this.showNotification('Настройки успешно сохранены!', 'success');
       },
       error: (error) => {
-        console.error('Ошибка сохранения настроек:', error);
         this.showNotification('Ошибка сохранения настроек. Попробуйте еще раз.', 'error');
       }
     });

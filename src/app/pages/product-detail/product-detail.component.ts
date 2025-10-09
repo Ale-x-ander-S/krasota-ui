@@ -61,7 +61,6 @@ export class ProductDetailComponent implements OnInit {
         this.loadCategory(product.category_id);
       },
       error: (error) => {
-        console.error('Ошибка загрузки товара:', error);
         this.router.navigate(['/products']);
       }
     });
@@ -73,7 +72,6 @@ export class ProductDetailComponent implements OnInit {
         this.category = category;
       },
       error: (error) => {
-        console.error('Ошибка загрузки категории:', error);
         this.category = null;
       }
     });

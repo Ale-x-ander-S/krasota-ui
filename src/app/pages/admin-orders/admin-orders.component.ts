@@ -85,7 +85,6 @@ export class AdminOrdersComponent implements OnInit {
       error: (error) => {
         this.error = 'Ошибка загрузки заказов';
         this.loading = false;
-        console.error('Error loading orders:', error);
       }
     });
   }
@@ -165,7 +164,6 @@ export class AdminOrdersComponent implements OnInit {
       },
       error: (error) => {
         this.error = 'Ошибка обновления заказа';
-        console.error('Error updating order:', error);
       }
     });
   }
@@ -178,7 +176,6 @@ export class AdminOrdersComponent implements OnInit {
         },
         error: (error) => {
           this.error = 'Ошибка отмены заказа';
-          console.error('Error cancelling order:', error);
         }
       });
     }
@@ -294,7 +291,6 @@ export class AdminOrdersComponent implements OnInit {
       this.clearSelection();
     }).catch(error => {
       this.error = 'Ошибка массового обновления заказов';
-      console.error('Bulk update error:', error);
     });
   }
 
@@ -312,7 +308,6 @@ export class AdminOrdersComponent implements OnInit {
         this.clearSelection();
       }).catch(error => {
         this.error = 'Ошибка массовой отмены заказов';
-        console.error('Bulk cancel error:', error);
       });
     }
   }

@@ -131,7 +131,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
         error: (error: any) => {
           this.error = 'Ошибка загрузки товаров';
           this.loading = false;
-          console.error('Error loading products:', error);
         }
       });
   }
@@ -147,7 +146,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
           this.categoriesLoading = false;
         },
         error: (error: any) => {
-          console.error('Error loading categories:', error);
           this.categories = [];
           this.categoriesLoading = false;
         }

@@ -60,7 +60,6 @@ export class OrdersComponent implements OnInit {
       error: (error) => {
         this.error = 'Ошибка загрузки заказов';
         this.loading = false;
-        console.error('Error loading orders:', error);
       }
     });
   }

@@ -30,7 +30,6 @@ export const appConfig: ApplicationConfig = {
                 localStorage.setItem('cart', sessionData);
               }
             } catch (e) {
-              console.warn('localStorage not available, using sessionStorage');
             }
           }
           return obj;

@@ -159,7 +159,9 @@ $newsletter-btn-hover: #059669;
       }
 
       .social-icon {
-        font-size: 1.2rem;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
       }
 
       .social-name {
