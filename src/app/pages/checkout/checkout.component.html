@@ -133,10 +133,13 @@
                     *ngFor="let date of getAvailableDeliveryDates()" 
                     class="date-option"
                     [class.selected]="checkoutForm.deliveryDate === date"
-                    (click)="checkoutForm.deliveryDate = date"
+                    [class.weekend]="isWeekend(date)"
+                    [class.disabled]="isWeekend(date)"
+                    (click)="!isWeekend(date) && (checkoutForm.deliveryDate = date)"
                   >
                     <div class="date-display">{{ formatDateForDisplay(date) }}</div>
                     <div class="date-value">{{ formatDateForValue(date) }}</div>
+                    <div *ngIf="isWeekend(date)" class="weekend-label">Выходной</div>
                   </div>
                 </div>
               </div>
