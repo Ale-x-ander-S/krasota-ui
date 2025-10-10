@@ -22,13 +22,9 @@
           <h3>📋 Прайс-листы</h3>
         </div>
         <div class="download-buttons">
-          <button class="download-btn excel-btn" (click)="downloadPriceListExcel()" title="Скачать прайс-лист в формате Excel">
-            <span class="download-icon">📊</span>
-            <span class="download-text">Excel</span>
-          </button>
-          <button class="download-btn csv-btn" (click)="downloadPriceList()" title="Скачать прайс-лист в формате CSV">
+          <button class="download-btn pdf-btn" (click)="downloadPriceListPDF()" title="Скачать прайс-лист в формате PDF">
             <span class="download-icon">📄</span>
-            <span class="download-text">CSV</span>
+            <span class="download-text">PDF</span>
           </button>
         </div>
       </div>
@@ -126,7 +122,7 @@
               </div>
               <div class="mini-products-grid">
                 <div 
-                  *ngFor="let product of getSearchedProductsForCategory(category).slice(0, 4)" 
+                  *ngFor="let product of getDisplayedProductsForCategory(category)" 
                   class="mini-product-card"
                   (click)="goToProduct(product.id)"
                   title="{{ product.name }}"
@@ -144,8 +140,18 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="getSearchedProductsForCategory(category).length > 4" class="show-more-hint">
-                +{{ getSearchedProductsForCategory(category).length - 4 }} ещё...
+              <div 
+                *ngIf="getHiddenProductsCount(category) > 0" 
+                class="show-more-hint"
+                (click)="toggleCategoryExpansion(category.id)"
+                [title]="isCategoryExpanded(category.id) ? 'Свернуть товары' : 'Показать все товары'"
+              >
+                <span *ngIf="!isCategoryExpanded(category.id)">
+                  +{{ getHiddenProductsCount(category) }} ещё...
+                </span>
+                <span *ngIf="isCategoryExpanded(category.id)">
+                  Свернуть товары
+                </span>
               </div>
             </div>
 

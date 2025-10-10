@@ -102,10 +102,10 @@
                 <span class="label">Способ оплаты:</span>
                 <span class="value">{{ getPaymentMethodLabel(order.payment_method) }}</span>
               </div>
-              <div class="info-row">
+              <!-- <div class="info-row">
                 <span class="label">Статус оплаты:</span>
                 <span class="value">{{ getPaymentStatusLabel(order) }}</span>
-              </div>
+              </div> -->
               <div class="info-row">
                 <span class="label">Сумма заказа:</span>
                 <span class="value total-amount">{{ formatPrice(order.total_amount) }}</span>

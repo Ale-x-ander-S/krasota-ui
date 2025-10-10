@@ -164,29 +164,14 @@ $transition: all 0.3s ease;
       font-weight: 600;
     }
 
-    &.excel-btn {
-      background: $success-color;
+    &.pdf-btn {
+      background: $primary-color;
       color: white;
 
       &:hover {
-        background: darken($success-color, 10%);
+        background: darken($primary-color, 10%);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba($success-color, 0.3);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-    }
-
-    &.csv-btn {
-      background: $accent-color;
-      color: white;
-
-      &:hover {
-        background: darken($accent-color, 10%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba($accent-color, 0.3);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.3);
       }
 
       &:active {
@@ -561,8 +546,24 @@ $transition: all 0.3s ease;
       margin-top: 10px;
       text-align: center;
       font-size: 0.85rem;
-      color: $text-secondary;
-      font-weight: 500;
+      color: $primary-color;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: $transition;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: lighten($primary-color, 45%);
+        color: darken($primary-color, 10%);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba($primary-color, 0.2);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
     }
   }
 }

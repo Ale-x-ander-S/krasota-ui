@@ -46,7 +46,11 @@
                   "maximumError": "30kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "allowedCommonJsDependencies": [
+                "pdfmake/build/pdfmake",
+                "pdfmake/build/vfs_fonts"
+              ]
             },
             "development": {
               "optimization": false,

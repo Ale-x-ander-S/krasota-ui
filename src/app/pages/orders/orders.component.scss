@@ -38,7 +38,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
-    align-items: end;
+    align-items: flex-end;
   }
 
   .filter-group {
@@ -67,7 +67,7 @@
 
   .filter-actions {
     display: flex;
-    align-items: end;
+    align-items: flex-end;
   }
 }
 

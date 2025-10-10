@@ -143,31 +143,31 @@ export class OrdersComponent implements OnInit {
   }
 
   canRepeatOrder(order: Order): boolean {
-    return order.status === OrderStatus.DELIVERED;
+    // Позволяем повторить заказ для всех статусов, кроме отмененных и возвращенных
+    return order.status !== OrderStatus.CANCELLED && 
+           order.status !== OrderStatus.REFUNDED;
   }
 
   repeatOrder(order: Order): void {
-    if (confirm(`Повторить заказ №${order.id}? Товары будут добавлены в корзину.`)) {
-      // Добавляем товары из заказа в корзину
-      order.items.forEach(item => {
-        this.store.dispatch(new AddToCart({
-          id: item.product_id,
-          name: item.product_name || `Товар #${item.product_id}`,
-          price: item.price,
-          quantity: item.quantity,
-          image_url: this.getProductImage(item),
-          category_id: 1, // Временное значение, так как в OrderItem нет category_id
-          category_name: 'Категория не указана',
-          description: '',
-          stock: 999, // Предполагаем, что товар в наличии
-          stock_type: 'in_stock',
-          sku: `SKU-${item.product_id}`
-        }));
-      });
-      
-      // Переходим в корзину
-      this.router.navigate(['/cart']);
-    }
+    // Добавляем товары из заказа в корзину без подтверждения и уведомлений
+    order.items.forEach(item => {
+      this.store.dispatch(new AddToCart({
+        id: item.product_id,
+        name: item.product_name || `Товар #${item.product_id}`,
+        price: item.price,
+        quantity: item.quantity,
+        image_url: this.getProductImage(item),
+        category_id: 1, // Временное значение, так как в OrderItem нет category_id
+        category_name: 'Категория не указана',
+        description: '',
+        stock: 999, // Предполагаем, что товар в наличии
+        stock_type: 'in_stock',
+        sku: `SKU-${item.product_id}`
+      }));
+    });
+    
+    // Переходим в корзину
+    this.router.navigate(['/cart']);
   }
 
   getProductImage(item: any): string {

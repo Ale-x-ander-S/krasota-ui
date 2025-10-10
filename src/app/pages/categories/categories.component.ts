@@ -7,6 +7,8 @@ import { FooterComponent } from '../../components/footer';
 import { CategoryService, Category } from '../../services/category.service';
 import { ProductService, Product } from '../../services/product.service';
 import { CartAnimationService } from '../../services/cart-animation.service';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
 // Используем интерфейсы из сервисов: Category из CategoryService, Product из ProductService
 
@@ -29,13 +31,29 @@ export class CategoriesComponent implements OnInit {
   categoriesError: string = '';
   productsLoading: boolean = false;
   productsError: string = '';
+  
+  // Состояние развернутых категорий
+  expandedCategories: Set<number> = new Set();
 
   constructor(
     private router: Router,
     private categoryService: CategoryService,
     private productService: ProductService,
     private cartAnimationService: CartAnimationService
-  ) {}
+  ) {
+    // Инициализация PDFMake с поддержкой кириллицы
+    (pdfMake as any).vfs = pdfFonts;
+    
+    // Настройка шрифтов для поддержки кириллицы
+    (pdfMake as any).fonts = {
+      Roboto: {
+        normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf',
+        bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Medium.ttf',
+        italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Italic.ttf',
+        bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-MediumItalic.ttf'
+      }
+    };
+  }
 
   ngOnInit() {
     this.loadCategories();
@@ -168,6 +186,7 @@ export class CategoriesComponent implements OnInit {
   clearFilters() {
     this.selectedCategory = '';
     this.searchTerm = '';
+    this.expandedCategories.clear(); // Сбрасываем развернутые категории при очистке фильтров
   }
 
   toggleMobileMenu() {
@@ -226,6 +245,41 @@ export class CategoriesComponent implements OnInit {
     );
   }
 
+  // Переключает состояние развернутости категории
+  toggleCategoryExpansion(categoryId: number): void {
+    if (this.expandedCategories.has(categoryId)) {
+      this.expandedCategories.delete(categoryId);
+    } else {
+      this.expandedCategories.add(categoryId);
+    }
+  }
+
+  // Проверяет, развернута ли категория
+  isCategoryExpanded(categoryId: number): boolean {
+    return this.expandedCategories.has(categoryId);
+  }
+
+  // Получает товары для отображения в категории (с учетом развернутого состояния)
+  getDisplayedProductsForCategory(category: Category): Product[] {
+    const searchedProducts = this.getSearchedProductsForCategory(category);
+    const isExpanded = this.isCategoryExpanded(category.id);
+    
+    // Если категория развернута, показываем все найденные товары
+    if (isExpanded) {
+      return searchedProducts;
+    }
+    
+    // Иначе показываем только первые 4 товара
+    return searchedProducts.slice(0, 4);
+  }
+
+  // Получает количество скрытых товаров
+  getHiddenProductsCount(category: Category): number {
+    const searchedProducts = this.getSearchedProductsForCategory(category);
+    const displayedCount = this.getDisplayedProductsForCategory(category).length;
+    return Math.max(0, searchedProducts.length - displayedCount);
+  }
+
   // Метод для экранирования HTML
   private escapeHtml(text: string): string {
     if (!text) return '';
@@ -237,269 +291,243 @@ export class CategoriesComponent implements OnInit {
       .replace(/'/g, '&#39;');
   }
 
-  // Генерация и скачивание прайс-листа
-  downloadPriceList() {
+  // Генерация и скачивание прайс-листа в PDF
+  downloadPriceListPDF() {
     if (this.products.length === 0) {
       alert('Нет товаров для скачивания');
       return;
     }
 
-    // Создаем CSV контент
-    let csvContent = '\uFEFF'; // BOM для корректной кодировки UTF-8 в Excel
-    
-    // Заголовок компании
-    csvContent += 'Krasota72 - Интернет-магазин товаров\n';
-    csvContent += 'Дата формирования: ' + new Date().toLocaleDateString('ru-RU') + '\n';
-    csvContent += 'Телефон: +7 (912) 999-37-66\n';
-    csvContent += 'Email: krasota72tmn@gmail.com\n';
-    csvContent += 'Адрес: г. Тюмень, ул. Республики, 249/8\n';
-    csvContent += 'Режим работы: Пн-Пт: 9:00-18:00, Сб: 10:00-16:00\n';
-    csvContent += 'VK: https://vk.com/tyumenkrasota72\n';
-    csvContent += 'Telegram: https://t.me/krasota72ru\n';
-    csvContent += '\n';
-    
-    // Заголовки таблицы
-    csvContent += 'Категория;Название товара;Артикул;Цена (₽);Цвет;Размер;Количество в упаковке;Описание\n';
-    
-    // Сортируем категории по имени
-    const sortedCategories = [...this.categories].sort((a, b) => 
-      a.name.localeCompare(b.name, 'ru')
-    );
-    
-    // Группируем товары по категориям
-    sortedCategories.forEach(category => {
-      const categoryProducts = this.getCategoryProducts(category.id);
-      
-      if (categoryProducts.length > 0) {
-        // Добавляем заголовок категории
-        csvContent += `"=== ${category.name} ===";"";"";"";"";"";"";""\n`;
-        
-        // Сортируем товары внутри категории по названию
-        const sortedProducts = categoryProducts.sort((a, b) => 
-          a.name.localeCompare(b.name, 'ru')
-        );
-        
-        sortedProducts.forEach(product => {
-          // Формируем информацию о количестве в упаковке
-          let packageInfo = '';
-          if (product.package_quantity && product.package_quantity > 0) {
-            const packageType = product.package_quantity_type || 'шт';
-            packageInfo = `${product.package_quantity} ${packageType}`;
-          } else {
-            packageInfo = product.stock_type || '';
-          }
-
-          // Получаем описание без обрезания
-          let description = product.description || '';
-
-          // Правильно определяем цвет
-          let color = '';
-          if (product.color && 
-              (product.color.toLowerCase().includes('белый') || 
-               product.color.toLowerCase().includes('черный') ||
-               product.color.toLowerCase().includes('красный') ||
-               product.color.toLowerCase().includes('синий') ||
-               product.color.toLowerCase().includes('зеленый') ||
-               product.color.toLowerCase().includes('желтый') ||
-               product.color.toLowerCase().includes('розовый') ||
-               product.color.toLowerCase().includes('серый'))) {
-            color = product.color;
-          }
-
-          const row = [
-            '', // Пустая ячейка под категорией
-            product.name.replace(/;/g, ','),
-            (product.sku || '').replace(/;/g, ','),
-            product.price.toString(),
-            color.replace(/;/g, ','),
-            (product.size || '').replace(/;/g, ','),
-            packageInfo.replace(/;/g, ','),
-            description.replace(/;/g, ',').replace(/\n/g, ' ').replace(/\r/g, ' ')
-          ];
-          
-          csvContent += row.join(';') + '\n';
+    try {
+      // Загружаем логотип через fetch
+      fetch('assets/images/lotus.png')
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64 = reader.result as string;
+            this.generatePDF(base64);
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => {
+          // Если логотип не загружается, генерируем без него
+          this.generatePDF('');
         });
-        
-        // Добавляем пустую строку между категориями
-        csvContent += '"";"";"";"";"";"";"";""\n';
-      }
-    });
-    
-    // Создаем blob и скачиваем файл
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `price_list_${dateStr}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    } catch (error) {
+      console.error('Ошибка генерации PDF:', error);
+      alert('Ошибка при генерации PDF');
+    }
   }
 
-  // Генерация расширенного прайс-листа в формате Excel (HTML таблица)
-  downloadPriceListExcel() {
-    if (this.products.length === 0) {
-      alert('Нет товаров для скачивания');
-      return;
-    }
+  private generatePDF(logoDataURL: string = '') {
+    try {
+      // Подготавливаем данные для таблицы
+      const tableData: Array<any> = [];
 
-    // Создаем HTML таблицу для Excel
-    let htmlContent = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
-    htmlContent += '<head>';
-    htmlContent += '<meta charset="UTF-8">';
-    htmlContent += '<style>';
-    htmlContent += 'body { font-family: Arial, sans-serif; margin: 20px; }';
-    htmlContent += 'table { border-collapse: collapse; width: 100%; margin-bottom: 20px; table-layout: fixed; }';
-    htmlContent += 'th, td { border: 1px solid #000; padding: 8px; text-align: left; vertical-align: top; }';
-    htmlContent += 'th { background-color: #4CAF50; color: white; font-weight: bold; }';
-    htmlContent += '.category-header { background-color: #E8F5E9; font-weight: bold; font-size: 14px; }';
-    htmlContent += '.category-title { background-color: #2E7D32; color: white; font-weight: bold; text-align: center; font-size: 16px; }';
-    htmlContent += '.company-header { text-align: center; margin-bottom: 30px; background-color: #f8f9fa; padding: 20px; border-radius: 8px; }';
-    htmlContent += '.company-logo { margin-bottom: 15px; }';
-    htmlContent += '.contact-info { font-size: 13px; color: #333; line-height: 1.6; }';
-    htmlContent += '.contact-row { margin: 5px 0; }';
-    htmlContent += '.col-num { width: 40px; text-align: center; }';
-    htmlContent += '.col-name { width: 200px; word-wrap: break-word; overflow-wrap: break-word; }';
-    htmlContent += '.col-sku { width: 100px; word-wrap: break-word; }';
-    htmlContent += '.col-price { width: 80px; text-align: right; }';
-    htmlContent += '.col-color { width: 80px; word-wrap: break-word; }';
-    htmlContent += '.col-size { width: 80px; word-wrap: break-word; }';
-    htmlContent += '.col-package { width: 100px; word-wrap: break-word; }';
-    htmlContent += '.col-description { width: 300px; max-width: 300px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; hyphens: auto; }';
-    htmlContent += '</style>';
-    htmlContent += '</head>';
-    htmlContent += '<body>';
-    
-    // Заголовок компании с логотипом
-    htmlContent += '<div class="company-header">';
-    htmlContent += '<div class="company-logo">';
-    htmlContent += '<img src="assets/images/lotus.png" alt="Krasota72" style="height: 40px; width: auto; margin-right: 10px; vertical-align: middle;" />';
-    htmlContent += '<span style="font-size: 28px; font-weight: bold; color: #059669; vertical-align: middle;">Krasota72</span>';
-    htmlContent += '</div>';
-    htmlContent += '<div class="contact-info">';
-    htmlContent += '<div class="contact-row"><strong>Интернет-магазин товаров</strong></div>';
-    htmlContent += '<div class="contact-row">📞 Телефон: +7 (912) 999-37-66</div>';
-    htmlContent += '<div class="contact-row">📧 Email: krasota72tmn@gmail.com</div>';
-    htmlContent += '<div class="contact-row">📍 Адрес: г. Тюмень, ул. Республики, 249/8</div>';
-    htmlContent += '<div class="contact-row">🕒 Режим работы: Пн-Пт: 9:00-18:00, Сб: 10:00-16:00</div>';
-    htmlContent += '<div class="contact-row">';
-    htmlContent += '<svg width="16" height="16" viewBox="0 0 24 24" fill="#4c75a3" style="vertical-align: middle; margin-right: 5px;">';
-    htmlContent += '<path d="M12.785 16.241s.327-.039.495-.186c.151-.133.146-.382.146-.382s-.021-1.305.653-1.496c.667-.186.1.526 3.006 2.971 2.133 1.906 2.373 1.515 2.373 1.515h2.938s1.219-.076.641-1.022c-.048-.077-.346-.729-1.781-2.413-1.504-1.674-1.301-.14.507-2.066.695-.744 1.218-1.197 1.109-1.39-.104-.186-.746-.137-.746-.137l-2.895.018s-.214-.029-.372.095c-.128.103-.207.333-.207.333s-.389 1.032-.906 1.911c-1.095 1.864-1.533 1.963-1.713.597-.065-.498-.978-2.094-.978-2.094s-.081-.186-.227-.286c-.175-.118-.419-.016-.419-.016l-2.901.018s-1.073.033-1.466.5c-.321.381-.021 1.164-.021 1.164s1.658 3.109 3.526 4.676c1.718 1.468 3.67 1.371 3.67 1.371h.857z"/>';
-    htmlContent += '</svg>';
-    htmlContent += 'VK: https://vk.com/tyumenkrasota72</div>';
-    htmlContent += '<div class="contact-row">';
-    htmlContent += '<svg width="16" height="16" viewBox="0 0 24 24" fill="#0088cc" style="vertical-align: middle; margin-right: 5px;">';
-    htmlContent += '<path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>';
-    htmlContent += '</svg>';
-    htmlContent += 'Telegram: https://t.me/krasota72ru</div>';
-    htmlContent += '<div class="contact-row"><strong>Дата формирования: ' + new Date().toLocaleDateString('ru-RU') + '</strong></div>';
-    htmlContent += '</div>';
-    htmlContent += '</div>';
-    
-    // Сортируем категории
-    const sortedCategories = [...this.categories].sort((a, b) => 
-      a.name.localeCompare(b.name, 'ru')
-    );
-    
-    sortedCategories.forEach(category => {
-      const categoryProducts = this.getCategoryProducts(category.id);
+      // Сортируем категории по имени
+      const sortedCategories = [...this.categories].sort((a, b) => 
+        a.name.localeCompare(b.name, 'ru')
+      );
+
+      // Группируем товары по категориям
+      sortedCategories.forEach(category => {
+        const categoryProducts = this.getCategoryProducts(category.id);
+        
+        if (categoryProducts.length > 0) {
+          // Добавляем заголовок категории
+          tableData.push({
+            name: category.name,
+            price: '',
+            isCategory: true
+          });
+
+          // Сортируем товары внутри категории по названию
+          const sortedProducts = categoryProducts.sort((a, b) => 
+            a.name.localeCompare(b.name, 'ru')
+          );
+
+          sortedProducts.forEach(product => {
+            // Формируем название товара с выделением
+            const productText: any[] = [
+              { text: product.name, bold: true }
+            ];
+            
+            // Добавляем дополнительную информацию
+            const details = [];
+            if (product.size) details.push(product.size);
+            if (product.color) details.push(product.color);
+            if (product.package_quantity && product.package_quantity > 0) {
+              const packageType = product.package_quantity_type || 'шт';
+              details.push(`${product.package_quantity} ${packageType}`);
+            }
+            
+            if (details.length > 0) {
+              productText.push({ text: ' (' + details.join(', ') + ')', bold: false });
+            }
+
+            // Добавляем описание если есть
+            if (product.description) {
+              const cleanDescription = product.description.replace(/<[^>]*>/g, '');
+              if (cleanDescription.length > 0 && cleanDescription !== product.name) {
+                productText.push({ text: ' - ' + cleanDescription, bold: false, italics: true, fontSize: 9 });
+              }
+            }
+
+            tableData.push({
+              name: productText,
+              price: `${product.price} ₽`,
+              isCategory: false
+            });
+          });
+        }
+      });
+
+      // Создаем определение документа для PDFMake
+      const docDefinition: any = {
+        pageSize: 'A4',
+        pageMargins: [40, 60, 40, 60],
+        defaultStyle: {
+          font: 'Roboto',
+          fontSize: 10
+        },
+        content: [
+          // Заголовок с логотипом и контактами
+          {
+            columns: [
+              {
+                width: '*',
+                stack: [
+                  logoDataURL ? {
+                    image: logoDataURL,
+                    width: 200,
+                    height: 50
+                  } : {
+                    text: '🌿',
+                    fontSize: 25
+                  }
+                ]
+              },
+              {
+                width: 'auto',
+                text: [
+                  'www.krasota72.ru\n',
+                  '8 (912) 999-3766\n',
+                  'krasota72tmn@gmail.com\n',
+                  'vk.com/tyumenkrasota72\n',
+                  't.me/krasota72ru\n',
+                  'г. Тюмень, ул. Республики 249/8'
+                ],
+                fontSize: 9,
+                alignment: 'right',
+                margin: [20, 0, 0, 0]
+              }
+            ],
+            margin: [0, 0, 0, 30]
+          },
+
+          // Заголовок прайс-листа
+          {
+            text: 'Прайс-лист товаров',
+            fontSize: 18,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 20]
+          },
+
+          // Таблица товаров
+          {
+            table: {
+              headerRows: 1,
+              widths: ['*', 'auto'],
+              body: [
+                // Заголовки таблицы
+                [
+                  {
+                    text: 'Название товара',
+                    style: 'tableHeader'
+                  },
+                  {
+                    text: 'Цена',
+                    style: 'tableHeader'
+                  }
+                ],
+                // Данные товаров
+                ...tableData.map(item => [
+                  {
+                    text: item.name,
+                    style: item.isCategory ? 'categoryHeader' : 'tableCell',
+                    colSpan: item.isCategory ? 2 : 1,
+                    alignment: item.isCategory ? 'left' : 'left'
+                  },
+                  item.isCategory ? {} : {
+                    text: item.price,
+                    style: 'tableCell',
+                    alignment: 'right',
+                    noWrap: true
+                  }
+                ])
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex: number, node: any) {
+                if (rowIndex === 0) return '#48bb78'; // Заголовок таблицы
+                
+                // Проверяем, является ли строка заголовком категории
+                const dataIndex = rowIndex - 1;
+                if (dataIndex >= 0 && dataIndex < tableData.length) {
+                  if (tableData[dataIndex].isCategory) {
+                    return '#f0fdf4'; // Светло-зеленый фон для категорий
+                  }
+                }
+                
+                return rowIndex % 2 === 0 ? '#f8fafc' : null; // Четные строки
+              },
+              hLineWidth: function (i: number, node: any) {
+                // Делаем линии под заголовками категорий толще
+                if (i > 1) {
+                  const dataIndex = i - 2;
+                  if (dataIndex >= 0 && dataIndex < tableData.length && tableData[dataIndex].isCategory) {
+                    return 2;
+                  }
+                }
+                return i === 0 || i === 1 ? 1 : 0.5;
+              },
+              hLineColor: function (i: number) {
+                return '#e2e8f0';
+              }
+            }
+          }
+        ],
+        styles: {
+          tableHeader: {
+            fontSize: 12,
+            bold: true,
+            color: 'white',
+            fillColor: '#48bb78'
+          },
+          categoryHeader: {
+            fontSize: 12,
+            bold: true,
+            color: '#059669',
+            fillColor: '#f0fdf4',
+            margin: [8, 8, 8, 8]
+          },
+          tableCell: {
+            fontSize: 10,
+            margin: [5, 3, 5, 3]
+          }
+        }
+      };
+
+      // Генерируем и скачиваем PDF
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      pdfMake.createPdf(docDefinition).download(`price_list_${dateStr}.pdf`);
       
-      if (categoryProducts.length > 0) {
-        // Заголовок категории
-        htmlContent += '<table>';
-        htmlContent += '<tr>';
-        htmlContent += '<td colspan="8" class="category-title">' + category.name + '</td>';
-        htmlContent += '</tr>';
-        htmlContent += '</table>';
-        
-        // Таблица товаров категории
-        htmlContent += '<table>';
-        htmlContent += '<thead>';
-        htmlContent += '<tr>';
-        htmlContent += '<th class="col-num">№</th>';
-        htmlContent += '<th class="col-name">Название товара</th>';
-        htmlContent += '<th class="col-sku">Артикул</th>';
-        htmlContent += '<th class="col-price">Цена (₽)</th>';
-        htmlContent += '<th class="col-color">Цвет</th>';
-        htmlContent += '<th class="col-size">Размер</th>';
-        htmlContent += '<th class="col-package">В упаковке</th>';
-        htmlContent += '<th class="col-description">Описание</th>';
-        htmlContent += '</tr>';
-        htmlContent += '</thead>';
-        htmlContent += '<tbody>';
-        
-        const sortedProducts = categoryProducts.sort((a, b) => 
-          a.name.localeCompare(b.name, 'ru')
-        );
-        
-        sortedProducts.forEach((product, index) => {
-          // Формируем информацию о количестве в упаковке
-          let packageInfo = '';
-          if (product.package_quantity && product.package_quantity > 0) {
-            const packageType = product.package_quantity_type || 'шт';
-            packageInfo = `${product.package_quantity} ${packageType}`;
-          } else {
-            packageInfo = product.stock_type || '';
-          }
-
-          // Очищаем HTML теги из описания
-          let description = (product.description || '').replace(/<[^>]*>/g, '');
-
-          // Правильно определяем цвет (только если это действительно цвет)
-          let color = '';
-          if (product.color && 
-              (product.color.toLowerCase().includes('белый') || 
-               product.color.toLowerCase().includes('черный') ||
-               product.color.toLowerCase().includes('красный') ||
-               product.color.toLowerCase().includes('синий') ||
-               product.color.toLowerCase().includes('зеленый') ||
-               product.color.toLowerCase().includes('желтый') ||
-               product.color.toLowerCase().includes('розовый') ||
-               product.color.toLowerCase().includes('серый'))) {
-            color = product.color;
-          }
-
-          htmlContent += '<tr>';
-          htmlContent += '<td class="col-num">' + (index + 1) + '</td>';
-          htmlContent += '<td class="col-name">' + this.escapeHtml(product.name) + '</td>';
-          htmlContent += '<td class="col-sku">' + this.escapeHtml(product.sku || '') + '</td>';
-          htmlContent += '<td class="col-price">' + product.price.toLocaleString('ru-RU') + '</td>';
-          htmlContent += '<td class="col-color">' + this.escapeHtml(color) + '</td>';
-          htmlContent += '<td class="col-size">' + this.escapeHtml(product.size || '') + '</td>';
-          htmlContent += '<td class="col-package">' + this.escapeHtml(packageInfo) + '</td>';
-          htmlContent += '<td class="col-description">' + this.escapeHtml(description) + '</td>';
-          htmlContent += '</tr>';
-        });
-        
-        htmlContent += '</tbody>';
-        htmlContent += '</table>';
-        htmlContent += '<br>';
-      }
-    });
-    
-    htmlContent += '</body>';
-    htmlContent += '</html>';
-    
-    // Создаем blob и скачиваем
-    const blob = new Blob(['\uFEFF' + htmlContent], { 
-      type: 'application/vnd.ms-excel;charset=utf-8' 
-    });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `price_list_${dateStr}.xls`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    } catch (error) {
+      console.error('Ошибка генерации PDF:', error);
+      alert('Ошибка при генерации PDF');
+    }
   }
 }
