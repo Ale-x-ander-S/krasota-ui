@@ -154,23 +154,18 @@ export class CheckoutComponent implements OnInit {
     const currentHour = now.getHours();
     
     // Если сейчас до 13:00, можно выбрать сегодняшний день
-    const startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    // Если после 13:00, можно выбрать только завтрашний день
+    let startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
     
-    // Генерируем доступные даты, исключая выходные (суббота=6, воскресенье=0)
-    let daysAdded = 0;
-    let currentDate = startDate;
+    // Если стартовая дата попадает на выходной, ищем ближайший рабочий день
+    while (startDate.getDay() === 0 || startDate.getDay() === 6) {
+      startDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    }
     
-    while (daysAdded < 8) {
-      const dayOfWeek = currentDate.getDay();
-      
-      // Пропускаем выходные дни (суббота и воскресенье)
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        dates.push(this.formatDateForInput(currentDate));
-        daysAdded++;
-      }
-      
-      // Переходим к следующему дню
-      currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    // Генерируем доступные даты на 8 дней вперед (включая все дни)
+    for (let i = 0; i < 8; i++) {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      dates.push(this.formatDateForInput(date));
     }
     
     return dates;
@@ -277,6 +272,8 @@ export class CheckoutComponent implements OnInit {
         guest_name: fullName,
         guest_phone: this.checkoutForm.phone
       };
+
+      console.log('orderData', orderData);
 
 
       const isAuthenticated = this.authService.isAuthenticated();

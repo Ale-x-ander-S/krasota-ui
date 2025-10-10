@@ -126,23 +126,9 @@
         </div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div class="stat-content">
-          <h3>{{ formatPrice(stats.totalRevenue) }}</h3>
-          <p>Общая выручка</p>
-        </div>
-      </div>
       
-      <div class="stat-card warning">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-content">
-          <h3>{{ stats.pendingOrders }}</h3>
-          <p>Ожидают обработки</p>
-        </div>
-      </div>
       
-      <div class="stat-card danger">
+      <div class="stat-card danger clickable" (click)="showLowStockModal()">
         <div class="stat-icon">⚠️</div>
         <div class="stat-content">
           <h3>{{ stats.lowStockProducts }}</h3>
@@ -151,91 +137,7 @@
       </div>
     </div>
 
-    <!-- Аналитика -->
-    <div class="analytics-section">
-      <h3>📊 Аналитика</h3>
-      <div class="analytics-grid">
-        <div class="analytics-card">
-          <div class="analytics-icon">📈</div>
-          <div class="analytics-content">
-            <h4>Продажи за месяц</h4>
-            <p class="analytics-value">{{ formatPrice(stats.totalRevenue) }}</p>
-            <span class="analytics-change positive">Всего</span>
-          </div>
-        </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">🆕</div>
-          <div class="analytics-content">
-            <h4>Всего пользователей</h4>
-            <p class="analytics-value">{{ stats.totalUsers }}</p>
-            <span class="analytics-change neutral">Активно</span>
-          </div>
-        </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">🔥</div>
-          <div class="analytics-content">
-            <h4>Активные товары</h4>
-            <p class="analytics-value">{{ getActiveProductsCount() }}</p>
-            <span class="analytics-change positive">Доступно</span>
-          </div>
-        </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">📊</div>
-          <div class="analytics-content">
-            <h4>Конверсия</h4>
-            <p class="analytics-value">3.2%</p>
-            <span class="analytics-change positive">+0.8%</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Последние заказы -->
-    <div class="recent-section">
-      <h3>Последние заказы</h3>
-      <div class="table-container">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Клиент</th>
-              <th>Email</th>
-              <th>Сумма</th>
-              <!-- <th>Статус</th> -->
-              <th>Дата</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let order of recentOrders">
-              <td>#{{ order.id }}</td>
-              <td>{{ order.customerName }}</td>
-              <td>{{ order.customerEmail }}</td>
-              <td>{{ formatPrice(order.total) }}</td>
-              <!-- <td>
-                <span class="status-badge" [class]="getStatusClass(order.status)">
-                  {{ getStatusText(order.status) }}
-                </span>
-              </td> -->
-              <td>{{ formatDate(order.date) }}</td>
-              <td>
-                <button class="btn btn-small" (click)="viewOrderDetails(order)">👁️</button>
-                <!-- <select class="status-select" (change)="updateOrderStatus(order, $event)">
-                  <option value="pending" [selected]="order.status === 'pending'">Ожидает</option>
-                  <option value="processing" [selected]="order.status === 'processing'">В обработке</option>
-                  <option value="shipped" [selected]="order.status === 'shipped'">Отправлен</option>
-                  <option value="delivered" [selected]="order.status === 'delivered'">Доставлен</option>
-                  <option value="cancelled" [selected]="order.status === 'cancelled'">Отменен</option>
-                </select> -->
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <!-- Заказы -->
@@ -344,8 +246,17 @@
             </td>
             <td>
               <div class="contact-info">
-                <div *ngIf="order.guest_phone">{{ order.guest_phone }}</div>
-                <div *ngIf="order.guest_email">{{ order.guest_email }}</div>
+                <div class="contact-item email-item">
+                  <span class="contact-icon">📧</span>
+                  <span class="contact-value">{{ order.guest_email || 'Email не указан' }}</span>
+                </div>
+                <div *ngIf="order.guest_phone" class="contact-item">
+                  <span class="contact-icon">📞</span>
+                  <span class="contact-value">{{ order.guest_phone }}</span>
+                </div>
+                <div *ngIf="!order.guest_phone" class="no-phone">
+                  Телефон не указан
+                </div>
               </div>
             </td>
             <td>{{ formatPrice(order.total_amount) }}</td>
@@ -1748,12 +1659,6 @@
         <div class="order-info-section">
           <h4>Информация о заказе</h4>
           <div class="info-grid">
-            <!-- <div class="info-item">
-              <label>Статус:</label>
-              <span class="status-badge" [class]="getOrderStatusClass(selectedOrder.status)">
-                {{ getOrderStatusText(selectedOrder.status) }}
-              </span>
-            </div> -->
             <div class="info-item">
               <label>Дата создания:</label>
               <span>{{ formatDate(selectedOrder.created_at) }}</span>
@@ -1761,6 +1666,10 @@
             <div class="info-item">
               <label>Общая сумма:</label>
               <span class="price">{{ formatPrice(selectedOrder.total_amount) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Способ оплаты:</label>
+              <span>{{ getPaymentMethodLabel(selectedOrder.payment_method) }}</span>
             </div>
             <div class="info-item" *ngIf="selectedOrder.guest_name">
               <label>Имя клиента:</label>
@@ -1813,6 +1722,53 @@
       
       <div class="modal-actions">
         <button class="btn btn-primary" (click)="closeOrderModal()">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно товаров с низким запасом -->
+  <div *ngIf="showLowStockModalFlag" class="modal-overlay" (click)="closeLowStockModal()">
+    <div class="modal-content low-stock-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⚠️ Товары с низким запасом</h3>
+        <button class="modal-close" (click)="closeLowStockModal()">×</button>
+      </div>
+      
+      <div class="low-stock-content">
+        <div *ngIf="lowStockProducts.length === 0" class="no-low-stock">
+          <div class="success-icon">✅</div>
+          <p>Все товары имеют достаточный запас!</p>
+        </div>
+        
+        <div *ngIf="lowStockProducts.length > 0" class="low-stock-list">
+          <div class="low-stock-summary">
+            <p>Найдено товаров с низким запасом: <strong>{{ lowStockProducts.length }}</strong></p>
+          </div>
+          
+          <div class="low-stock-items">
+            <div *ngFor="let product of lowStockProducts" class="low-stock-item">
+              <div class="product-info">
+                <h4>{{ product.name }}</h4>
+                <p class="category">{{ product.category }}</p>
+              </div>
+              <div class="stock-info">
+                <div class="stock-level" [class]="getStockLevelClass(product.currentStock)">
+                  <span class="current-stock">{{ product.currentStock }}</span>
+                  <span class="stock-label">шт.</span>
+                </div>
+                <div class="min-stock">
+                  <small>мин. {{ product.minStock }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-primary" (click)="closeLowStockModal()">
           Закрыть
         </button>
       </div>

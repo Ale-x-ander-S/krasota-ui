@@ -86,6 +86,7 @@ export class AdminComponent implements OnInit {
   orderFilters: OrderFilters = {};
   selectedOrder: Order | null = null;
   showOrderModal = false;
+  showLowStockModalFlag = false;
 
   // Фильтры товаров
   productFilters = {
@@ -460,6 +461,16 @@ export class AdminComponent implements OnInit {
   // Форматирование даты из строки
   formatDateString(dateString: string): string {
     return this.formatDate(new Date(dateString));
+  }
+
+  getPaymentMethodLabel(paymentMethod: string): string {
+    const paymentMethods: { [key: string]: string } = {
+      'cash': 'Наличными при получении',
+      'bank_transfer': 'По счету',
+      'card': 'Банковской картой',
+      'online': 'Онлайн оплата'
+    };
+    return paymentMethods[paymentMethod] || paymentMethod;
   }
 
   getStatusText(status: string): string {
@@ -1251,6 +1262,24 @@ export class AdminComponent implements OnInit {
   closeOrderModal() {
     this.showOrderModal = false;
     this.selectedOrder = null;
+  }
+
+  // Показать модальное окно товаров с низким запасом
+  showLowStockModal() {
+    this.showLowStockModalFlag = true;
+  }
+
+  // Закрыть модальное окно товаров с низким запасом
+  closeLowStockModal() {
+    this.showLowStockModalFlag = false;
+  }
+
+  // Получить CSS класс для уровня запаса
+  getStockLevelClass(currentStock: number): string {
+    if (currentStock === 0) return 'out-of-stock';
+    if (currentStock <= 3) return 'critical';
+    if (currentStock <= 5) return 'low';
+    return 'normal';
   }
 
   // Изменение статуса заказа
