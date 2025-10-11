@@ -325,9 +325,9 @@ export class CategoriesComponent implements OnInit {
       // Подготавливаем данные для таблицы
       const tableData: Array<any> = [];
 
-      // Сортируем категории по имени
+      // Сортируем категории по ID
       const sortedCategories = [...this.categories].sort((a, b) => 
-        a.name.localeCompare(b.name, 'ru')
+        a.id - b.id
       );
 
       // Группируем товары по категориям
@@ -364,14 +364,6 @@ export class CategoriesComponent implements OnInit {
             
             if (details.length > 0) {
               productText.push({ text: ' (' + details.join(', ') + ')', bold: false });
-            }
-
-            // Добавляем описание если есть
-            if (product.description) {
-              const cleanDescription = product.description.replace(/<[^>]*>/g, '');
-              if (cleanDescription.length > 0 && cleanDescription !== product.name) {
-                productText.push({ text: ' - ' + cleanDescription, bold: false, italics: true, fontSize: 9 });
-              }
             }
 
             tableData.push({
