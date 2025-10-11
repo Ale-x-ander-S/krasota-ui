@@ -246,6 +246,7 @@ export class AdminOrdersComponent implements OnInit {
     const methods: { [key: string]: string } = {
       'card': 'Банковская карта',
       'cash': 'Наличными при получении',
+      'bank_transfer': 'По счету',
       'online': 'Онлайн оплата'
     };
     return methods[method] || method;

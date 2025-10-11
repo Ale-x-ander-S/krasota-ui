@@ -242,6 +242,7 @@ export class CheckoutComponent implements OnInit {
 
   onPaymentChange(method: any) {
     this.selectedPayment = method;
+    this.checkoutForm.paymentMethod = method.value;
   }
 
   onSubmit() {
