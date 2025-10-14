@@ -332,7 +332,7 @@ export class CategoriesComponent implements OnInit {
 
       // Группируем товары по категориям
       sortedCategories.forEach(category => {
-        const categoryProducts = this.getCategoryProducts(category.id);
+        const categoryProducts = this.getCategoryProducts(category.id).filter(product => product.is_active);
         
         if (categoryProducts.length > 0) {
           // Добавляем заголовок категории
