@@ -54,7 +54,7 @@ export interface CreateProductData {
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://45.12.229.112:8080/api/v1';
+  private apiUrl = 'https://45.12.229.112:8080/api/v1';
 
   constructor(
     private http: HttpClient,

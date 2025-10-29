@@ -53,7 +53,7 @@ export class CategoryImageUploadComponent {
     });
 
     // Загружаем изображение категории в S3 через API
-    this.http.post<any>('http://45.12.229.112:8080/api/v1/upload/category-image', formData, { 
+    this.http.post<any>('https://45.12.229.112:8080/api/v1/upload/category-image', formData, { 
       headers,
       reportProgress: true,
       observe: 'events'

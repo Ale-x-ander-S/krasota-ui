@@ -37,7 +37,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://45.12.229.112:8080/api/v1/auth';
+  private readonly apiUrl = 'https://45.12.229.112:8080/api/v1/auth';
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'auth_user';
   
@@ -116,14 +116,14 @@ export class AuthService {
   getProfile(): Observable<User> {
     const token = this.getToken();
     const headers = { 'Authorization': `Bearer ${token}` };
-    return this.http.get<User>('http://45.12.229.112:8080/api/v1/users/me', { headers });
+    return this.http.get<User>('https://45.12.229.112:8080/api/v1/users/me', { headers });
   }
 
   // Обновить профиль текущего пользователя
   updateProfile(profileData: Partial<User>): Observable<User> {
     const token = this.getToken();
     const headers = { 'Authorization': `Bearer ${token}` };
-    return this.http.put<User>('http://45.12.229.112:8080/api/v1/users/me', profileData, { headers }).pipe(
+    return this.http.put<User>('https://45.12.229.112:8080/api/v1/users/me', profileData, { headers }).pipe(
       tap(updatedUser => {
         // Обновляем локальные данные пользователя
         this.currentUserSubject.next(updatedUser);
@@ -139,7 +139,7 @@ export class AuthService {
     const token = this.getToken();
     const headers = { 'Authorization': `Bearer ${token}` };
     const body = { is_email_active: isEmailActive };
-    return this.http.put<any>('http://45.12.229.112:8080/api/v1/users/me/email-status', body, { headers }).pipe(
+    return this.http.put<any>('https://45.12.229.112:8080/api/v1/users/me/email-status', body, { headers }).pipe(
       tap(() => {
         // Обновляем локальные данные пользователя
         const currentUser = this.currentUserSubject.value;

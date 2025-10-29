@@ -35,7 +35,7 @@ export interface UpdateCategoryData {
   providedIn: 'root'
 })
 export class CategoryService {
-  private apiUrl = 'http://45.12.229.112:8080/api/v1';
+  private apiUrl = 'https://45.12.229.112:8080/api/v1';
 
   constructor(
     private http: HttpClient,
