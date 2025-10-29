@@ -16,7 +16,7 @@ import { ProductService } from './product.service';
   providedIn: 'root'
 })
 export class OrderService {
-  private readonly apiUrl = 'https://45.12.229.112:8080/api/v1';
+  private readonly apiUrl = '/api/v1';
 
   constructor(
     private http: HttpClient,

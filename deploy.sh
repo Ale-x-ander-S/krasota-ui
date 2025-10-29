@@ -38,4 +38,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ SPA deployment completed successfully!"
-echo "🌐 Your app is available at: http://45.12.229.112"
+echo "🌐 Your app is available at: https://krasota72.ru"

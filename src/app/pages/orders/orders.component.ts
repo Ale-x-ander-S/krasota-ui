@@ -187,9 +187,9 @@ export class OrdersComponent implements OnInit {
       `assets/images/products/product_${item.product_id}.jpg`,
       `assets/images/products/product_${item.product_id}.png`,
       `assets/images/products/product_${item.product_id}.webp`,
-      `https://45.12.229.112:8080/images/products/${item.product_id}.jpg`,
-      `https://45.12.229.112:8080/images/products/${item.product_id}.png`,
-      `https://45.12.229.112:8080/images/products/${item.product_id}.webp`
+      `/images/products/${item.product_id}.jpg`,
+      `/images/products/${item.product_id}.png`,
+      `/images/products/${item.product_id}.webp`
     ];
     
     // Возвращаем первый стандартный путь (браузер покажет placeholder если файл не найден)

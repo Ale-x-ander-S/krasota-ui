@@ -53,7 +53,7 @@ export class ImageUploadComponent {
     });
 
     // Загружаем изображение продукта в S3 через API
-    this.http.post<any>('https://45.12.229.112:8080/api/v1/upload/product-image', formData, { 
+    this.http.post<any>('/api/v1/upload/product-image', formData, { 
       headers,
       reportProgress: true,
       observe: 'events'

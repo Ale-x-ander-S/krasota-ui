@@ -120,9 +120,9 @@ export class CategoriesComponent implements OnInit {
       `assets/images/categories/category_${category.id}.jpg`,
       `assets/images/categories/category_${category.id}.png`,
       `assets/images/categories/category_${category.id}.webp`,
-      `https://45.12.229.112:8080/images/categories/${category.id}.jpg`,
-      `https://45.12.229.112:8080/images/categories/${category.id}.png`,
-      `https://45.12.229.112:8080/images/categories/${category.id}.webp`
+      `/images/categories/${category.id}.jpg`,
+      `/images/categories/${category.id}.png`,
+      `/images/categories/${category.id}.webp`
     ];
     
     return standardPaths[0];
