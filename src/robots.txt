@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://krasota72.ru/sitemap.xml
+
+# Блокируем служебные пути
+Disallow: /api/
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /checkout/
+Disallow: /cart/
+
+# Разрешаем основные страницы
+Allow: /
+Allow: /categories
+Allow: /products
+Allow: /about
+Allow: /contacts
+Allow: /delivery
+Allow: /returns
+Allow: /terms
+Allow: /privacy
+
