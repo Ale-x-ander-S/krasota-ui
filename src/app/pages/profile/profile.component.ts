@@ -265,6 +265,17 @@ export class ProfileComponent implements OnInit {
   }
 
   updateProfile() {
+    // Валидация
+    if (!this.editProfile.phone || !this.editProfile.phone.trim()) {
+      alert('Телефон обязателен для заполнения');
+      return;
+    }
+
+    if (!this.isValidPhone(this.editProfile.phone)) {
+      alert('Введите корректный номер телефона');
+      return;
+    }
+
     this.isUpdating = true;
     
     // Подготавливаем данные для API
@@ -294,6 +305,12 @@ export class ProfileComponent implements OnInit {
         alert('Ошибка обновления профиля. Попробуйте еще раз.');
       }
     });
+  }
+
+  // Проверка корректности телефона
+  private isValidPhone(phone: string): boolean {
+    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,15}$/;
+    return phoneRegex.test(phone);
   }
 
 

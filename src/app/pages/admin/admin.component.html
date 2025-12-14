@@ -374,7 +374,7 @@
       
       <form (ngSubmit)="saveUserChanges()" class="edit-form">
         <div class="form-group" [class.has-error]="hasFieldError('username')">
-          <label for="edit-username">Имя пользователя *</label>
+          <label for="edit-username">Имя пользователя <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="edit-username"
@@ -391,7 +391,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasFieldError('email')">
-          <label for="edit-email">Email *</label>
+          <label for="edit-email">Email <span class="required-asterisk">*</span></label>
           <input
             type="email"
             id="edit-email"
@@ -408,7 +408,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasFieldError('role')">
-          <label for="edit-role">Роль *</label>
+          <label for="edit-role">Роль <span class="required-asterisk">*</span></label>
           <select
             id="edit-role"
             [(ngModel)]="editForm.role"
@@ -454,7 +454,7 @@
             name="phone"
             class="form-control"
             placeholder="Не указан"
-            (input)="clearFieldError('phone')"
+            (input)="onPhoneInput()"
             [class.error]="hasFieldError('phone')"
           >
           <div *ngIf="hasFieldError('phone')" class="error-message">
@@ -495,7 +495,7 @@
       
       <form (ngSubmit)="saveProductChanges()" class="edit-form">
         <div class="form-group" [class.has-error]="hasProductFieldError('name')">
-          <label for="edit-product-name">Название товара *</label>
+          <label for="edit-product-name">Название товара <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="edit-product-name"
@@ -512,7 +512,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasProductFieldError('description')">
-          <label for="edit-product-description">Описание *</label>
+          <label for="edit-product-description">Описание <span class="required-asterisk">*</span></label>
           <textarea
             id="edit-product-description"
             [(ngModel)]="productEditForm.description"
@@ -530,7 +530,7 @@
 
         <div class="form-row">
           <div class="form-group" [class.has-error]="hasProductFieldError('price')">
-            <label for="edit-product-price">Цена *</label>
+            <label for="edit-product-price">Цена <span class="required-asterisk">*</span></label>
             <input
               type="number"
               id="edit-product-price"
@@ -549,7 +549,7 @@
           </div>
 
           <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
-            <label for="edit-product-category">Категория *</label>
+            <label for="edit-product-category">Категория <span class="required-asterisk">*</span></label>
             <select
               id="edit-product-category"
               [(ngModel)]="productEditForm.category_id"
@@ -580,7 +580,7 @@
 
         <div class="form-row">
           <div class="form-group" [class.has-error]="hasProductFieldError('stock')">
-            <label for="edit-product-stock">Запас *</label>
+            <label for="edit-product-stock">Запас <span class="required-asterisk">*</span></label>
             <input
               type="number"
               id="edit-product-stock"
@@ -667,7 +667,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasProductFieldError('sku')">
-          <label for="edit-product-sku">SKU *</label>
+          <label for="edit-product-sku">SKU <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="edit-product-sku"
@@ -739,7 +739,7 @@
       
       <form (ngSubmit)="createNewProduct()" class="edit-form">
         <div class="form-group" [class.has-error]="hasProductFieldError('name')">
-          <label for="create-product-name">Название товара *</label>
+          <label for="create-product-name">Название товара <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="create-product-name"
@@ -756,7 +756,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasProductFieldError('description')">
-          <label for="create-product-description">Описание *</label>
+          <label for="create-product-description">Описание <span class="required-asterisk">*</span></label>
           <textarea
             id="create-product-description"
             [(ngModel)]="productCreateForm.description"
@@ -774,7 +774,7 @@
 
         <div class="form-row">
           <div class="form-group" [class.has-error]="hasProductFieldError('price')">
-            <label for="create-product-price">Цена *</label>
+            <label for="create-product-price">Цена <span class="required-asterisk">*</span></label>
             <input
               type="number"
               id="create-product-price"
@@ -793,7 +793,7 @@
           </div>
 
           <div class="form-group" [class.has-error]="hasProductFieldError('category_id')">
-            <label for="create-product-category">Категория *</label>
+            <label for="create-product-category">Категория <span class="required-asterisk">*</span></label>
             <select
               id="create-product-category"
               [(ngModel)]="productCreateForm.category_id"
@@ -824,7 +824,7 @@
 
         <div class="form-row">
           <div class="form-group" [class.has-error]="hasProductFieldError('stock')">
-            <label for="create-product-stock">Запас *</label>
+            <label for="create-product-stock">Запас <span class="required-asterisk">*</span></label>
             <input
               type="number"
               id="create-product-stock"
@@ -911,7 +911,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasProductFieldError('sku')">
-          <label for="create-product-sku">SKU *</label>
+          <label for="create-product-sku">SKU <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="create-product-sku"
@@ -1387,7 +1387,7 @@
       
       <form (ngSubmit)="createNewCategory()" class="edit-form">
         <div class="form-group" [class.has-error]="hasCategoryFieldError('name')">
-          <label for="create-category-name">Название категории *</label>
+          <label for="create-category-name">Название категории <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="create-category-name"
@@ -1404,7 +1404,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasCategoryFieldError('description')">
-          <label for="create-category-description">Описание *</label>
+          <label for="create-category-description">Описание <span class="required-asterisk">*</span></label>
           <textarea
             id="create-category-description"
             [(ngModel)]="categoryCreateForm.description"
@@ -1475,7 +1475,7 @@
       
       <form (ngSubmit)="saveCategoryChanges()" class="edit-form">
         <div class="form-group" [class.has-error]="hasCategoryFieldError('name')">
-          <label for="edit-category-name">Название категории *</label>
+          <label for="edit-category-name">Название категории <span class="required-asterisk">*</span></label>
           <input
             type="text"
             id="edit-category-name"
@@ -1492,7 +1492,7 @@
         </div>
 
         <div class="form-group" [class.has-error]="hasCategoryFieldError('description')">
-          <label for="edit-category-description">Описание *</label>
+          <label for="edit-category-description">Описание <span class="required-asterisk">*</span></label>
           <textarea
             id="edit-category-description"
             [(ngModel)]="categoryEditForm.description"

@@ -123,6 +123,27 @@ input, select, textarea {
   font-size: inherit;
 }
 
+/* Красные звездочки для обязательных полей */
+/* Используем CSS для стилизации звездочек в label */
+label {
+  color: inherit;
+}
+
+/* Стилизация звездочек через универсальный селектор */
+label {
+  /* Применяем красный цвет к звездочкам через общий стиль для всех форм */
+  &::after {
+    content: '';
+  }
+}
+
+/* Красные звездочки для обязательных полей */
+.required-asterisk {
+  color: #ef4444 !important;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
 /* Focus styles */
 *:focus {
   outline: 2px solid #2563eb;

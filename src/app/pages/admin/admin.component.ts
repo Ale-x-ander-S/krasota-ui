@@ -378,6 +378,14 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  // Обработчик ввода телефона - очищает ошибку при корректном вводе
+  onPhoneInput(): void {
+    if (this.editForm.phone && this.isValidPhone(this.editForm.phone)) {
+      // Очищаем ошибку, если телефон корректный
+      this.clearFieldError('phone');
+    }
+  }
+
   // Проверка наличия ошибки для поля
   hasFieldError(fieldName: string): boolean {
     return !!this.validationErrors[fieldName];

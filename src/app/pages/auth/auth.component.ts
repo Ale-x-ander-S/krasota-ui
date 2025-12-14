@@ -27,7 +27,8 @@ export class AuthComponent {
     email: '',
     password: '',
     confirmPassword: '',
-    username: ''
+    username: '',
+    phone: ''
   };
 
   constructor(
@@ -75,7 +76,8 @@ export class AuthComponent {
     const userData: RegisterData = {
       email: this.registerForm.email,
       password: this.registerForm.password,
-      username: this.registerForm.username
+      username: this.registerForm.username,
+      phone: this.registerForm.phone
     };
 
     this.authService.register(userData).subscribe({
@@ -104,8 +106,8 @@ export class AuthComponent {
 
   // Валидация формы регистрации
   private validateRegisterForm(): boolean {
-    if (!this.registerForm.email || !this.registerForm.password || !this.registerForm.username) {
-      this.error = 'Заполните все поля';
+    if (!this.registerForm.email || !this.registerForm.password || !this.registerForm.username || !this.registerForm.phone) {
+      this.error = 'Заполните все обязательные поля';
       return false;
     }
 
@@ -119,7 +121,28 @@ export class AuthComponent {
       return false;
     }
 
+    if (!this.isValidPhone(this.registerForm.phone)) {
+      this.error = 'Введите корректный номер телефона';
+      return false;
+    }
+
     return true;
+  }
+
+  // Проверка корректности телефона
+  private isValidPhone(phone: string): boolean {
+    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,15}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Обработчик ввода телефона - очищает ошибку при корректном вводе
+  onPhoneInput(): void {
+    if (this.registerForm.phone && this.isValidPhone(this.registerForm.phone)) {
+      // Очищаем ошибку, если она связана с телефоном
+      if (this.error && this.error.includes('телефон')) {
+        this.error = '';
+      }
+    }
   }
 
   // Получение сообщения об ошибке
@@ -144,6 +167,6 @@ export class AuthComponent {
   // Сброс форм
   private resetForms(): void {
     this.loginForm = { email: '', password: '' };
-    this.registerForm = { email: '', password: '', confirmPassword: '', username: '' };
+    this.registerForm = { email: '', password: '', confirmPassword: '', username: '', phone: '' };
   }
 }

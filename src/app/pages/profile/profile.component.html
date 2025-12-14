@@ -99,7 +99,7 @@
             </div>
             <form class="profile-form" (ngSubmit)="updateProfile()">
               <div class="form-group">
-                <label for="editUsername">Имя пользователя *</label>
+                <label for="editUsername">Имя пользователя <span class="required-asterisk">*</span></label>
                 <input 
                   type="text" 
                   id="editUsername" 
@@ -112,7 +112,7 @@
               </div>
 
               <div class="form-group">
-                <label for="editEmail">Email *</label>
+                <label for="editEmail">Email <span class="required-asterisk">*</span></label>
                 <input 
                   type="email" 
                   id="editEmail" 
@@ -135,13 +135,14 @@
               </div>
 
               <div class="form-group">
-                <label for="editPhone">Телефон</label>
+                <label for="editPhone">Телефон <span class="required-asterisk">*</span></label>
                 <input 
                   type="tel" 
                   id="editPhone" 
                   name="editPhone"
                   [(ngModel)]="editProfile.phone" 
                   placeholder="+7 (999) 123-45-67"
+                  required
                 >
               </div>
 

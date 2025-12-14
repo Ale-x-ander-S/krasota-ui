@@ -255,8 +255,35 @@ export class CheckoutComponent implements OnInit {
       this.loading = true;
       this.error = null;
 
-      const fullAddress = `${this.checkoutForm.address}, ${this.checkoutForm.city}`;
-      const fullName = `${this.checkoutForm.firstName} ${this.checkoutForm.lastName}`;
+      // Дополнительная проверка перед отправкой (на случай обхода валидации)
+      const email = this.checkoutForm.email?.trim();
+      const phone = this.checkoutForm.phone?.trim();
+      const firstName = this.checkoutForm.firstName?.trim();
+      const address = this.checkoutForm.address?.trim();
+      const city = this.checkoutForm.city?.trim();
+
+      if (!email || !phone || !firstName || !address || !city) {
+        this.error = 'Заполните все обязательные поля';
+        this.loading = false;
+        return;
+      }
+
+      // Проверка формата email и телефона перед отправкой
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        this.error = 'Введите корректный email';
+        this.loading = false;
+        return;
+      }
+
+      if (!this.isValidPhone(phone)) {
+        this.error = 'Введите корректный номер телефона';
+        this.loading = false;
+        return;
+      }
+
+      const fullAddress = `${address}, ${city}`;
+      const fullName = `${firstName} ${this.checkoutForm.lastName?.trim() || ''}`.trim();
       
       const orderData = {
         items: this.cartItems.map(item => ({
@@ -267,11 +294,11 @@ export class CheckoutComponent implements OnInit {
         shipping_address: fullAddress,
         payment_method: this.checkoutForm.paymentMethod,
         delivery_date: this.checkoutForm.deliveryDate,
-        notes: this.checkoutForm.notes,
-        coupon_code: this.checkoutForm.couponCode || undefined,
-        guest_email: this.checkoutForm.email,
+        notes: this.checkoutForm.notes?.trim() || undefined,
+        coupon_code: this.checkoutForm.couponCode?.trim() || undefined,
+        guest_email: email,
         guest_name: fullName,
-        guest_phone: this.checkoutForm.phone
+        guest_phone: phone
       };
 
       console.log('orderData', orderData);
@@ -296,7 +323,13 @@ export class CheckoutComponent implements OnInit {
           }
         });
       } else {
-        // Создание заказа для гостя
+        // Создание заказа для гостя - дополнительная проверка обязательных полей
+        if (!orderData.guest_email || !orderData.guest_phone || !orderData.guest_name) {
+          this.error = 'Email и телефон обязательны для оформления заказа';
+          this.loading = false;
+          return;
+        }
+
         this.orderService.createGuestOrder(orderData as CreateGuestOrderRequest).subscribe({
           next: (order: Order) => {
             this.loading = false;
@@ -314,8 +347,63 @@ export class CheckoutComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    const requiredFields = ['firstName', 'email', 'phone', 'address', 'city'];
-    return requiredFields.every(field => this.checkoutForm[field as keyof CheckoutForm]?.trim() !== '');
+    // Проверка обязательных полей
+    if (!this.checkoutForm.firstName || !this.checkoutForm.firstName.trim()) {
+      this.error = 'Заполните поле "Имя"';
+      return false;
+    }
+
+    if (!this.checkoutForm.email || !this.checkoutForm.email.trim()) {
+      this.error = 'Заполните поле "Email"';
+      return false;
+    }
+
+    // Валидация формата email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.checkoutForm.email.trim())) {
+      this.error = 'Введите корректный email';
+      return false;
+    }
+
+    if (!this.checkoutForm.phone || !this.checkoutForm.phone.trim()) {
+      this.error = 'Заполните поле "Телефон"';
+      return false;
+    }
+
+    // Валидация формата телефона
+    if (!this.isValidPhone(this.checkoutForm.phone.trim())) {
+      this.error = 'Введите корректный номер телефона';
+      return false;
+    }
+
+    if (!this.checkoutForm.address || !this.checkoutForm.address.trim()) {
+      this.error = 'Заполните поле "Адрес"';
+      return false;
+    }
+
+    if (!this.checkoutForm.city || !this.checkoutForm.city.trim()) {
+      this.error = 'Заполните поле "Город"';
+      return false;
+    }
+
+    this.error = null;
+    return true;
+  }
+
+  // Проверка корректности телефона
+  private isValidPhone(phone: string): boolean {
+    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,15}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Обработчик ввода телефона - очищает ошибку при корректном вводе
+  onPhoneInput(): void {
+    if (this.checkoutForm.phone && this.isValidPhone(this.checkoutForm.phone)) {
+      // Очищаем ошибку, если она связана с телефоном
+      if (this.error && this.error.includes('телефон')) {
+        this.error = null;
+      }
+    }
   }
 
   toggleMobileMenu() {

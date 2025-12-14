@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://www.krasota72.ru",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
