@@ -347,16 +347,18 @@
             <td>{{ formatDateString(user.created_at) }}</td>
             <td>{{ formatDateString(user.updated_at) }}</td>
             <td>
-              <button class="btn btn-small" (click)="viewUserDetails(user)" title="Просмотр деталей">👁️</button>
-              <button class="btn btn-small btn-primary" (click)="editUser(user)" title="Редактировать">✏️</button>
-              <button 
-                class="btn btn-small btn-danger" 
-                (click)="deleteUser(user)" 
-                [disabled]="user.id === currentUser?.id"
-                title="Удалить пользователя"
-              >
-                🗑️
-              </button>
+              <div class="action-buttons">
+                <button class="btn btn-small" (click)="viewUserDetails(user)" title="Просмотр деталей">👁️</button>
+                <button class="btn btn-small btn-primary" (click)="editUser(user)" title="Редактировать">✏️</button>
+                <button 
+                  class="btn btn-small btn-danger" 
+                  (click)="deleteUser(user)" 
+                  [disabled]="user.id === currentUser?.id"
+                  title="Удалить пользователя"
+                >
+                  🗑️
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -1242,15 +1244,17 @@
               </div>
             </td>
             <td>
-              <button class="btn btn-small" (click)="viewProductDetails(product)" title="Просмотр деталей">👁️</button>
-              <button class="btn btn-small btn-primary" (click)="editProduct(product)" title="Редактировать">✏️</button>
-              <button 
-                class="btn btn-small btn-danger" 
-                (click)="deleteProduct(product)" 
-                title="Удалить товар"
-              >
-                🗑️
-              </button>
+              <div class="action-buttons">
+                <button class="btn btn-small" (click)="viewProductDetails(product)" title="Просмотр деталей">👁️</button>
+                <button class="btn btn-small btn-primary" (click)="editProduct(product)" title="Редактировать">✏️</button>
+                <button 
+                  class="btn btn-small btn-danger" 
+                  (click)="deleteProduct(product)" 
+                  title="Удалить товар"
+                >
+                  🗑️
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -1359,16 +1363,18 @@
               </span>
             </td>
             <td>
-              <button class="btn btn-small" (click)="viewCategoryDetails(category)" title="Просмотр деталей">👁️</button>
-              <button class="btn btn-small btn-primary" (click)="editCategory(category)" title="Редактировать">✏️</button>
-              <button 
-                class="btn btn-small btn-danger" 
-                (click)="deleteCategory(category)" 
-                [disabled]="category.product_count > 0"
-                title="Удалить категорию"
-              >
-                🗑️
-              </button>
+              <div class="action-buttons">
+                <button class="btn btn-small" (click)="viewCategoryDetails(category)" title="Просмотр деталей">👁️</button>
+                <button class="btn btn-small btn-primary" (click)="editCategory(category)" title="Редактировать">✏️</button>
+                <button 
+                  class="btn btn-small btn-danger" 
+                  (click)="deleteCategory(category)" 
+                  [disabled]="category.product_count > 0"
+                  title="Удалить категорию"
+                >
+                  🗑️
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>

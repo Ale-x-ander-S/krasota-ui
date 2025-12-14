@@ -505,6 +505,19 @@
   }
 }
 
+// Контейнер для кнопок действий в таблице
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
+  .btn {
+    margin-right: 0;
+  }
+}
+
 // Селекты
 .status-select, .role-select {
   padding: 6px 10px;
