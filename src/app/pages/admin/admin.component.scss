@@ -2029,6 +2029,10 @@
       flex-direction: column;
       gap: 0.5rem;
 
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
       label {
         font-weight: 600;
         color: #6c757d;
@@ -2089,6 +2093,7 @@
 
       .item-details {
         flex: 1;
+        min-width: 0;
 
         h5 {
           margin: 0 0 0.5rem 0;
@@ -2096,10 +2101,40 @@
           font-size: 1rem;
         }
 
+        .item-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem 1rem;
+          margin-bottom: 0.35rem;
+          font-size: 0.85rem;
+          color: #6c757d;
+
+          .item-sku,
+          .item-color,
+          .item-size {
+            &::after {
+              content: none;
+            }
+          }
+        }
+
         .item-price {
           margin: 0;
           color: #6c757d;
           font-size: 0.9rem;
+        }
+
+        .item-discount {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.85rem;
+          color: #dc3545;
+        }
+
+        .item-total-line {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #495057;
         }
       }
 

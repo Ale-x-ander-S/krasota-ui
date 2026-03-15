@@ -484,21 +484,37 @@ export class AdminComponent implements OnInit {
   getStatusText(status: string): string {
     const statusMap: { [key: string]: string } = {
       'pending': 'Ожидает подтверждения',
+      'confirmed': 'Подтверждён',
       'processing': 'В обработке',
       'shipped': 'Отправлен',
       'delivered': 'Доставлен',
-      'cancelled': 'Отменен'
+      'cancelled': 'Отменён',
+      'refunded': 'Возвращён'
     };
     return statusMap[status] || status;
+  }
+
+  getPaymentStatusLabel(paymentStatus: string | undefined): string {
+    if (!paymentStatus) return '—';
+    const map: { [key: string]: string } = {
+      'pending': 'Ожидает оплаты',
+      'paid': 'Оплачен',
+      'failed': 'Ошибка оплаты',
+      'refunded': 'Возвращён',
+      'cancelled': 'Отменён'
+    };
+    return map[paymentStatus] || paymentStatus;
   }
 
   getStatusClass(status: string): string {
     const statusClassMap: { [key: string]: string } = {
       'pending': 'status-pending',
+      'confirmed': 'status-processing',
       'processing': 'status-processing',
       'shipped': 'status-shipped',
       'delivered': 'status-delivered',
-      'cancelled': 'status-cancelled'
+      'cancelled': 'status-cancelled',
+      'refunded': 'status-cancelled'
     };
     return statusClassMap[status] || '';
   }

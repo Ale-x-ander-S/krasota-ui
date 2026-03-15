@@ -6,11 +6,15 @@ export interface OrderItem {
   price: number;
   discount: number;
   total: number;
-  // Дополнительные поля для отображения (заполняются на фронтенде)
+  // Дополнительные поля для отображения (с бэкенда или фронтенда)
   product_name?: string;
   product_image?: string;
   image_url?: string;
   image?: string;
+  thumb_url?: string;
+  medium_url?: string;
+  color?: string;
+  size?: string;
 }
 
 export interface Order {

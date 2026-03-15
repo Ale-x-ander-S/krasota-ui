@@ -1677,29 +1677,48 @@
               <label>Способ оплаты:</label>
               <span>{{ getPaymentMethodLabel(selectedOrder.payment_method) }}</span>
             </div>
-            <div class="info-item" *ngIf="selectedOrder.guest_name">
-              <label>Имя клиента:</label>
-              <span>{{ selectedOrder.guest_name }}</span>
+            <div class="info-item">
+              <label>Статус заказа:</label>
+              <span>{{ getStatusText(selectedOrder.status) }}</span>
             </div>
-            <div class="info-item" *ngIf="selectedOrder.guest_phone">
-              <label>Телефон:</label>
-              <span>{{ selectedOrder.guest_phone }}</span>
+            <div class="info-item">
+              <label>Статус оплаты:</label>
+              <span>{{ getPaymentStatusLabel(selectedOrder.payment_status) }}</span>
             </div>
-            <div class="info-item" *ngIf="selectedOrder.guest_email">
-              <label>Email:</label>
-              <span>{{ selectedOrder.guest_email }}</span>
+            <div class="info-item" *ngIf="selectedOrder.delivery_date">
+              <label>Дата доставки:</label>
+              <span>{{ selectedOrder.delivery_date }}</span>
             </div>
-            <div class="info-item" *ngIf="selectedOrder.shipping_address">
-              <label>Адрес доставки:</label>
-              <span>{{ selectedOrder.shipping_address }}</span>
-            </div>
-            <div class="info-item" *ngIf="selectedOrder.billing_address">
-              <label>Адрес оплаты:</label>
-              <span>{{ selectedOrder.billing_address }}</span>
-            </div>
-            <div class="info-item" *ngIf="selectedOrder.notes">
+            <div class="info-item full-width" *ngIf="selectedOrder.notes">
               <label>Заметки:</label>
               <span>{{ selectedOrder.notes }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Информация о клиенте -->
+        <div class="order-info-section">
+          <h4>Информация о клиенте</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Имя:</label>
+              <span>{{ selectedOrder.guest_name || '—' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Телефон:</label>
+              <span>{{ selectedOrder.guest_phone || '—' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email:</label>
+              <span>{{ selectedOrder.guest_email || '—' }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Адрес доставки:</label>
+              <span>{{ selectedOrder.shipping_address || '—' }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Адрес оплаты:</label>
+              <span>{{ selectedOrder.billing_address || '—' }}</span>
             </div>
           </div>
         </div>
@@ -1710,13 +1729,20 @@
           <div class="items-list">
             <div *ngFor="let item of selectedOrder.items" class="order-item">
               <div class="item-image">
-                <img [src]="item.product_image || '/assets/images/placeholder.svg'" 
+                <img [src]="item.image_url || item.medium_url || item.thumb_url || item.product_image || '/assets/images/placeholder.svg'" 
                      [alt]="item.product_name"
                      (error)="onImageError($event)">
               </div>
               <div class="item-details">
                 <h5>{{ item.product_name || 'Товар #' + item.product_id }}</h5>
-                <p class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }}</p>
+                <div class="item-meta">
+                  <span *ngIf="item.product_id" class="item-sku">Артикул: {{ item.product_id }}</span>
+                  <span *ngIf="item.color" class="item-color">Цвет: {{ item.color }}</span>
+                  <span *ngIf="item.size" class="item-size">Размер: {{ item.size }}</span>
+                </div>
+                <p class="item-price">{{ formatPrice(item.price) }} × {{ item.quantity }} шт.</p>
+                <p class="item-discount" *ngIf="item.discount && item.discount > 0">Скидка: {{ formatPrice(item.discount) }}</p>
+                <p class="item-total-line">{{ formatPrice(item.price) }} × {{ item.quantity }} = {{ formatPrice(item.total) }}</p>
               </div>
               <div class="item-total">
                 {{ formatPrice(item.total) }}
