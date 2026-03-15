@@ -19,7 +19,7 @@ export class AdminOrdersComponent implements OnInit {
   orders: Order[] = [];
   loading = false;
   error: string | null = null;
-  filters: OrderFilters = {};
+  filters: OrderFilters = { limit: 50 };
   selectedOrder: Order | null = null;
   showUpdateModal = false;
   updateForm: UpdateOrderRequest = {};
@@ -129,7 +129,7 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   clearFilters() {
-    this.filters = {};
+    this.filters = { limit: 50 };
     this.loadOrders();
   }
 

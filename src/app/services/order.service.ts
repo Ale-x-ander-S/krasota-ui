@@ -51,6 +51,10 @@ export class OrderService {
     const headers = { 'Authorization': `Bearer ${token}` };
     
     let params = new HttpParams();
+    // Устанавливаем дефолтный limit 50, если не указан
+    const limit = filters?.limit || 50;
+    params = params.set('limit', limit.toString());
+    
     if (filters) {
       if (filters.status) params = params.set('status', filters.status);
       if (filters.date_from) params = params.set('date_from', filters.date_from);

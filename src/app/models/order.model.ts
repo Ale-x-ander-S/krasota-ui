@@ -105,6 +105,7 @@ export interface OrderFilters {
   date_from?: string;
   date_to?: string;
   search?: string;
+  limit?: number;
 }
 
 export interface OrdersResponse {

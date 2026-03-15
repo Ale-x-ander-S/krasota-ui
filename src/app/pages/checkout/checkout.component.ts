@@ -139,8 +139,8 @@ export class CheckoutComponent implements OnInit {
     // Если после 13:00, можно выбрать только завтрашний день
     let startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
     
-    // Если стартовая дата попадает на выходной, ищем ближайший рабочий день
-    while (startDate.getDay() === 0 || startDate.getDay() === 6) {
+    // Если стартовая дата попадает на выходной или недоступную дату, ищем ближайший доступный день
+    while (this.isWeekendDate(startDate) || this.isDisabledDate(startDate)) {
       startDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
     }
     
@@ -157,12 +157,14 @@ export class CheckoutComponent implements OnInit {
     // Если после 13:00, можно выбрать только завтрашний день
     let startDate = currentHour < 13 ? now : new Date(now.getTime() + 24 * 60 * 60 * 1000);
     
-    // Если стартовая дата попадает на выходной, ищем ближайший рабочий день
-    while (startDate.getDay() === 0 || startDate.getDay() === 6) {
-      startDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    // Если стартовая дата попадает на выходной или недоступную дату, ищем ближайший доступный день для установки по умолчанию
+    // Но в список включаем все даты, включая выходные и недоступные
+    let defaultDate = new Date(startDate);
+    while (this.isWeekendDate(defaultDate) || this.isDisabledDate(defaultDate)) {
+      defaultDate = new Date(defaultDate.getTime() + 24 * 60 * 60 * 1000);
     }
     
-    // Генерируем доступные даты на 8 дней вперед (включая все дни)
+    // Генерируем даты на 8 дней вперед (включая все дни, даже выходные и недоступные)
     for (let i = 0; i < 8; i++) {
       const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
       dates.push(this.formatDateForInput(date));
@@ -177,8 +179,27 @@ export class CheckoutComponent implements OnInit {
 
   isWeekend(dateString: string): boolean {
     const date = new Date(dateString);
+    // Выходные дни: суббота, воскресенье или даты 1-5 января
+    return this.isWeekendDate(date) || this.isDisabledDate(date);
+  }
+
+  isWeekendDate(date: Date): boolean {
     const dayOfWeek = date.getDay();
     return dayOfWeek === 0 || dayOfWeek === 6; // Воскресенье или суббота
+  }
+
+  isDisabledDate(date: Date | string): boolean {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    const month = dateObj.getMonth(); // 0-11, где 0 = январь, 11 = декабрь
+    const day = dateObj.getDate();
+    
+    // Проверяем, является ли дата 31 декабря или 1-4 января
+    return (month === 11 && day === 31) || (month === 0 && day >= 1 && day <= 4);
+  }
+
+  isDateDisabled(dateString: string): boolean {
+    const date = new Date(dateString);
+    return this.isDisabledDate(date);
   }
 
   formatDateForDisplay(dateString: string): string {
